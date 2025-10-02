@@ -1,6 +1,6 @@
 # Mudae Noter
 
-A simple web-based tool to record, view, and manage your Mudae collection.  
+A simple web-based tool to view and note your Mudae collection.  
 Designed for use with the [Mudae bot](https://top.gg/bot/432610292342587392) on Discord.
 
 ---
@@ -14,24 +14,22 @@ Designed for use with the [Mudae bot](https://top.gg/bot/432610292342587392) on 
 ---
 
 ## How to Open
-1. Download or clone this repository.  
-2. Locate the file **`mudae-note-manager.html`**.  
-3. Open it in your browser:
-   - Double-click the file, or  
-   - Drag it into a browser window, or  
-   - Enter `file:///path/to/mudae-note-manager.html` in the address bar.  
+How to Open
+
+1. Download the repository or **`mudae-note-manager.html`** file.
+2. Open **`mudae-note-manager.html`** on any browser.
 
 The app works offline, but images require an internet connection.
 
 ---
 
-## Basic Instructions
-1. Run `$mmai-s` in Discord to dump your collection.  
-2. Copy the entire character list (skip the collection title).  
-3. Paste it into the input field on the page and click **Parse Input**.  
-4. Browse and add notes to your characters as needed.  
+## How to Use
+1. Run `$mmai-s` or `$mmnai-s` in Discord.  
+2. Copy the character list.  
+3. Paste it in the page and click **Parse Input**.  
+4. Add notes as needed.
 
 ---
 
 ## Notes
-- Large collections may take a while to process.
+- Large collections may take some time to load.
