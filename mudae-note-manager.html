@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mudae Note Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #13131a;
+            border-radius: 15px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+            padding: 30px;
+            border: 1px solid #1f1f2e;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 25px;
+        }
+
+        .header-left {
+            flex: 1;
+        }
+
+        h1 {
+            color: #a78bfa;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            color: #9ca3af;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .instructions {
+            margin-top: 10px;
+            font-size: 0.8em;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .quick-notes {
+            background: #1a1a24;
+            border-radius: 10px;
+            padding: 15px;
+            min-width: 250px;
+            border: 1px solid #2a2a3a;
+        }
+
+        .quick-notes-title {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #e5e7eb;
+            margin-bottom: 10px;
+        }
+
+        .quick-notes-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .quick-note {
+            background: #1a1a24;
+            border: 2px solid #7c3aed;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #e5e7eb;
+        }
+
+        .quick-note:hover {
+            background: #7c3aed;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .quick-note-remove {
+            font-size: 0.8em;
+            margin-left: 3px;
+            opacity: 0.6;
+        }
+
+        .quick-note-remove:hover {
+            opacity: 1;
+        }
+
+        .add-note-container {
+            display: flex;
+            gap: 5px;
+        }
+
+        .add-note-input {
+            flex: 1;
+            padding: 6px 10px;
+            border: 2px solid #2a2a3a;
+            border-radius: 5px;
+            font-size: 0.9em;
+            background: #0a0a0f;
+            color: #e5e7eb;
+        }
+
+        .add-note-btn {
+            padding: 6px 15px;
+            font-size: 0.9em;
+            background: #7c3aed;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #e5e7eb;
+            margin-bottom: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 12px;
+            border: 2px solid #2a2a3a;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            resize: vertical;
+            background: #0a0a0f;
+            color: #e5e7eb;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #7c3aed;
+        }
+
+        button {
+            background: #7c3aed;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background: #6d28d9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.4);
+        }
+
+        button:disabled {
+            background: #4b5563;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .series-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .series-card {
+            background: #1a1a24;
+            border-radius: 10px;
+            padding: 15px;
+            border: 2px solid #2a2a3a;
+        }
+
+        .series-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .series-title {
+            font-weight: 600;
+            color: #e5e7eb;
+            font-size: 0.95em;
+            flex: 1;
+        }
+
+        .series-toggle-btn {
+            background: #7c3aed;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .series-toggle-btn:hover {
+            background: #6d28d9;
+            transform: scale(1.05);
+        }
+
+        .series-toggle-btn.disabled {
+            background: #dc2626;
+        }
+
+        .series-toggle-btn.disabled:hover {
+            background: #b91c1c;
+        }
+
+        .series-count {
+            color: #9ca3af;
+            font-size: 0.85em;
+        }
+
+        .note-input {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #2a2a3a;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            background: #0a0a0f;
+            color: #e5e7eb;
+        }
+
+        .note-input:focus {
+            outline: none;
+            border-color: #7c3aed;
+        }
+
+        .characters-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .character-card {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .character-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .character-card.excluded {
+            opacity: 0.4;
+        }
+
+        .character-card.excluded img {
+            filter: grayscale(100%);
+        }
+
+        .character-card img {
+            width: 112px;
+            height: 175px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .character-name {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px;
+            font-size: 0.7em;
+            text-align: center;
+            word-break: break-word;
+        }
+
+        .commands-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #1a1a24;
+            border-radius: 10px;
+            border: 1px solid #2a2a3a;
+        }
+
+        .command-item {
+            background: #13131a;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #7c3aed;
+        }
+
+        .command-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .command-series {
+            font-weight: 600;
+            color: #e5e7eb;
+        }
+
+        .command-text {
+            background: #0a0a0f;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            word-break: break-all;
+            margin-bottom: 10px;
+            color: #d1d5db;
+            border: 1px solid #2a2a3a;
+        }
+
+        .copy-btn {
+            padding: 8px 20px;
+            font-size: 0.9em;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #1a1a24;
+            border-radius: 8px;
+            border: 1px solid #2a2a3a;
+        }
+
+        .stat-item {
+            flex: 1;
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: #9ca3af;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #a78bfa;
+        }
+
+        .error-message {
+            background: #7f1d1d;
+            color: #fecaca;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc2626;
+        }
+
+        .success-message {
+            background: #064e3b;
+            color: #6ee7b7;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-row">
+            <div class="header-left">
+                <h1>🎴 Mudae Note Manager</h1>
+                <p class="subtitle">Parse your $mmnai-s or $mmai-s output and create note commands for your characters</p>
+                <div class="instructions">
+                    <div>• Click characters to disable</div>
+                    <div>• Click "Disable All" to toggle entire series</div>
+                    <div>• Add notes to group characters</div>
+                </div>
+            </div>
+            <div class="quick-notes">
+                <div class="quick-notes-title">Quick Notes</div>
+                <div class="quick-notes-list" id="quickNotesList"></div>
+                <div class="add-note-container">
+                    <input type="text" id="newQuickNote" class="add-note-input" placeholder="Add note...">
+                    <button class="add-note-btn" onclick="addQuickNote()">+</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <label for="input">Paste your $mmnai-s or $mmai-s output here:</label>
+            <textarea id="input" placeholder="Series Name - 5/20&#10;Character Name - https://mudae.net/uploads/...&#10;Another Character - https://mudae.net/uploads/...&#10;&#10;Another Series - 3/15&#10;Character Name - https://mudae.net/uploads/...&#10;...and so on"></textarea>
+            <div style="margin-top: 10px;">
+                <button onclick="parseInput()">Parse Input</button>
+                <button onclick="clearAll()">Clear All</button>
+                <button onclick="generateCommands()" id="generateBtn" disabled>Generate Commands</button>
+            </div>
+        </div>
+
+        <div id="message"></div>
+
+        <div id="stats"></div>
+
+        <div id="seriesGrid" class="series-grid"></div>
+
+        <div id="commands"></div>
+    </div>
+
+    <script>
+        let seriesData = {};
+        let quickNotes = ['💖', '✨', '💕', '⭐'];
+
+        function initQuickNotes() {
+            displayQuickNotes();
+        }
+
+        function displayQuickNotes() {
+            const list = document.getElementById('quickNotesList');
+            list.innerHTML = '';
+            
+            quickNotes.forEach(function(note, idx) {
+                const noteEl = document.createElement('div');
+                noteEl.className = 'quick-note';
+                noteEl.onclick = function(e) {
+                    if (!e.target.classList.contains('quick-note-remove')) {
+                        copyToClipboard(note);
+                    }
+                };
+                
+                const noteText = document.createTextNode(note + ' ');
+                const removeSpan = document.createElement('span');
+                removeSpan.className = 'quick-note-remove';
+                removeSpan.textContent = '×';
+                removeSpan.title = 'Remove';
+                removeSpan.onclick = function(e) {
+                    e.stopPropagation();
+                    removeQuickNote(idx);
+                };
+                
+                noteEl.appendChild(noteText);
+                noteEl.appendChild(removeSpan);
+                list.appendChild(noteEl);
+            });
+        }
+
+        function addQuickNote() {
+            const input = document.getElementById('newQuickNote');
+            const note = input.value.trim();
+            if (note && quickNotes.indexOf(note) === -1) {
+                quickNotes.push(note);
+                displayQuickNotes();
+                input.value = '';
+            }
+        }
+
+        function removeQuickNote(idx) {
+            quickNotes.splice(idx, 1);
+            displayQuickNotes();
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                showMessage('Copied: ' + text, 'success');
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', initQuickNotes);
+
+        function parseInput() {
+            const input = document.getElementById('input').value.trim();
+            if (!input) {
+                showMessage('Please paste your $mmnai-s or $mmai-s output first!', 'error');
+                return;
+            }
+
+            seriesData = {};
+            const lines = input.split('\n');
+            let currentSeries = null;
+
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i].trim();
+                if (!line) continue;
+
+                const seriesMatch = line.match(/^(.+?)\s*-\s*(\d+)\/(\d+)$/);
+                if (seriesMatch) {
+                    currentSeries = seriesMatch[1].trim();
+                    seriesData[currentSeries] = {
+                        total: parseInt(seriesMatch[3]),
+                        owned: parseInt(seriesMatch[2]),
+                        characters: [],
+                        note: ''
+                    };
+                } else if (currentSeries) {
+                    const charMatch = line.match(/^(.+?)\s*-\s*(https?:\/\/.+)$/);
+                    if (charMatch) {
+                        let fullName = charMatch[1].trim();
+                        const imageUrl = charMatch[2].trim();
+                        
+                        let displayName = fullName;
+                        let cleanName = fullName;
+                        
+                        const noteMatch = fullName.match(/^(.+?)\s*\|\s*(.+)$/);
+                        if (noteMatch) {
+                            cleanName = noteMatch[1].trim();
+                            displayName = fullName;
+                        }
+                        
+                        seriesData[currentSeries].characters.push({
+                            name: cleanName,
+                            displayName: displayName,
+                            image: imageUrl,
+                            excluded: false
+                        });
+                    }
+                }
+            }
+
+            if (Object.keys(seriesData).length === 0) {
+                showMessage('No valid data found. Please check your input format.', 'error');
+                return;
+            }
+
+            displaySeries();
+            updateStats();
+            showMessage('Successfully parsed ' + Object.keys(seriesData).length + ' series!', 'success');
+            document.getElementById('generateBtn').disabled = false;
+        }
+
+        function displaySeries() {
+            const grid = document.getElementById('seriesGrid');
+            grid.innerHTML = '';
+
+            for (let seriesName in seriesData) {
+                const data = seriesData[seriesName];
+                const card = document.createElement('div');
+                card.className = 'series-card';
+
+                const seriesId = seriesName.replace(/[^a-zA-Z0-9]/g, '_');
+                
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'series-header';
+                
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'series-title';
+                titleDiv.textContent = seriesName;
+                
+                const toggleBtn = document.createElement('button');
+                toggleBtn.className = 'series-toggle-btn';
+                const allExcluded = data.characters.every(function(c) { return c.excluded; });
+                toggleBtn.className += allExcluded ? ' disabled' : '';
+                toggleBtn.textContent = allExcluded ? 'Enable All' : 'Disable All';
+                toggleBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    toggleSeries(seriesName);
+                };
+                
+                const countDiv = document.createElement('div');
+                countDiv.className = 'series-count';
+                countDiv.textContent = data.owned + '/' + data.total;
+                
+                headerDiv.appendChild(titleDiv);
+                headerDiv.appendChild(toggleBtn);
+                headerDiv.appendChild(countDiv);
+                
+                const noteInput = document.createElement('input');
+                noteInput.type = 'text';
+                noteInput.className = 'note-input';
+                noteInput.placeholder = 'Enter note (emoji or text)...';
+                noteInput.value = data.note;
+                noteInput.onchange = function() {
+                    updateNote(seriesName, this.value);
+                };
+                
+                const charList = document.createElement('div');
+                charList.className = 'characters-list';
+                charList.id = 'chars-' + seriesId;
+                
+                card.appendChild(headerDiv);
+                card.appendChild(noteInput);
+                card.appendChild(charList);
+                grid.appendChild(card);
+
+                data.characters.forEach(function(char, idx) {
+                    const charCard = document.createElement('div');
+                    charCard.className = 'character-card' + (char.excluded ? ' excluded' : '');
+                    charCard.onclick = function() {
+                        toggleCharacter(seriesName, idx);
+                    };
+                    
+                    const img = document.createElement('img');
+                    img.src = char.image;
+                    img.alt = char.displayName || char.name;
+                    img.onerror = function() {
+                        this.style.display = 'none';
+                        const placeholder = document.createElement('div');
+                        placeholder.style.cssText = 'width: 112px; height: 175px; background: #2a2a3a; display: flex; align-items: center; justify-content: center; color: #6b7280; font-size: 0.8em; text-align: center; padding: 10px;';
+                        placeholder.textContent = 'No Image';
+                        this.parentNode.insertBefore(placeholder, this);
+                    };
+                    
+                    const nameDiv = document.createElement('div');
+                    nameDiv.className = 'character-name';
+                    nameDiv.textContent = char.displayName || char.name;
+                    
+                    charCard.appendChild(img);
+                    charCard.appendChild(nameDiv);
+                    charList.appendChild(charCard);
+                });
+            }
+        }
+
+        function updateNote(seriesName, note) {
+            if (seriesData[seriesName]) {
+                seriesData[seriesName].note = note;
+            }
+        }
+
+        function toggleCharacter(seriesName, charIdx) {
+            if (seriesData[seriesName] && seriesData[seriesName].characters[charIdx]) {
+                seriesData[seriesName].characters[charIdx].excluded = 
+                    !seriesData[seriesName].characters[charIdx].excluded;
+                displaySeries();
+                updateStats();
+            }
+        }
+
+        function toggleSeries(seriesName) {
+            if (!seriesData[seriesName]) return;
+            
+            const allExcluded = seriesData[seriesName].characters.every(function(c) { return c.excluded; });
+            
+            seriesData[seriesName].characters.forEach(function(char) {
+                char.excluded = !allExcluded;
+            });
+            
+            displaySeries();
+            updateStats();
+        }
+
+        function updateStats() {
+            const totalSeries = Object.keys(seriesData).length;
+            let totalChars = 0;
+            let includedChars = 0;
+
+            for (let key in seriesData) {
+                const data = seriesData[key];
+                totalChars += data.characters.length;
+                includedChars += data.characters.filter(function(c) { return !c.excluded; }).length;
+            }
+
+            const stats = document.getElementById('stats');
+            stats.innerHTML = '<div class="stats">' +
+                '<div class="stat-item">' +
+                    '<div class="stat-label">Total Series</div>' +
+                    '<div class="stat-value">' + totalSeries + '</div>' +
+                '</div>' +
+                '<div class="stat-item">' +
+                    '<div class="stat-label">Total Characters</div>' +
+                    '<div class="stat-value">' + totalChars + '</div>' +
+                '</div>' +
+                '<div class="stat-item">' +
+                    '<div class="stat-label">Included Characters</div>' +
+                    '<div class="stat-value">' + includedChars + '</div>' +
+                '</div>' +
+            '</div>';
+        }
+
+function generateCommands() {
+    const commandsDiv = document.getElementById('commands');
+    commandsDiv.innerHTML = '<div class="commands-section"><h2>Generated Commands</h2></div>';
+    const container = commandsDiv.querySelector('.commands-section');
+
+    const noteGroups = {};
+    
+    for (let seriesName in seriesData) {
+        const data = seriesData[seriesName];
+        const includedChars = data.characters.filter(c => !c.excluded);
+        if (includedChars.length === 0) continue;
+        
+        const note = data.note.trim();
+        if (!noteGroups[note]) {
+            noteGroups[note] = [];
+        }
+        noteGroups[note].push({
+            series: seriesName,
+            characters: includedChars
+        });
+    }
+
+    for (let note in noteGroups) {
+        const seriesList = noteGroups[note];
+        const allChars = [];
+
+        for (let s of seriesList) {
+            for (let c of s.characters) {
+                allChars.push(c.name);
+            }
+        }
+
+        const noteText = note ? ' ' + note : '';
+        const seriesNames = seriesList.map(s => s.series + ' (' + s.characters.length + ')').join(', ');
+
+        let currentCommand = '$n ';
+        let commandParts = [];
+        for (let i = 0; i < allChars.length; i++) {
+            let next = allChars[i] + '$';
+            if ((currentCommand + next + noteText).length > 2000) {
+                currentCommand += noteText;
+                commandParts.push(currentCommand);
+                currentCommand = '$n ' + allChars[i] + '$';
+            } else {
+                currentCommand += next;
+            }
+        }
+        if (currentCommand !== '$n ') {
+            currentCommand += noteText;
+            commandParts.push(currentCommand);
+        }
+
+        commandParts.forEach((command, idx) => {
+            const commandItem = document.createElement('div');
+            commandItem.className = 'command-item';
+            
+            commandItem.innerHTML = `
+                <div class="command-header">
+                    <div class="command-series">${note || '(No note)'} - ${allChars.length} character${allChars.length > 1 ? 's' : ''} ${commandParts.length > 1 ? `(Part ${idx+1}/${commandParts.length})` : ''}</div>
+                </div>
+                <div style="font-size: 0.85em; color: #666; margin-bottom: 8px;">${seriesNames}</div>
+                <div class="command-text">${command}</div>
+                <button class="copy-btn" onclick="copyCommand(this, \`${command.replace(/`/g, '\\`')}\`)">📋 Copy Command</button>
+            `;
+            
+            container.appendChild(commandItem);
+        });
+    }
+
+    if (container.children.length === 1) {
+        const p = document.createElement('p');
+        p.style.color = '#666';
+        p.style.padding = '20px';
+        p.textContent = 'No commands to generate. Please select at least one character.';
+        container.appendChild(p);
+    }
+}
+
+        function copyCommand(btn, command) {
+            navigator.clipboard.writeText(command).then(function() {
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copied!';
+                btn.style.background = '#28a745';
+                setTimeout(function() {
+                    btn.textContent = originalText;
+                    btn.style.background = '#667eea';
+                }, 2000);
+            });
+        }
+
+        function clearAll() {
+            if (Object.keys(seriesData).length > 0) {
+                if (!confirm('Are you sure you want to clear all data?')) return;
+            }
+            
+            seriesData = {};
+            document.getElementById('input').value = '';
+            document.getElementById('seriesGrid').innerHTML = '';
+            document.getElementById('commands').innerHTML = '';
+            document.getElementById('stats').innerHTML = '';
+            document.getElementById('message').innerHTML = '';
+            document.getElementById('generateBtn').disabled = true;
+        }
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
+            messageDiv.textContent = text;
+            setTimeout(function() {
+                messageDiv.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
