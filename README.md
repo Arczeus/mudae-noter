@@ -35,7 +35,8 @@ The app works offline, but images require an internet connection.
 
 ## To-Do
 
-- Add local storage
-- Search and filter functionality
+- ~~Add local storage~~
+- ~~Sorting~~
 - Parse kakera values
+- Search and filter functionality
 - Generate `$sortmarry` commands for your collection
