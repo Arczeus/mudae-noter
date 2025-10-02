@@ -536,9 +536,9 @@
                         let displayName = fullName;
                         let cleanName = fullName;
                         
-                        const noteMatch = fullName.match(/^(.+?)\s*\|\s*(.+)$/);
-                        if (noteMatch) {
-                            cleanName = noteMatch[1].trim();
+                        const pipeIndex = fullName.indexOf('|');
+                        if (pipeIndex !== -1) {
+                            cleanName = fullName.substring(0, pipeIndex).trim();
                             displayName = fullName;
                         }
                         
