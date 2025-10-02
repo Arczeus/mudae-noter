@@ -33,3 +33,9 @@ The app works offline, but images require an internet connection.
 
 ## Notes
 - Large collections may take some time to load.
+
+## To-Do
+- Add local storage
+- Search and filter functionality
+- Parse kakera values
+- Generate `$sortmarry` commands for your collection
