@@ -404,6 +404,24 @@
             margin-bottom: 20px;
             border-left: 4px solid #10b981;
         }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #6b7280;
+            font-size: 0.85em;
+            margin-top: 40px;
+            border-top: 1px solid #2a2a3a;
+        }
+
+        .footer-contact {
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .footer-contact strong {
+            color: #a78bfa;
+        }
     </style>
 </head>
 
@@ -442,6 +460,12 @@
         <div id="seriesGrid" class="series-grid"></div>
 
         <div id="commands"></div>
+        
+        <div class="footer">
+            <div class="footer-contact">
+                Questions or feedback? Contact <strong>arczeus</strong> on Discord
+            </div>
+        </div>
     </div>
 
     <div class="quick-notes">
@@ -513,7 +537,7 @@
             });
         }
 
-        window.addEventListener('DOMContentLoaded', function() {
+        window.addEventListener('DOMContentLoaded', function () {
             initQuickNotes();
             loadFromLocalStorage();
         });
