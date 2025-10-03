@@ -72,7 +72,6 @@
             top: 20px;
             height: fit-content;
             max-height: calc(100vh - 40px);
-            overflow-y: auto;
         }
 
         .quick-notes-title {
@@ -309,17 +308,44 @@
             display: block;
         }
 
+        .character-info {
+            background: #0a0a0f;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
         .character-name {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 5px;
+            color: #e5e7eb;
             font-size: 0.7em;
             text-align: center;
             word-break: break-word;
+            font-weight: 600;
+        }
+
+        .character-stats {
+            display: flex;
+            justify-content: space-around;
+            gap: 8px;
+            font-size: 0.65em;
+        }
+
+        .stat-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .stat-badge-label {
+            color: #9ca3af;
+            font-size: 0.9em;
+        }
+
+        .stat-badge-value {
+            color: #a78bfa;
+            font-weight: 700;
         }
 
         .commands-section {
@@ -411,6 +437,10 @@
             border-left: 4px solid #10b981;
         }
 
+        .empty-message {
+            display: none;
+        }
+
         .footer {
             text-align: center;
             padding: 20px;
@@ -434,8 +464,9 @@
 <body>
     <div class="container">
         <div class="header-row">
-            <h1>🎴 Mudae Note Manager</h1>
-            <p class="subtitle">Parse your $mmnai-s or $mmai-s output and create note commands for your characters</p>
+            <h1>Mudae Note Manager</h1>
+            <p class="subtitle">Parse your $mmasi-[y+][k][n] (brackets are optional) output and create note commands for
+                your characters</p>
             <div class="instructions">
                 <div>• Click characters to disable</div>
                 <div>• Click "Disable All" to toggle entire series</div>
@@ -444,7 +475,7 @@
         </div>
 
         <div class="input-section">
-            <label for="input">Paste your $mmnai-s or $mmai-s output here:</label>
+            <label for="input">Paste your $mmasi-[y+][k][n] (brackets are optional) output here:</label>
             <textarea id="input"
                 placeholder="Series Name - 5/20&#10;Character Name - https://mudae.net/uploads/...&#10;Another Character - https://mudae.net/uploads/...&#10;&#10;Another Series - 3/15&#10;Character Name - https://mudae.net/uploads/...&#10;...and so on"></textarea>
             <div style="margin-top: 10px;">
@@ -465,7 +496,7 @@
 
         <div id="seriesGrid" class="series-grid"></div>
 
-        <div id="commands"></div>     
+        <div id="commands"></div>
 
         <div class="footer">
             <div class="footer-contact">
@@ -485,7 +516,7 @@
 
     <script>
         let seriesData = {};
-        let quickNotes = ['💖', '✨', '💕', '⭐'];
+        let quickNotes = ['⭐', '✨', '💕',];
 
         function initQuickNotes() {
             displayQuickNotes();
@@ -551,7 +582,7 @@
         function parseInput() {
             const input = document.getElementById('input').value.trim();
             if (!input) {
-                showMessage('Please paste your $mmnai-s or $mmai-s output first!', 'error');
+                showMessage('Please paste your $mmasi-[y+][k][n] (brackets are optional) output first!', 'error');
                 return;
             }
 
@@ -573,25 +604,57 @@
                         note: ''
                     };
                 } else if (currentSeries) {
-                    const charMatch = line.match(/^(.+?)\s*-\s*(https?:\/\/.+)$/);
+                    // Match: Name | notes · :keytype: (count) kakera ka - url
+                    // or: Name | notes kakera ka - url
+                    // or: Name · :keytype: (count) kakera ka - url
+                    // or: Name kakera ka - url
+                    // or: Name - url
+                    const charMatch = line.match(/^(.+?)\s+-\s+(https?:\/\/.+)$/);
                     if (charMatch) {
-                        let fullName = charMatch[1].trim();
+                        let fullInfo = charMatch[1].trim();
                         const imageUrl = charMatch[2].trim();
 
-                        let displayName = fullName;
-                        let cleanName = fullName;
+                        let fullName = fullInfo;
+                        let displayName = fullInfo;
+                        let cleanName = fullInfo;
+                        let kakera = '';
+                        let keys = '';
 
+                        const kakeraMatch = fullInfo.match(/([\d,]+)\s*ka\s*$/);
+                        if (kakeraMatch) {
+                            kakera = kakeraMatch[1].replace(/,/g, '');
+                            fullInfo = fullInfo.substring(0, kakeraMatch.index).trim();
+                        }
+
+                        const keysMatch = fullInfo.match(/\((\d+)\)/);
+                        if (keysMatch) {
+                            keys = keysMatch[1];
+                        }
+
+                        fullName = fullInfo.replace(/\(\d+\)/g, '').trim();
+                        fullName = fullName.replace(/:(?:bronze|silver|gold|chaos)key:/gi, '').trim();
+                        fullName = fullName.replace(/\s*·\s*$/, '').trim();
+
+                        displayName = fullName;
+                        cleanName = fullName;
+
+                        let characterNote = '';
                         const pipeIndex = fullName.indexOf('|');
                         if (pipeIndex !== -1) {
                             cleanName = fullName.substring(0, pipeIndex).trim();
-                            displayName = fullName;
+                            characterNote = fullName.substring(pipeIndex + 1).trim();
+                        } else {
+                            cleanName = fullName;
                         }
 
                         seriesData[currentSeries].characters.push({
                             name: cleanName,
-                            displayName: displayName,
+                            displayName: cleanName,
                             image: imageUrl,
-                            excluded: false
+                            excluded: false,
+                            kakera: kakera,
+                            keys: keys,
+                            note: characterNote
                         });
                     }
                 }
@@ -679,7 +742,7 @@
                 const noteInput = document.createElement('input');
                 noteInput.type = 'text';
                 noteInput.className = 'note-input';
-                noteInput.placeholder = 'Enter note (emoji or text)...';
+                noteInput.placeholder = 'Enter note...';
                 noteInput.value = data.note;
                 noteInput.onchange = function () {
                     updateNote(seriesName, this.value);
@@ -703,21 +766,48 @@
 
                     const img = document.createElement('img');
                     img.src = char.image;
-                    img.alt = char.displayName || char.name;
+                    img.alt = char.name;
                     img.onerror = function () {
                         this.style.display = 'none';
                         const placeholder = document.createElement('div');
-                        placeholder.style.cssText = 'width: 112px; height: 175px; background: #2a2a3a; display: flex; align-items: center; justify-content: center; color: #6b7280; font-size: 0.8em; text-align: center; padding: 10px;';
+                        placeholder.style.cssText = 'width: 135px; height: 210px; background: #2a2a3a; display: flex; align-items: center; justify-content: center; color: #6b7280; font-size: 0.8em; text-align: center; padding: 10px;';
                         placeholder.textContent = 'No Image';
                         this.parentNode.insertBefore(placeholder, this);
                     };
 
+                    const infoDiv = document.createElement('div');
+                    infoDiv.className = 'character-info';
+
                     const nameDiv = document.createElement('div');
                     nameDiv.className = 'character-name';
-                    nameDiv.textContent = char.displayName || char.name;
+                    nameDiv.textContent = char.name;
+
+                    const noteDiv = document.createElement('div');
+                    const hasNote = char.note && char.note.trim() !== '';
+                    noteDiv.style.cssText = 'background: #0a0a0f; padding: 4px 4px; font-size: 0.7em; color: ' + (hasNote ? '#9ca3af' : '#dc2626; font-weight: bold') + '; text-align: center; word-break: break-word;';
+                    noteDiv.textContent = hasNote ? char.note : 'No note!';
+
+                    const statsDiv = document.createElement('div');
+                    statsDiv.className = 'character-stats';
+
+                    const kakeraBadge = document.createElement('div');
+                    kakeraBadge.className = 'stat-badge';
+                    kakeraBadge.innerHTML = '<div class="stat-badge-label">Ka</div><div class="stat-badge-value">' + (char.kakera || '?') + '</div>';
+
+                    const keysBadge = document.createElement('div');
+                    keysBadge.className = 'stat-badge';
+                    keysBadge.innerHTML = '<div class="stat-badge-label">Keys</div><div class="stat-badge-value">' + (char.keys || '?') + '</div>';
+
+                    statsDiv.appendChild(kakeraBadge);
+                    statsDiv.appendChild(keysBadge);
+
+                    infoDiv.appendChild(nameDiv);
+                    infoDiv.appendChild(noteDiv);
+                    infoDiv.appendChild(statsDiv);
+
 
                     charCard.appendChild(img);
-                    charCard.appendChild(nameDiv);
+                    charCard.appendChild(infoDiv);
                     charList.appendChild(charCard);
                 });
             }
@@ -838,8 +928,8 @@
                     const commandItem = document.createElement('div');
                     commandItem.className = 'command-item';
                     const seriesBlock = (idx === 0)
-        ? `<div style="font-size: 0.85em; color: #666; margin-bottom: 8px;">${seriesNames}</div>`
-        : '';
+                        ? `<div style="font-size: 0.85em; color: #666; margin-bottom: 8px;">${seriesNames}</div>`
+                        : '';
                     commandItem.innerHTML = `
                 <div class="command-header">
                     <div class="command-series">${note || '(No note)'} - ${allChars.length} character${allChars.length > 1 ? 's' : ''} ${commandParts.length > 1 ? `(Part ${idx + 1}/${commandParts.length})` : ''}</div>
@@ -885,6 +975,7 @@
             document.getElementById('commands').innerHTML = '';
             document.getElementById('stats').innerHTML = '';
             document.getElementById('message').innerHTML = '';
+            document.getElementById('message').className = 'empty';
             document.getElementById('generateBtn').disabled = true;
             localStorage.removeItem('mudaeSeriesData');
             localStorage.removeItem('mudaeQuickNotes');
@@ -896,7 +987,8 @@
             messageDiv.textContent = text;
             setTimeout(function () {
                 messageDiv.innerHTML = '';
-            }, 5000);
+                messageDiv.className = 'empty-message'
+            }, 10000);
         }
 
         function saveToLocalStorage() {
