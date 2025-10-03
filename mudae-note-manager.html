@@ -832,12 +832,14 @@
                 commandParts.forEach((command, idx) => {
                     const commandItem = document.createElement('div');
                     commandItem.className = 'command-item';
-
+                    const seriesBlock = (idx === 0)
+        ? `<div style="font-size: 0.85em; color: #666; margin-bottom: 8px;">${seriesNames}</div>`
+        : '';
                     commandItem.innerHTML = `
                 <div class="command-header">
                     <div class="command-series">${note || '(No note)'} - ${allChars.length} character${allChars.length > 1 ? 's' : ''} ${commandParts.length > 1 ? `(Part ${idx + 1}/${commandParts.length})` : ''}</div>
                 </div>
-                <div style="font-size: 0.85em; color: #666; margin-bottom: 8px;">${seriesNames}</div>
+                ${seriesBlock}
                 <div class="command-text">${command}</div>
                 <button class="copy-btn" onclick="copyCommand(this, \`${command.replace(/`/g, '\\`')}\`)">📋 Copy Command</button>
             `;
