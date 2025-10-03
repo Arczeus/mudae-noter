@@ -37,6 +37,7 @@ The app works offline, but images require an internet connection.
 
 - ~~Add local storage~~
 - ~~Sorting~~
+- Group by note
 - Parse kakera values
 - Search and filter functionality
 - Generate `$sortmarry` commands for your collection
