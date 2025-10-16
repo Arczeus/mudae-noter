@@ -288,7 +288,7 @@
             border: 3px solid transparent;
             border-radius: 8px;
             overflow: hidden;
-            width: 140px;
+            width: 150px;
         }
 
         .character-card:hover {
@@ -522,6 +522,8 @@
                 <button onclick="parseInput()">Parse Input</button>
                 <button onclick="clearAll()">Clear All</button>
                 <button onclick="generateCommands()" id="generateBtn" disabled>Generate Commands</button>
+                <button onclick="scrollToCommands()" id="goToCommandsBtn" style="display: none;">Go to Commands
+                    ↓</button>
             </div>
             <div style="margin-top: 10px;">
                 <label style="display: inline; margin-right: 10px;">Group by:</label>
@@ -567,7 +569,7 @@
 
     <script>
         let seriesData = {};
-        let quickNotes = ['⭐', '✨', '💕',];
+        let quickNotes = ['⭐', '✨', '💕', '#fefefe', '#000000'];
 
         function initQuickNotes() {
             displayQuickNotes();
@@ -868,23 +870,23 @@
                 noteInput.placeholder = 'Enter series note';
                 noteInput.value = data.note;
                 noteInput.style.flexGrow = '1';
-                
+
                 noteInput.onchange = function () {
                     data.note = this.value;
-                    saveToLocalStorage(); 
+                    saveToLocalStorage();
                 };
 
                 const applyButton = document.createElement('button');
                 applyButton.className = 'series-apply-note-btn';
                 applyButton.textContent = 'Apply';
                 applyButton.style.cssText = 'background: #7c3aed; border-radius: 5px; padding: 10px; font-size: 0.8em; white-space: nowrap; height: fit-content;';
-                applyButton.onclick = function() {
+                applyButton.onclick = function () {
                     updateCharacterNotes(seriesName, data.note);
                 };
 
                 noteInputContainer.appendChild(noteInput);
                 noteInputContainer.appendChild(applyButton);
-                
+
                 const charList = document.createElement('div');
                 charList.className = 'characters-list';
                 charList.id = 'chars-' + seriesId;
@@ -930,8 +932,53 @@
 
                     const noteDiv = document.createElement('div');
                     const hasNote = char.note && char.note.trim() !== '';
-                    noteDiv.style.cssText = 'background: #0a0a0f; padding: 4px 4px; font-size: 0.7em; color: ' + (hasNote ? '#9ca3af' : '#dc2626; font-weight: bold') + '; text-align: center; word-break: break-word;';
+                    noteDiv.style.cssText = 'background: #13131a; padding: 4px 4px; font-size: 0.7em; color: ' + (hasNote ? '#9ca3af' : '#dc2626; font-weight: bold') + '; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; border-radius: 4px;';
+                    noteDiv.title = hasNote ? char.note : 'Click to add note';
                     noteDiv.textContent = hasNote ? char.note : 'No note!';
+
+                    noteDiv.onclick = function (e) {
+                        e.stopPropagation();
+
+                        const originalNoteDiv = this;
+                        const currentNote = char.note;
+                        originalNoteDiv.style.display = 'none';
+
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.value = currentNote;
+                        input.style.cssText = 'width: 100%; box-sizing: border-box; font-size: 0.7em; text-align: center; padding: 3px; border: 1px solid #7c3aed; background: #1a1a24; color: #e5e7eb; border-radius: 4px;';
+
+                        originalNoteDiv.parentNode.insertBefore(input, originalNoteDiv);
+                        input.focus();
+                        input.select();
+
+                        const saveAndClose = () => {
+                            char.note = input.value.trim();
+                            const stillHasNote = char.note && char.note.trim() !== '';
+                            originalNoteDiv.textContent = stillHasNote ? char.note : 'No note!';
+                            originalNoteDiv.style.color = stillHasNote ? '#9ca3af' : '#dc2626';
+                            originalNoteDiv.style.fontWeight = stillHasNote ? 'normal' : 'bold';
+
+                            if (input.parentNode) {
+                                input.parentNode.removeChild(input);
+                            }
+                            originalNoteDiv.style.display = '';
+                            saveToLocalStorage();
+                        };
+
+                        input.onblur = saveAndClose;
+
+                        input.onkeydown = function (event) {
+                            if (event.key === 'Enter') {
+                                saveAndClose();
+                            } else if (event.key === 'Escape') {
+                                if (input.parentNode) {
+                                    input.parentNode.removeChild(input);
+                                }
+                                originalNoteDiv.style.display = '';
+                            }
+                        };
+                    };
 
                     const statsDiv = document.createElement('div');
                     statsDiv.className = 'character-stats';
@@ -965,9 +1012,9 @@
             seriesData[seriesName].characters.forEach(function (char) {
                 char.note = newNote;
             });
-            
-            displaySeries(); 
-            
+
+            displaySeries();
+
             saveToLocalStorage();
         }
 
@@ -1062,53 +1109,58 @@
                 '</div>';
         }
 
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         function generateCommands() {
             const commandsDiv = document.getElementById('commands');
-            commandsDiv.innerHTML = '<div class="commands-section"><h2>Generated Commands</h2></div>';
+            commandsDiv.innerHTML = `
+    <div class="commands-section">
+        <h2 style="display: flex; justify-content: space-between; align-items: center;">
+            Generated Commands
+            <button onclick="scrollToTop()" style="font-size: 0.7em; padding: 6px 12px;">Go to Top ↑</button>
+        </h2>
+    </div>`;
             const container = commandsDiv.querySelector('.commands-section');
 
             const noteGroups = {};
 
-            for (let seriesName in seriesData) {
-                const data = seriesData[seriesName];
-                const includedChars = data.characters.filter(c => !c.excluded);
-                if (includedChars.length === 0) continue;
-
-                const note = data.note.trim();
-                if (!noteGroups[note]) {
-                    noteGroups[note] = [];
-                }
-                noteGroups[note].push({
-                    series: seriesName,
-                    characters: includedChars
+            for (const seriesName in seriesData) {
+                seriesData[seriesName].characters.forEach(char => {
+                    if (!char.excluded) {
+                        const note = char.note ? char.note.trim() : '(No note)';
+                        if (!noteGroups[note]) {
+                            noteGroups[note] = [];
+                        }
+                        noteGroups[note].push({ name: char.name, series: seriesName });
+                    }
                 });
             }
 
-            for (let note in noteGroups) {
-                const seriesList = noteGroups[note];
-                const allChars = [];
+            for (const note in noteGroups) {
+                const charactersInGroup = noteGroups[note];
+                const allCharsNames = charactersInGroup.map(c => c.name);
 
-                for (let s of seriesList) {
-                    for (let c of s.characters) {
-                        allChars.push(c.name);
-                    }
-                }
+                const uniqueSeries = [...new Set(charactersInGroup.map(c => c.series))];
+                const seriesNames = uniqueSeries.join(', ');
 
-                const noteText = note ? ' ' + note : '';
-                const seriesNames = seriesList.map(s => s.series + ' (' + s.characters.length + ')').join(', ');
+                const noteText = (note !== '(No note)') ? ' ' + note : '';
 
                 let currentCommand = '$n ';
                 let commandParts = [];
-                for (let i = 0; i < allChars.length; i++) {
-                    let next = allChars[i] + '$';
+
+                for (let i = 0; i < allCharsNames.length; i++) {
+                    let next = allCharsNames[i] + '$';
                     if ((currentCommand + next + noteText).length > 2000) {
                         currentCommand += noteText;
                         commandParts.push(currentCommand);
-                        currentCommand = '$n ' + allChars[i] + '$';
+                        currentCommand = '$n ' + next;
                     } else {
                         currentCommand += next;
                     }
                 }
+
                 if (currentCommand !== '$n ') {
                     currentCommand += noteText;
                     commandParts.push(currentCommand);
@@ -1117,39 +1169,53 @@
                 commandParts.forEach((command, idx) => {
                     const commandItem = document.createElement('div');
                     commandItem.className = 'command-item';
+
                     const seriesBlock = (idx === 0)
-                        ? `<div style="font-size: 0.85em; color: #666; margin-bottom: 8px;">${seriesNames}</div>`
+                        ? `<div style="font-size: 0.85em; color: #9ca3af; margin-bottom: 8px;">From series: ${seriesNames}</div>`
                         : '';
+
                     commandItem.innerHTML = `
                 <div class="command-header">
-                    <div class="command-series">${note || '(No note)'} - ${allChars.length} character${allChars.length > 1 ? 's' : ''} ${commandParts.length > 1 ? `(Part ${idx + 1}/${commandParts.length})` : ''}</div>
+                    <div class="command-series">${note} - ${allCharsNames.length} character${allCharsNames.length > 1 ? 's' : ''} ${commandParts.length > 1 ? `(Part ${idx + 1}/${commandParts.length})` : ''}</div>
                 </div>
                 ${seriesBlock}
                 <div class="command-text">${command}</div>
-                <button class="copy-btn" onclick="copyCommand(this, \`${command.replace(/`/g, '\\`')}\`)">📋 Copy Command</button>
+                <button class="copy-btn" onclick="copyCommand(this, \`${command.replace(/`/g, '\\`')}\`)">Copy Command</button>
             `;
-
                     container.appendChild(commandItem);
                 });
             }
 
-            if (container.children.length === 1) {
+            if (Object.keys(noteGroups).length === 0) {
                 const p = document.createElement('p');
-                p.style.color = '#666';
+                p.style.color = '#6b7280';
                 p.style.padding = '20px';
                 p.textContent = 'No commands to generate. Please select at least one character.';
                 container.appendChild(p);
+            }
+            const commandsContainer = document.getElementById('commands').querySelector('.command-item');
+            if (commandsContainer) {
+                document.getElementById('goToCommandsBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('goToCommandsBtn').style.display = 'none';
+            }
+        }
+
+        function scrollToCommands() {
+            const commandsSection = document.getElementById('commands');
+            if (commandsSection) {
+                commandsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
 
         function copyCommand(btn, command) {
             navigator.clipboard.writeText(command).then(function () {
                 const originalText = btn.textContent;
-                btn.textContent = '✅ Copied!';
+                btn.textContent = 'Copied!';
                 btn.style.background = '#28a745';
                 setTimeout(function () {
                     btn.textContent = originalText;
-                    btn.style.background = '#667eea';
+                    btn.style.background = '#7c3aed';
                 }, 2000);
             });
         }
@@ -1167,8 +1233,10 @@
             document.getElementById('message').innerHTML = '';
             document.getElementById('message').className = 'empty';
             document.getElementById('generateBtn').disabled = true;
+            document.getElementById('goToCommandsBtn').style.display = 'none';
             localStorage.removeItem('mudaeSeriesData');
             localStorage.removeItem('mudaeQuickNotes');
+
         }
 
         function showMessage(text, type) {
