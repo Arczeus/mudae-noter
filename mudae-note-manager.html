@@ -314,7 +314,7 @@
         .character-card.permanently-disabled::after {
             content: '';
             position: absolute;
-            top: 50%;
+            top: 35%;
             left: 5%;
             right: 5%;
             height: 5px;
@@ -328,7 +328,7 @@
         .character-card.permanently-disabled .character-info::after {
             content: '';
             position: absolute;
-            top: 50%;
+            top: 35%;
             left: 5%;
             right: 5%;
             height: 5px;
@@ -560,9 +560,11 @@
             displayQuickNotes();
         }
 
-        function displayQuickNotes() {
+function displayQuickNotes() {
             const list = document.getElementById('quickNotesList');
             list.innerHTML = '';
+
+            const isColorCode = /^#([0-9a-fA-F]{3}){1,2}$/; 
 
             quickNotes.forEach(function (note, idx) {
                 const noteEl = document.createElement('div');
@@ -572,8 +574,22 @@
                         copyToClipboard(note);
                     }
                 };
+                
+                const isColor = isColorCode.test(note);
+                
+                if (isColor) {
+                    const colorIndicator = document.createElement('div');
+                    colorIndicator.className = 'color-indicator';
+                    colorIndicator.style.cssText = `background-color: ${note}; width: 12px; height: 12px; border: none;`; 
+                    noteEl.appendChild(colorIndicator);
 
-                const noteText = document.createTextNode(note + ' ');
+                    const noteText = document.createTextNode(note);
+                    noteEl.appendChild(noteText);
+                } else {
+                    const noteText = document.createTextNode(note);
+                    noteEl.appendChild(noteText);
+                }
+                
                 const removeSpan = document.createElement('span');
                 removeSpan.className = 'quick-note-remove';
                 removeSpan.textContent = '×';
@@ -583,7 +599,7 @@
                     removeQuickNote(idx);
                 };
 
-                noteEl.appendChild(noteText);
+                noteEl.appendChild(document.createTextNode(' '));
                 noteEl.appendChild(removeSpan);
                 list.appendChild(noteEl);
             });
