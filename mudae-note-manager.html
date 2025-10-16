@@ -696,6 +696,8 @@
                         // 4. Clean up Key Type and separator
                         fullInfo = fullInfo.replace(/:(?:bronze|silver|gold|chaos)key:/gi, '').trim();
 
+                        fullInfo = fullInfo.replace(/\(\$toggle[a-zA-Z]+\)/g, '').trim();
+
                         // Check for the disabled symbol 🚫
                         if (fullInfo.includes('🚫')) {
                             isDisabled = true;
