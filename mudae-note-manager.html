@@ -560,11 +560,11 @@
             displayQuickNotes();
         }
 
-function displayQuickNotes() {
+        function displayQuickNotes() {
             const list = document.getElementById('quickNotesList');
             list.innerHTML = '';
 
-            const isColorCode = /^#([0-9a-fA-F]{3}){1,2}$/; 
+            const isColorCode = /^#([0-9a-fA-F]{3}){1,2}$/;
 
             quickNotes.forEach(function (note, idx) {
                 const noteEl = document.createElement('div');
@@ -574,13 +574,13 @@ function displayQuickNotes() {
                         copyToClipboard(note);
                     }
                 };
-                
+
                 const isColor = isColorCode.test(note);
-                
+
                 if (isColor) {
                     const colorIndicator = document.createElement('div');
                     colorIndicator.className = 'color-indicator';
-                    colorIndicator.style.cssText = `background-color: ${note}; width: 12px; height: 12px; border: none;`; 
+                    colorIndicator.style.cssText = `background-color: ${note}; width: 12px; height: 12px; border: none;`;
                     noteEl.appendChild(colorIndicator);
 
                     const noteText = document.createTextNode(note);
@@ -589,7 +589,7 @@ function displayQuickNotes() {
                     const noteText = document.createTextNode(note);
                     noteEl.appendChild(noteText);
                 }
-                
+
                 const removeSpan = document.createElement('span');
                 removeSpan.className = 'quick-note-remove';
                 removeSpan.textContent = '×';
@@ -974,17 +974,19 @@ function displayQuickNotes() {
             if (!seriesData[seriesName]) return;
 
             const data = seriesData[seriesName];
-            const allExcluded = data.characters.every(function (c) { return c.excluded; });
+            const allExcluded = data.characters.every(function (c) {
+                return c.excluded;
+            });
             const shouldExclude = !allExcluded;
 
             const seriesId = seriesName.replace(/[^a-zA-Z0-9]/g, '_');
             const charList = document.getElementById('chars-' + seriesId);
+            const charCards = charList.querySelectorAll('.character-card');
 
             data.characters.forEach(function (char, idx) {
                 char.excluded = shouldExclude;
-                const charCard = charList.querySelector(`div:nth-child(${idx + 1})`);
-                if (charCard) {
-                    charCard.classList.toggle('excluded', shouldExclude);
+                if (charCards[idx]) {
+                    charCards[idx].classList.toggle('excluded', shouldExclude);
                 }
             });
 
