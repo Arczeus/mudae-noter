@@ -241,8 +241,7 @@
         }
 
         .series-toggle-btn:hover {
-            background: #6d28d9;
-            transform: scale(1.05);
+            transform: translateY(-2px);
         }
 
         .series-toggle-btn.disabled {
@@ -251,6 +250,7 @@
 
         .series-toggle-btn.disabled:hover {
             background: #b91c1c;
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4);
         }
 
         .series-count {
@@ -523,8 +523,14 @@
                 <button onclick="clearAll()">Clear All</button>
                 <button onclick="generateCommands()" id="generateBtn" disabled>Generate Commands</button>
             </div>
+            <div style="margin-top: 10px;">
+                <label style="display: inline; margin-right: 10px;">Group by:</label>
+                <button onclick="groupBySeries()" disabled>Series</button>
+                <button onclick="groupByNote()" disabled>Note</button>
+                <button onclick="groupByKeys()" disabled>Keys</button>
+            </div>
             <div style="margin-top: 15px;">
-                <label style="display: inline; margin-right: 10px;">Sort by:</label>
+                <label style="display: inline; margin-right: 10px;">Sort groupings by:</label>
                 <button onclick="sortSeries('alpha')">A-Z</button>
                 <button onclick="sortSeries('count')">Character Count</button>
             </div>
@@ -853,21 +859,38 @@
                 headerDiv.appendChild(toggleBtn);
                 headerDiv.appendChild(countDiv);
 
+                const noteInputContainer = document.createElement('div');
+                noteInputContainer.style.cssText = 'display: flex; gap: 5px; margin-bottom: 10px; padding 8px; width: 100%;';
+
                 const noteInput = document.createElement('input');
                 noteInput.type = 'text';
                 noteInput.className = 'note-input';
-                noteInput.placeholder = 'Enter note...';
+                noteInput.placeholder = 'Enter series note';
                 noteInput.value = data.note;
+                noteInput.style.flexGrow = '1';
+                
                 noteInput.onchange = function () {
-                    updateNote(seriesName, this.value);
+                    data.note = this.value;
+                    saveToLocalStorage(); 
                 };
 
+                const applyButton = document.createElement('button');
+                applyButton.className = 'series-apply-note-btn';
+                applyButton.textContent = 'Apply';
+                applyButton.style.cssText = 'background: #7c3aed; border-radius: 5px; padding: 10px; font-size: 0.8em; white-space: nowrap; height: fit-content;';
+                applyButton.onclick = function() {
+                    updateCharacterNotes(seriesName, data.note);
+                };
+
+                noteInputContainer.appendChild(noteInput);
+                noteInputContainer.appendChild(applyButton);
+                
                 const charList = document.createElement('div');
                 charList.className = 'characters-list';
                 charList.id = 'chars-' + seriesId;
 
                 card.appendChild(headerDiv);
-                card.appendChild(noteInput);
+                card.appendChild(noteInputContainer);
                 card.appendChild(charList);
                 grid.appendChild(card);
 
@@ -936,10 +959,15 @@
             }
         }
 
-        function updateNote(seriesName, note) {
-            if (seriesData[seriesName]) {
-                seriesData[seriesName].note = note;
-            }
+        function updateCharacterNotes(seriesName, newNote) {
+            if (!seriesData[seriesName]) return;
+
+            seriesData[seriesName].characters.forEach(function (char) {
+                char.note = newNote;
+            });
+            
+            displaySeries(); 
+            
             saveToLocalStorage();
         }
 

@@ -46,3 +46,4 @@ The app works offline, but images require an internet connection.
 - ~~fix characters not getting disabled~~
 - ~~delete any ($togglewestern) or other things that can appear~~
 - ~~cut the name short if it's too long~~
+- change sort group pare buttons/select buttons ui
