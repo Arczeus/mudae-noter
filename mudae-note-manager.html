@@ -23,11 +23,9 @@
         }
 
         .container {
-            max-width: 1540px;
-            width: 100%;
+            max-width: 1610px;
             background: #13131a;
             border-radius: 15px;
-            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
             padding: 30px;
             border: 1px solid #1f1f2e;
         }
@@ -66,11 +64,11 @@
             padding: 20px;
             width: 280px;
             border: 1px solid #1f1f2e;
-            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
-            position: fixed;
-            right: 20px;
+            position: sticky;
             top: 20px;
-            height: fit-content;
+            height: calc(100vh - 40px);
+            display: flex;
+            flex-direction: column;
             max-height: calc(100vh - 40px);
         }
 
@@ -83,21 +81,25 @@
 
         .quick-notes-list {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 8px;
-            margin-bottom: 10px;
+            flex-grow: 1;
+            overflow-y: auto;
+            scrollbar-gutter: stable;
+            padding-right: 5px;
         }
 
         .quick-note {
             background: #1a1a24;
             border: 2px solid #7c3aed;
             border-radius: 8px;
-            padding: 8px 12px;
+            padding: 10px;
             cursor: pointer;
             transition: all 0.2s;
             font-size: 1.2em;
             display: flex;
             align-items: center;
+            justify-content: flex-start;
             gap: 5px;
             color: #e5e7eb;
         }
@@ -108,18 +110,27 @@
         }
 
         .quick-note-remove {
-            font-size: 0.8em;
-            margin-left: 3px;
+            font-size: 1.4em;
+            margin-left: auto;
             opacity: 0.6;
+            padding: 0 8px;
+            border-radius: 5px;
+            transition: all 0.2s;
         }
 
         .quick-note-remove:hover {
             opacity: 1;
+            background-color: #b91c1c;
+            color: white;
         }
 
         .add-note-container {
             display: flex;
-            gap: 5px;
+            gap: 8px;
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #2a2a3a;
+            min-width: 0;
         }
 
         .add-note-input {
@@ -130,6 +141,7 @@
             font-size: 0.9em;
             background: #0a0a0f;
             color: #e5e7eb;
+            min-width: 0;
         }
 
         .add-note-btn {
@@ -138,12 +150,13 @@
             background: #7c3aed;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.2s;
         }
 
-        .input-section {
-            margin-bottom: 30px;
+        c .add-note-btn:hover {
+            background-color: #6d28d9;
         }
 
         label {
@@ -194,6 +207,10 @@
             background: #4b5563;
             cursor: not-allowed;
             transform: none;
+        }
+
+        button.active {
+            background: #34c965;
         }
 
         .series-grid {
@@ -284,23 +301,11 @@
         .character-card {
             position: relative;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             border: 3px solid transparent;
             border-radius: 8px;
             overflow: hidden;
-            width: 150px;
-        }
-
-        .character-card:hover {
-            transform: scale(1.05);
-        }
-
-        .character-card.excluded {
-            opacity: 0.4;
-        }
-
-        .character-card.excluded img {
-            filter: grayscale(100%);
+            width: 135px;
         }
 
         .character-card img {
@@ -310,37 +315,29 @@
             display: block;
         }
 
-        .character-card.permanently-disabled {
-            position: relative;
-            opacity: 0.75;
+        .character-card:hover {
+            transform: scale(1.05);
+            border-color: #a78bfa !important;
+        }
+
+        .character-card.excluded {
+            filter: opacity(0.5);
+        }
+
+        .character-card.excluded img {
+            filter: grayscale(100%);
         }
 
         .character-card.permanently-disabled::after {
-            content: '';
+            content: '🚫';
             position: absolute;
-            top: 35%;
-            left: 5%;
-            right: 5%;
-            height: 5px;
-            background: #dc2626;
-            transform: translateY(-50%) rotate(-45deg);
-            z-index: 10;
-            border-radius: 2px;
-            box-shadow: 0 0 5px rgba(220, 38, 38, 0.8);
-        }
-
-        .character-card.permanently-disabled .character-info::after {
-            content: '';
-            position: absolute;
-            top: 35%;
-            left: 5%;
-            right: 5%;
-            height: 5px;
-            background: #dc2626;
-            transform: translateY(-50%) rotate(45deg);
-            z-index: 10;
-            border-radius: 2px;
-            box-shadow: 0 0 5px rgba(220, 38, 38, 0.8);
+            top: 105px;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 7em;
+            color: rgba(255, 255, 255, 0.8);
+            text-shadow: 0 0 10px black;
+            pointer-events: none;
         }
 
         .character-info {
@@ -464,6 +461,7 @@
             border-radius: 8px;
             margin-bottom: 20px;
             border-left: 4px solid #dc2626;
+            margin-top: 15px;
         }
 
         .success-message {
@@ -473,6 +471,7 @@
             border-radius: 8px;
             margin-bottom: 20px;
             border-left: 4px solid #10b981;
+            margin-top: 15px;
         }
 
         .empty-message {
@@ -481,10 +480,10 @@
 
         .footer {
             text-align: center;
-            padding: 20px;
+            padding: 1%;
             color: #6b7280;
             font-size: 0.85em;
-            margin-top: 40px;
+            margin-top: 600px;
             border-top: 1px solid #2a2a3a;
         }
 
@@ -518,29 +517,42 @@
             <label for="input">Paste your $mmasi-[y+][k][c+][x+][n] (brackets are optional) output here:</label>
             <textarea id="input"
                 placeholder="Series Name - 5/20&#10;Character Name - https://mudae.net/uploads/...&#10;Another Character - https://mudae.net/uploads/...&#10;&#10;Another Series - 3/15&#10;Character Name - https://mudae.net/uploads/...&#10;...and so on"></textarea>
-            <div style="margin-top: 10px;">
+            <div style="margin-top: 15px;">
                 <button onclick="parseInput()">Parse Input</button>
                 <button onclick="clearAll()">Clear All</button>
                 <button onclick="generateCommands()" id="generateBtn" disabled>Generate Commands</button>
                 <button onclick="scrollToCommands()" id="goToCommandsBtn" style="display: none;">Go to Commands
                     ↓</button>
             </div>
-            <div style="margin-top: 10px;">
+
+            <div style="margin-top: 15px;">
                 <label style="display: inline; margin-right: 10px;">Group by:</label>
-                <button onclick="groupBySeries()" disabled>Series</button>
-                <button onclick="groupByNote()" disabled>Note</button>
-                <button onclick="groupByKeys()" disabled>Keys</button>
+                <button onclick="setGrouping('nogroup')" id="group-nogroup-btn">No Group</button>
+                <button onclick="setGrouping('series')" id="group-series-btn" class="active">Series</button>
+                <button onclick="setGrouping('note')" id="group-note-btn">Note</button>
+                <button onclick="setGrouping('keys')" id="group-keys-btn">Keys</button>
             </div>
             <div style="margin-top: 15px;">
                 <label style="display: inline; margin-right: 10px;">Sort groupings by:</label>
-                <button onclick="sortSeries('alpha')">A-Z</button>
-                <button onclick="sortSeries('count')">Character Count</button>
+                <button onclick="sortGroups('alpha')">A-Z</button>
+                <button onclick="sortGroups('count')">Character Count</button>
             </div>
             <div style="margin-top: 15px;">
+                <label style="display: inline; margin-right: 10px;">Grid Columns:</label>
+                <button onclick="changeGridColumns(1)" id="grid-btn-1"
+                    style="padding: 8px 15px; font-size: 0.9em;">1</button>
+                <button onclick="changeGridColumns(2)" id="grid-btn-2"
+                    style="padding: 8px 15px; font-size: 0.9em;">2</button>
+                <button onclick="changeGridColumns(3)" id="grid-btn-3"
+                    style="padding: 8px 15px; font-size: 0.9em;">3</button>
+                <button onclick="changeGridColumns(4)" id="grid-btn-4"
+                    style="padding: 8px 15px; font-size: 0.9em;">4</button>
+            </div>
+            <div style="margin-top: 15px;">
+                <label style="display: inline; margin-right: 10px;">Group by:</label>
                 <button onclick="selectAllCharacters()">Select All</button>
                 <button onclick="deselectAllCharacters()">Deselect All</button>
             </div>
-
         </div>
 
         <div id="message"></div>
@@ -553,7 +565,7 @@
 
         <div class="footer">
             <div class="footer-contact">
-                Questions or feedback? Contact <strong>arczeus</strong> on Discord
+                Questions or feedback? Contact <strong>arczeus</strong> on Discord.
             </div>
         </div>
     </div>
@@ -570,9 +582,46 @@
     <script>
         let seriesData = {};
         let quickNotes = ['⭐', '✨', '💕', '#fefefe', '#000000'];
+        let currentGrouping = 'series';
+        let currentSortMethod = 'alpha';
 
         function initQuickNotes() {
             displayQuickNotes();
+        }
+
+        function setGrouping(method) {
+            currentGrouping = method;
+            const buttons = document.querySelectorAll('#group-series-btn, #group-note-btn, #group-keys-btn, #group-nogroup-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`group-${method}-btn`).classList.add('active');
+            displaySeries();
+            showMessage(`Grouping by ${method}`, 'success');
+        }
+
+        function sortGroups(method) {
+            if (Object.keys(seriesData).length === 0) {
+                showMessage('No data to sort!', 'error');
+                return;
+            }
+            currentSortMethod = method;
+            displaySeries();
+            showMessage(`Sorted by ${method === 'alpha' ? 'A-Z' : 'character count'}`, 'success');
+        }
+
+        function changeGridColumns(columns) {
+            const grid = document.getElementById('seriesGrid');
+            if (grid) {
+                grid.style.gridTemplateColumns = `repeat(${columns}, minmax(300px, 1fr))`;
+            }
+
+            for (let i = 1; i <= 4; i++) {
+                const btn = document.getElementById(`grid-btn-${i}`);
+                if (btn) btn.classList.remove('active');
+            }
+            const activeBtn = document.getElementById(`grid-btn-${columns}`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            localStorage.setItem('mudaeGridColumns', columns);
         }
 
         function displayQuickNotes() {
@@ -757,33 +806,124 @@
             saveToLocalStorage();
         }
 
-        function sortSeries(method) {
-            if (Object.keys(seriesData).length === 0) {
-                showMessage('No series to sort!', 'error');
-                return;
+        function createCharacterCard(char) {
+            const charCard = document.createElement('div');
+            charCard.className = 'character-card' + (char.excluded ? ' excluded' : '');
+            if (char.isDisabled) {
+                charCard.className += ' permanently-disabled';
             }
+            const colorCode = char.color || '#670d08';
+            charCard.style.borderColor = colorCode;
+            charCard.onclick = (event) => toggleCharacter(char.originalSeries, char.originalIndex, event.currentTarget);
+            const img = document.createElement('img');
+            img.src = char.image;
+            img.alt = char.name;
+            img.onerror = function () {
+                this.style.display = 'none';
+                const placeholder = document.createElement('div');
+                placeholder.style.cssText = 'width: 135px; height: 210px; background: #2a2a3a; display: flex; align-items: center; justify-content: center; color: #6b7280; font-size: 0.8em; text-align: center; padding: 10px;';
+                placeholder.textContent = 'No Image';
+                this.parentNode.insertBefore(placeholder, this);
+            };
 
-            const entries = Object.entries(seriesData);
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'character-info';
 
-            if (method === 'alpha') {
-                entries.sort(function (a, b) {
-                    return a[0].localeCompare(b[0]);
-                });
-                showMessage('Sorted alphabetically', 'success');
-            } else if (method === 'count') {
-                entries.sort(function (a, b) {
-                    return b[1].characters.length - a[1].characters.length;
-                });
-                showMessage('Sorted by character count', 'success');
-            }
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'character-name';
+            nameDiv.textContent = char.name;
+            nameDiv.title = char.name;
 
-            seriesData = {};
-            entries.forEach(function (entry) {
-                seriesData[entry[0]] = entry[1];
+            const noteDiv = document.createElement('div');
+            const hasNote = char.note && char.note.trim() !== '';
+            noteDiv.style.cssText = 'background: #13131a; padding: 4px 4px; font-size: 0.7em; color: ' + (hasNote ? '#9ca3af' : '#dc2626; font-weight: bold') + '; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; border-radius: 4px;';
+            noteDiv.title = hasNote ? char.note : 'Click to add note';
+            noteDiv.textContent = hasNote ? char.note : 'No note!';
+
+            noteDiv.onclick = function (e) {
+                e.stopPropagation();
+                const originalNoteDiv = this;
+                const currentNote = char.note;
+                originalNoteDiv.style.display = 'none';
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = currentNote;
+                input.style.cssText = 'width: 100%; box-sizing: border-box; font-size: 0.7em; text-align: center; padding: 3px; border: 1px solid #7c3aed; background: #1a1a24; color: #e5e7eb; border-radius: 4px;';
+
+                originalNoteDiv.parentNode.insertBefore(input, originalNoteDiv);
+                input.focus();
+                input.select();
+
+                const saveAndClose = () => {
+                    const newNote = input.value.trim();
+                    seriesData[char.originalSeries].characters[char.originalIndex].note = newNote;
+                    saveToLocalStorage();
+                    displaySeries();
+                };
+                input.onblur = saveAndClose;
+                input.onkeydown = (event) => {
+                    if (event.key === 'Enter') saveAndClose();
+                    else if (event.key === 'Escape') {
+                        if (input.parentNode) input.parentNode.removeChild(input);
+                        originalNoteDiv.style.display = '';
+                    }
+                };
+            };
+
+            const statsDiv = document.createElement('div');
+            statsDiv.className = 'character-stats';
+            const kakeraBadge = document.createElement('div');
+            kakeraBadge.className = 'stat-badge';
+            kakeraBadge.innerHTML = `<div class="stat-badge-label">Ka</div><div class="stat-badge-value">${char.kakera || '?'}</div>`;
+            const keysBadge = document.createElement('div');
+            keysBadge.className = 'stat-badge';
+            keysBadge.innerHTML = `<div class="stat-badge-label">Keys</div><div class="stat-badge-value">${char.keys || '?'}</div>`;
+            statsDiv.appendChild(kakeraBadge);
+            statsDiv.appendChild(keysBadge);
+
+            infoDiv.appendChild(nameDiv);
+            infoDiv.appendChild(noteDiv);
+            infoDiv.appendChild(statsDiv);
+
+            charCard.appendChild(img);
+            charCard.appendChild(infoDiv);
+
+            return charCard;
+        }
+
+        function updateSelectionView(deselectAll) {
+            const allCards = document.querySelectorAll('.character-card');
+            allCards.forEach(card => {
+                if (deselectAll) {
+                    card.classList.add('excluded');
+                } else {
+                    card.classList.remove('excluded');
+                }
             });
 
-            displaySeries();
-            saveToLocalStorage();
+            const allToggleBtns = document.querySelectorAll('.series-toggle-btn');
+            allToggleBtns.forEach(btn => {
+                if (deselectAll) {
+                    btn.classList.add('disabled');
+                    btn.textContent = 'Enable All';
+                } else {
+                    btn.classList.remove('disabled');
+                    btn.textContent = 'Disable All';
+                }
+            });
+
+            if (currentGrouping !== 'series') {
+                const allGroupCards = document.querySelectorAll('.series-card');
+                allGroupCards.forEach(groupCard => {
+                    const countEl = groupCard.querySelector('.series-count');
+                    const total = groupCard.dataset.totalChars;
+                    if (countEl && total) {
+                        const newCount = deselectAll ? 0 : total;
+                        countEl.textContent = `${newCount}/${total}`;
+                    }
+                });
+            }
         }
 
         function selectAllCharacters() {
@@ -798,7 +938,7 @@
                 });
             }
 
-            displaySeries();
+            updateSelectionView(false);
             updateStats();
             saveToLocalStorage();
             showMessage('All characters selected', 'success');
@@ -816,7 +956,7 @@
                 });
             }
 
-            displaySeries();
+            updateSelectionView(true);
             updateStats();
             saveToLocalStorage();
             showMessage('All characters deselected', 'success');
@@ -825,184 +965,122 @@
         function displaySeries() {
             const grid = document.getElementById('seriesGrid');
             grid.innerHTML = '';
+            if (Object.keys(seriesData).length === 0) return;
 
-            const seriesEntries = Object.entries(seriesData);
-            for (let i = 0; i < seriesEntries.length; i++) {
-                const seriesName = seriesEntries[i][0];
-                const data = seriesEntries[i][1];
+            // Step 1: Group all characters based on the current setting.
+            const groups = {};
+            for (const seriesName in seriesData) {
+                seriesData[seriesName].characters.forEach((char, idx) => {
+                    let groupKey;
+                    switch (currentGrouping) {
+                        case 'note':
+                            groupKey = char.note.trim() || '(No Note)';
+                            break;
+                        case 'keys':
+                            groupKey = char.keys ? `${char.keys} Keys` : '0 Keys';
+                            break;
+                        case 'nogroup':
+                            groupKey = 'All Characters';
+                            break;
+                        case 'series':
+                        default:
+                            groupKey = seriesName;
+                            break;
+                    }
+                    if (!groups[groupKey]) {
+                        groups[groupKey] = {
+                            characters: [],
+                            ...(currentGrouping === 'series' && {
+                                owned: seriesData[seriesName].owned,
+                                total: seriesData[seriesName].total,
+                                note: seriesData[seriesName].note,
+                            })
+                        };
+                    }
+                    // Store the character's original location so we can modify it later.
+                    groups[groupKey].characters.push({
+                        ...char,
+                        originalSeries: seriesName,
+                        originalIndex: idx
+                    });
+                });
+            }
+
+            // Step 2: Sort the groups based on the current setting.
+            const sortedGroupEntries = Object.entries(groups).sort((a, b) => {
+                const [keyA, dataA] = a;
+                const [keyB, dataB] = b;
+                if (currentSortMethod === 'count') {
+                    return dataB.characters.length - dataA.characters.length;
+                }
+                return keyA.localeCompare(keyB);
+            });
+
+            // Step 3: Create and display a card for each group.
+            for (const [groupName, data] of sortedGroupEntries) {
                 const card = document.createElement('div');
                 card.className = 'series-card';
-
-                const seriesId = seriesName.replace(/[^a-zA-Z0-9]/g, '_');
-
                 const headerDiv = document.createElement('div');
                 headerDiv.className = 'series-header';
-
                 const titleDiv = document.createElement('div');
                 titleDiv.className = 'series-title';
-                titleDiv.textContent = seriesName;
-                titleDiv.title = seriesName;
+                titleDiv.textContent = groupName;
+                titleDiv.title = groupName;
 
                 const toggleBtn = document.createElement('button');
                 toggleBtn.className = 'series-toggle-btn';
-                const allExcluded = data.characters.every(function (c) { return c.excluded; });
-                toggleBtn.className += allExcluded ? ' disabled' : '';
+                const allExcluded = data.characters.every(c => c.excluded);
+                toggleBtn.classList.toggle('disabled', allExcluded);
                 toggleBtn.textContent = allExcluded ? 'Enable All' : 'Disable All';
-                toggleBtn.onclick = function (e) {
+                toggleBtn.onclick = (e) => {
                     e.stopPropagation();
-                    toggleSeries(seriesName);
+                    toggleGroup(data.characters);
                 };
-
                 const countDiv = document.createElement('div');
                 countDiv.className = 'series-count';
-                countDiv.textContent = data.owned + '/' + data.total;
-
+                if (currentGrouping === 'series') {
+                    countDiv.textContent = `${data.owned}/${data.total}`;
+                } else {
+                    const includedCount = data.characters.filter(c => !c.excluded).length;
+                    countDiv.textContent = `${includedCount}/${data.characters.length}`;
+                    card.dataset.totalChars = data.characters.length;
+                }
                 headerDiv.appendChild(titleDiv);
                 headerDiv.appendChild(toggleBtn);
                 headerDiv.appendChild(countDiv);
+                card.appendChild(headerDiv);
 
-                const noteInputContainer = document.createElement('div');
-                noteInputContainer.style.cssText = 'display: flex; gap: 5px; margin-bottom: 10px; padding 8px; width: 100%;';
-
-                const noteInput = document.createElement('input');
-                noteInput.type = 'text';
-                noteInput.className = 'note-input';
-                noteInput.placeholder = 'Enter series note';
-                noteInput.value = data.note;
-                noteInput.style.flexGrow = '1';
-
-                noteInput.onchange = function () {
-                    data.note = this.value;
-                    saveToLocalStorage();
-                };
-
-                const applyButton = document.createElement('button');
-                applyButton.className = 'series-apply-note-btn';
-                applyButton.textContent = 'Apply';
-                applyButton.style.cssText = 'background: #7c3aed; border-radius: 5px; padding: 10px; font-size: 0.8em; white-space: nowrap; height: fit-content;';
-                applyButton.onclick = function () {
-                    updateCharacterNotes(seriesName, data.note);
-                };
-
-                noteInputContainer.appendChild(noteInput);
-                noteInputContainer.appendChild(applyButton);
+                // Only show the "Apply note to series" input when grouping by series
+                if (currentGrouping === 'series') {
+                    const noteInputContainer = document.createElement('div');
+                    noteInputContainer.style.cssText = 'display: flex; gap: 5px; margin-bottom: 10px; padding: 8px; width: 100%;';
+                    const noteInput = document.createElement('input');
+                    noteInput.type = 'text';
+                    noteInput.className = 'note-input';
+                    noteInput.placeholder = 'Enter series note';
+                    noteInput.value = data.note || '';
+                    noteInput.style.flexGrow = '1';
+                    noteInput.onchange = function () {
+                        seriesData[groupName].note = this.value;
+                        saveToLocalStorage();
+                    };
+                    const applyButton = document.createElement('button');
+                    applyButton.className = 'series-apply-note-btn';
+                    applyButton.textContent = 'Apply';
+                    applyButton.style.cssText = 'background: #7c3aed; border-radius: 5px; padding: 10px; font-size: 0.8em; white-space: nowrap; height: fit-content;';
+                    applyButton.onclick = () => updateCharacterNotes(groupName, noteInput.value);
+                    noteInputContainer.appendChild(noteInput);
+                    noteInputContainer.appendChild(applyButton);
+                    card.appendChild(noteInputContainer);
+                }
 
                 const charList = document.createElement('div');
                 charList.className = 'characters-list';
-                charList.id = 'chars-' + seriesId;
-
-                card.appendChild(headerDiv);
-                card.appendChild(noteInputContainer);
+                data.characters.forEach((char) => {
+                    charList.appendChild(createCharacterCard(char));
+                });
                 card.appendChild(charList);
                 grid.appendChild(card);
-
-                data.characters.forEach(function (char, idx) {
-                    const charCard = document.createElement('div');
-                    charCard.className = 'character-card' + (char.excluded ? ' excluded' : '');
-
-                    if (char.isDisabled) {
-                        charCard.className += ' permanently-disabled';
-                    }
-
-                    const colorCode = char.color || '#670d08';
-                    charCard.style.borderLeft = '5px solid ' + colorCode;
-
-                    charCard.onclick = function () {
-                        toggleCharacter(seriesName, idx);
-                    };
-
-                    const img = document.createElement('img');
-                    img.src = char.image;
-                    img.alt = char.name;
-                    img.onerror = function () {
-                        this.style.display = 'none';
-                        const placeholder = document.createElement('div');
-                        placeholder.style.cssText = 'width: 135px; height: 210px; background: #2a2a3a; display: flex; align-items: center; justify-content: center; color: #6b7280; font-size: 0.8em; text-align: center; padding: 10px;';
-                        placeholder.textContent = 'No Image';
-                        this.parentNode.insertBefore(placeholder, this);
-                    };
-
-                    const infoDiv = document.createElement('div');
-                    infoDiv.className = 'character-info';
-
-                    const nameDiv = document.createElement('div');
-                    nameDiv.className = 'character-name';
-                    nameDiv.textContent = char.name;
-                    nameDiv.title = char.name;
-
-                    const noteDiv = document.createElement('div');
-                    const hasNote = char.note && char.note.trim() !== '';
-                    noteDiv.style.cssText = 'background: #13131a; padding: 4px 4px; font-size: 0.7em; color: ' + (hasNote ? '#9ca3af' : '#dc2626; font-weight: bold') + '; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; border-radius: 4px;';
-                    noteDiv.title = hasNote ? char.note : 'Click to add note';
-                    noteDiv.textContent = hasNote ? char.note : 'No note!';
-
-                    noteDiv.onclick = function (e) {
-                        e.stopPropagation();
-
-                        const originalNoteDiv = this;
-                        const currentNote = char.note;
-                        originalNoteDiv.style.display = 'none';
-
-                        const input = document.createElement('input');
-                        input.type = 'text';
-                        input.value = currentNote;
-                        input.style.cssText = 'width: 100%; box-sizing: border-box; font-size: 0.7em; text-align: center; padding: 3px; border: 1px solid #7c3aed; background: #1a1a24; color: #e5e7eb; border-radius: 4px;';
-
-                        originalNoteDiv.parentNode.insertBefore(input, originalNoteDiv);
-                        input.focus();
-                        input.select();
-
-                        const saveAndClose = () => {
-                            char.note = input.value.trim();
-                            const stillHasNote = char.note && char.note.trim() !== '';
-                            originalNoteDiv.textContent = stillHasNote ? char.note : 'No note!';
-                            originalNoteDiv.style.color = stillHasNote ? '#9ca3af' : '#dc2626';
-                            originalNoteDiv.style.fontWeight = stillHasNote ? 'normal' : 'bold';
-
-                            if (input.parentNode) {
-                                input.parentNode.removeChild(input);
-                            }
-                            originalNoteDiv.style.display = '';
-                            saveToLocalStorage();
-                        };
-
-                        input.onblur = saveAndClose;
-
-                        input.onkeydown = function (event) {
-                            if (event.key === 'Enter') {
-                                saveAndClose();
-                            } else if (event.key === 'Escape') {
-                                if (input.parentNode) {
-                                    input.parentNode.removeChild(input);
-                                }
-                                originalNoteDiv.style.display = '';
-                            }
-                        };
-                    };
-
-                    const statsDiv = document.createElement('div');
-                    statsDiv.className = 'character-stats';
-
-                    const kakeraBadge = document.createElement('div');
-                    kakeraBadge.className = 'stat-badge';
-                    kakeraBadge.innerHTML = '<div class="stat-badge-label">Ka</div><div class="stat-badge-value">' + (char.kakera || '?') + '</div>';
-
-                    const keysBadge = document.createElement('div');
-                    keysBadge.className = 'stat-badge';
-                    keysBadge.innerHTML = '<div class="stat-badge-label">Keys</div><div class="stat-badge-value">' + (char.keys || '?') + '</div>';
-
-                    statsDiv.appendChild(kakeraBadge);
-                    statsDiv.appendChild(keysBadge);
-
-                    infoDiv.appendChild(nameDiv);
-                    infoDiv.appendChild(noteDiv);
-                    infoDiv.appendChild(statsDiv);
-
-
-                    charCard.appendChild(img);
-                    charCard.appendChild(infoDiv);
-                    charList.appendChild(charCard);
-                });
             }
         }
 
@@ -1014,69 +1092,53 @@
             });
 
             displaySeries();
-
             saveToLocalStorage();
         }
 
-        function toggleCharacter(seriesName, charIdx) {
-            if (seriesData[seriesName] && seriesData[seriesName].characters[charIdx]) {
-                const char = seriesData[seriesName].characters[charIdx];
-                char.excluded = !char.excluded;
+function toggleCharacter(seriesName, charIdx, cardElement) {
+    if (!seriesData[seriesName] || !seriesData[seriesName].characters[charIdx]) return;
 
-                const seriesId = seriesName.replace(/[^a-zA-Z0-9]/g, '_');
-                const charCard = document.querySelector(`#chars-${seriesId} > div:nth-child(${charIdx + 1})`);
-                if (charCard) {
-                    charCard.classList.toggle('excluded', char.excluded);
-                }
+    const char = seriesData[seriesName].characters[charIdx];
+    char.excluded = !char.excluded;
 
-                updateSeriesToggleButton(seriesName);
+    cardElement.classList.toggle('excluded', char.excluded);
 
-                updateStats();
-            }
-            saveToLocalStorage();
-        }
-        function updateSeriesToggleButton(seriesName) {
-            const data = seriesData[seriesName];
-            const allExcluded = data.characters.every(function (c) { return c.excluded; });
-
-            const grid = document.getElementById('seriesGrid');
-            const seriesElements = grid.querySelectorAll('.series-card');
-            let toggleBtn;
-
-            for (let i = 0; i < seriesElements.length; i++) {
-                const titleDiv = seriesElements[i].querySelector('.series-title');
-                if (titleDiv && titleDiv.textContent === seriesName) {
-                    toggleBtn = seriesElements[i].querySelector('.series-toggle-btn');
-                    break;
-                }
-            }
-
-            if (toggleBtn) {
-                toggleBtn.classList.toggle('disabled', allExcluded);
-                toggleBtn.textContent = allExcluded ? 'Enable All' : 'Disable All';
+    const groupCard = cardElement.closest('.series-card');
+    if (groupCard) {
+        if (currentGrouping !== 'series') {
+            const countEl = groupCard.querySelector('.series-count');
+            if (countEl) {
+                const parts = countEl.textContent.split('/');
+                let includedCount = parseInt(parts[0], 10);
+                includedCount += char.excluded ? -1 : 1;
+                countEl.textContent = `${includedCount}/${parts[1]}`;
             }
         }
-        function toggleSeries(seriesName) {
-            if (!seriesData[seriesName]) return;
 
-            const data = seriesData[seriesName];
-            const allExcluded = data.characters.every(function (c) {
-                return c.excluded;
-            });
+        const allExcludedInGroup = !groupCard.querySelector('.character-card:not(.excluded)');
+
+        const toggleBtn = groupCard.querySelector('.series-toggle-btn');
+        if (toggleBtn) {
+            toggleBtn.classList.toggle('disabled', allExcludedInGroup);
+            toggleBtn.textContent = allExcludedInGroup ? 'Enable All' : 'Disable All';
+        }
+    }
+
+    updateStats();
+    saveToLocalStorage();
+}
+
+        function toggleGroup(charactersInGroup) {
+            if (!charactersInGroup || charactersInGroup.length === 0) return;
+
+            const allExcluded = charactersInGroup.every(c => seriesData[c.originalSeries].characters[c.originalIndex].excluded);
             const shouldExclude = !allExcluded;
 
-            const seriesId = seriesName.replace(/[^a-zA-Z0-9]/g, '_');
-            const charList = document.getElementById('chars-' + seriesId);
-            const charCards = charList.querySelectorAll('.character-card');
-
-            data.characters.forEach(function (char, idx) {
-                char.excluded = shouldExclude;
-                if (charCards[idx]) {
-                    charCards[idx].classList.toggle('excluded', shouldExclude);
-                }
+            charactersInGroup.forEach(char => {
+                seriesData[char.originalSeries].characters[char.originalIndex].excluded = shouldExclude;
             });
 
-            updateSeriesToggleButton(seriesName);
+            displaySeries();
             updateStats();
             saveToLocalStorage();
         }
@@ -1124,35 +1186,66 @@
     </div>`;
             const container = commandsDiv.querySelector('.commands-section');
 
-            const noteGroups = {};
+            const groups = {};
+            let charactersToGroup = [];
 
             for (const seriesName in seriesData) {
                 seriesData[seriesName].characters.forEach(char => {
                     if (!char.excluded) {
-                        const note = char.note ? char.note.trim() : '(No note)';
-                        if (!noteGroups[note]) {
-                            noteGroups[note] = [];
-                        }
-                        noteGroups[note].push({ name: char.name, series: seriesName });
+                        charactersToGroup.push({
+                            ...char,
+                            seriesName
+                        });
                     }
                 });
             }
 
-            for (const note in noteGroups) {
-                const charactersInGroup = noteGroups[note];
+            if (currentGrouping === 'nogroup') {
+                if (charactersToGroup.length > 0) {
+                    groups['All Characters'] = charactersToGroup;
+                }
+            } else {
+                charactersToGroup.forEach(char => {
+                    let groupKey;
+                    if (currentGrouping === 'note') {
+                        groupKey = char.note ? char.note.trim() : '(No note)';
+                    } else if (currentGrouping === 'series') {
+                        groupKey = char.seriesName;
+                    } else if (currentGrouping === 'keys') {
+                        groupKey = char.keys ? `${char.keys} key${parseInt(char.keys, 10) !== 1 ? 's' : ''}` : '0 keys';
+                    }
+
+                    if (!groups[groupKey]) {
+                        groups[groupKey] = [];
+                    }
+                    groups[groupKey].push(char);
+                });
+            }
+
+
+            const sortedGroupKeys = Object.keys(groups).sort((a, b) => a.localeCompare(b));
+
+            for (const groupKey of sortedGroupKeys) {
+                const charactersInGroup = groups[groupKey];
                 const allCharsNames = charactersInGroup.map(c => c.name);
 
-                const uniqueSeries = [...new Set(charactersInGroup.map(c => c.series))];
-                const seriesNames = uniqueSeries.join(', ');
-
-                const noteText = (note !== '(No note)') ? ' ' + note : '';
+                let noteText = '';
+                if (currentGrouping === 'note' && groupKey !== '(No note)') {
+                    noteText = ' ' + groupKey;
+                } else if (currentGrouping === 'series') {
+                    const seriesNote = seriesData[groupKey] ? seriesData[groupKey].note : '';
+                    if (seriesNote) {
+                        noteText = ' ' + seriesNote;
+                    }
+                }
 
                 let currentCommand = '$n ';
                 let commandParts = [];
 
                 for (let i = 0; i < allCharsNames.length; i++) {
                     let next = allCharsNames[i] + '$';
-                    if ((currentCommand + next + noteText).length > 2000) {
+                    if ((currentCommand + next + noteText).length > 1990) {
+                        currentCommand = currentCommand.slice(0, -1);
                         currentCommand += noteText;
                         commandParts.push(currentCommand);
                         currentCommand = '$n ' + next;
@@ -1161,7 +1254,8 @@
                     }
                 }
 
-                if (currentCommand !== '$n ') {
+                if (currentCommand.length > 3) {
+                    currentCommand = currentCommand.slice(0, -1);
                     currentCommand += noteText;
                     commandParts.push(currentCommand);
                 }
@@ -1170,29 +1264,25 @@
                     const commandItem = document.createElement('div');
                     commandItem.className = 'command-item';
 
-                    const seriesBlock = (idx === 0)
-                        ? `<div style="font-size: 0.85em; color: #9ca3af; margin-bottom: 8px;">From series: ${seriesNames}</div>`
-                        : '';
-
                     commandItem.innerHTML = `
-                <div class="command-header">
-                    <div class="command-series">${note} - ${allCharsNames.length} character${allCharsNames.length > 1 ? 's' : ''} ${commandParts.length > 1 ? `(Part ${idx + 1}/${commandParts.length})` : ''}</div>
-                </div>
-                ${seriesBlock}
-                <div class="command-text">${command}</div>
-                <button class="copy-btn" onclick="copyCommand(this, \`${command.replace(/`/g, '\\`')}\`)">Copy Command</button>
-            `;
+            <div class="command-header">
+                <div class="command-series">${groupKey} - ${allCharsNames.length} character${allCharsNames.length > 1 ? 's' : ''} ${commandParts.length > 1 ? `(Part ${idx + 1}/${commandParts.length})` : ''}</div>
+            </div>
+            <div class="command-text">${command}</div>
+            <button class="copy-btn" onclick="copyCommand(this, \`${command.replace(/`/g, '\\`')}\`)">Copy Command</button>
+        `;
                     container.appendChild(commandItem);
                 });
             }
 
-            if (Object.keys(noteGroups).length === 0) {
+            if (sortedGroupKeys.length === 0) {
                 const p = document.createElement('p');
                 p.style.color = '#6b7280';
                 p.style.padding = '20px';
                 p.textContent = 'No commands to generate. Please select at least one character.';
                 container.appendChild(p);
             }
+
             const commandsContainer = document.getElementById('commands').querySelector('.command-item');
             if (commandsContainer) {
                 document.getElementById('goToCommandsBtn').style.display = 'inline-block';
@@ -1226,6 +1316,9 @@
             }
 
             seriesData = {};
+            currentGrouping = 'series'; // Reset to default
+            currentSortMethod = 'alpha'; // Reset to default
+
             document.getElementById('input').value = '';
             document.getElementById('seriesGrid').innerHTML = '';
             document.getElementById('commands').innerHTML = '';
@@ -1236,7 +1329,6 @@
             document.getElementById('goToCommandsBtn').style.display = 'none';
             localStorage.removeItem('mudaeSeriesData');
             localStorage.removeItem('mudaeQuickNotes');
-
         }
 
         function showMessage(text, type) {
@@ -1246,7 +1338,7 @@
             setTimeout(function () {
                 messageDiv.innerHTML = '';
                 messageDiv.className = 'empty-message'
-            }, 10000);
+            }, 5000);
         }
 
         function saveToLocalStorage() {
@@ -1273,6 +1365,13 @@
                 if (savedNotes) {
                     quickNotes = JSON.parse(savedNotes);
                     displayQuickNotes();
+                }
+
+                const savedColumns = localStorage.getItem('mudaeGridColumns');
+                if (savedColumns) {
+                    changeGridColumns(parseInt(savedColumns, 10));
+                } else {
+                    changeGridColumns(3);
                 }
             } catch (e) {
                 console.error('Failed to load from localStorage:', e);

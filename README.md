@@ -6,7 +6,7 @@ Designed for use with the [Mudae bot](https://top.gg/bot/432610292342587392) on 
 
 ## Features
 
-- Import characters from `$mmai-s` or `$mmnai-s` output  
+- Import characters from `$mmasi-[kc+x+y+]` output  
 - Display characters with names, series, and images  
 - Organize notes for characters
 - Copy created commands
@@ -22,7 +22,7 @@ The app works offline, but images require an internet connection.
 
 ## How to Use
 
-1. Run `$mmai-s` or `$mmnai-s` in Discord.  
+1. Run `$mmasi-[kc+x+y+]` in Discord.  
 2. Copy the character list.  
 3. Paste it in the page and click **Parse Input**.  
 4. Add notes as needed.
@@ -31,20 +31,27 @@ The app works offline, but images require an internet connection.
 ## Notes
 
 - Large collections may take some time to load.
+- This website doesn't won't work on phones.
 
 
 ## To-Do
 
 - ~~Add local storage~~
 - ~~Sorting~~
-- add note to a specific character
+- ~~add note to a specific character~~
 - ~~add [c+] option~~
-- Group by note
 - ~~Parse kakera values~~
-- Search and filter functionality
-- Generate `$sortmarry` commands for your collection
 - ~~fix characters not getting disabled~~
 - ~~delete any ($togglewestern) or other things that can appear~~
 - ~~cut the name short if it's too long~~
-- change sort group pare buttons/select buttons ui
-- Go to generated commands button :)
+- ~~Go to generated commands button :)~~
+Top priority:
+- Make groupings work
+- Filter functionality (automatically deselect or something)
+- Sort functionality (in groupings)
+- Index characters and let the user moves them around or something
+
+The less important:
+- change sort group parse buttons/select buttons ui
+- Generate `$sortmarry` commands for your collection based on series order (another thing to add is to index groups which the user can change uhh)
+- Search characters
