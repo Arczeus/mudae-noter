@@ -223,6 +223,9 @@
             color: #e5e7eb;
             font-size: 0.95em;
             flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .series-toggle-btn {
@@ -285,6 +288,7 @@
             border: 3px solid transparent;
             border-radius: 8px;
             overflow: hidden;
+            width: 140px;
         }
 
         .character-card:hover {
@@ -353,6 +357,9 @@
             text-align: center;
             word-break: break-word;
             font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .character-stats {
@@ -826,6 +833,7 @@
                 const titleDiv = document.createElement('div');
                 titleDiv.className = 'series-title';
                 titleDiv.textContent = seriesName;
+                titleDiv.title = seriesName;
 
                 const toggleBtn = document.createElement('button');
                 toggleBtn.className = 'series-toggle-btn';
@@ -895,6 +903,7 @@
                     const nameDiv = document.createElement('div');
                     nameDiv.className = 'character-name';
                     nameDiv.textContent = char.name;
+                    nameDiv.title = char.name;
 
                     const noteDiv = document.createElement('div');
                     const hasNote = char.note && char.note.trim() !== '';
