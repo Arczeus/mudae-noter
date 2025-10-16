@@ -383,6 +383,34 @@
             font-weight: 700;
         }
 
+        .character-rank-badge {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background-color: rgba(10, 10, 15, 0.8);
+            color: #a78bfa;
+            font-weight: 700;
+            font-size: 0.9em;
+            padding: 2px 6px;
+            border-radius: 4px;
+            z-index: 10;
+            cursor: pointer;
+            border: 1px solid #a78bfa;
+        }
+
+        .rank-input {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 40px;
+            z-index: 10;
+            text-align: center;
+            border: 1px solid #7c3aed;
+            background: #1a1a24;
+            color: #e5e7eb;
+            border-radius: 4px;
+        }
+
         .commands-section {
             margin-top: 30px;
             padding: 20px;
@@ -478,12 +506,58 @@
             display: none;
         }
 
+        .card-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #13131a;
+            border-radius: 8px;
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .sort-buttons button {
+            background: #2a2a3a;
+            color: #9ca3af;
+            border: 1px solid transparent;
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sort-buttons button:hover {
+            background: #7c3aed;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .note-applicator .apply-btn {
+            padding: 8px 15px;
+            font-size: 0.8em;
+            white-space: nowrap;
+            background-color: #6d28d9;
+            flex-shrink: 0;
+        }
+
+        .note-applicator .apply-btn:hover {
+            background-color: #7c3aed;
+        }
+
         .footer {
             text-align: center;
             padding: 1%;
             color: #6b7280;
             font-size: 0.85em;
-            margin-top: 600px;
             border-top: 1px solid #2a2a3a;
         }
 
@@ -509,7 +583,7 @@
                 <div>• Click characters to disable</div>
                 <div>• Click "Disable All" to toggle entire series</div>
                 <div>• Add notes to group characters</div>
-                <div>• You can also use this to generate $ec commands</div>
+                <div>• You can also use this to generate $ec or other commands</div>
             </div>
         </div>
 
@@ -533,7 +607,7 @@
                 <button onclick="setGrouping('keys')" id="group-keys-btn">Keys</button>
             </div>
             <div style="margin-top: 15px;">
-                <label style="display: inline; margin-right: 10px;">Sort groupings by:</label>
+                <label style="display: inline; margin-right: 10px;">Sort groups by:</label>
                 <button onclick="sortGroups('alpha')">A-Z</button>
                 <button onclick="sortGroups('count')">Character Count</button>
             </div>
@@ -549,7 +623,6 @@
                     style="padding: 8px 15px; font-size: 0.9em;">4</button>
             </div>
             <div style="margin-top: 15px;">
-                <label style="display: inline; margin-right: 10px;">Group by:</label>
                 <button onclick="selectAllCharacters()">Select All</button>
                 <button onclick="deselectAllCharacters()">Deselect All</button>
             </div>
@@ -743,7 +816,6 @@
                         }
 
                         // 2. Extract Color, Keys, Keytype, Count (part of fullInfo)
-                        // This part is the most variable. We'll search for the color pattern (#xxxxxx)
                         const colorMatch = fullInfo.match(/\(#([0-9a-fA-F]{6})\)/);
                         if (colorMatch) {
                             color = '#' + colorMatch[1];
@@ -788,7 +860,8 @@
                             keys: keys,
                             note: note,
                             color: color,
-                            isDisabled: isDisabled
+                            isDisabled: isDisabled,
+                            rank: 0
                         });
                     }
                 }
@@ -806,8 +879,10 @@
             saveToLocalStorage();
         }
 
-        function createCharacterCard(char) {
+        function createCharacterCard(char, groupChars) {
             const charCard = document.createElement('div');
+            charCard.dataset.originalSeries = char.originalSeries;
+            charCard.dataset.originalIndex = char.originalIndex;
             charCard.className = 'character-card' + (char.excluded ? ' excluded' : '');
             if (char.isDisabled) {
                 charCard.className += ' permanently-disabled';
@@ -815,6 +890,57 @@
             const colorCode = char.color || '#670d08';
             charCard.style.borderColor = colorCode;
             charCard.onclick = (event) => toggleCharacter(char.originalSeries, char.originalIndex, event.currentTarget);
+
+            const rankBadge = document.createElement('div');
+            rankBadge.className = 'character-rank-badge';
+            rankBadge.textContent = char.rank > 0 ? char.rank : '#';
+
+            rankBadge.onclick = (e) => {
+                e.stopPropagation();
+                const currentBadge = e.target;
+                const oldRankText = currentBadge.textContent;
+                const oldRank = oldRankText === '#' ? 0 : parseInt(oldRankText);
+                currentBadge.style.display = 'none';
+
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.className = 'rank-input';
+                input.value = oldRank > 0 ? oldRank : '';
+
+                charCard.prepend(input);
+                input.focus();
+                input.select();
+
+                const saveRank = () => {
+                    let newRank = parseInt(input.value);
+                    if (isNaN(newRank) || newRank < 1) newRank = oldRank;
+
+                    groupChars.forEach(otherChar => {
+                        const otherCharData = seriesData[otherChar.originalSeries].characters[otherChar.originalIndex];
+                        if (otherChar.originalSeries === char.originalSeries && otherChar.originalIndex === char.originalIndex) return;
+
+                        if (newRank < oldRank && otherCharData.rank >= newRank && otherCharData.rank < oldRank) {
+                            otherCharData.rank++;
+                        } else if (newRank > oldRank && otherCharData.rank <= newRank && otherCharData.rank > oldRank) {
+                            otherCharData.rank--;
+                        }
+                    });
+
+                    seriesData[char.originalSeries].characters[char.originalIndex].rank = newRank;
+                    saveToLocalStorage();
+                    displaySeries();
+                };
+
+                input.onblur = saveRank;
+                input.onkeydown = (event) => {
+                    if (event.key === 'Enter') saveRank();
+                    if (event.key === 'Escape') {
+                        if (input.parentNode) input.parentNode.removeChild(input);
+                        currentBadge.style.display = 'block';
+                    }
+                };
+            };
+
             const img = document.createElement('img');
             img.src = char.image;
             img.alt = char.name;
@@ -843,12 +969,11 @@
             noteDiv.onclick = function (e) {
                 e.stopPropagation();
                 const originalNoteDiv = this;
-                const currentNote = char.note;
                 originalNoteDiv.style.display = 'none';
 
                 const input = document.createElement('input');
                 input.type = 'text';
-                input.value = currentNote;
+                input.value = char.note;
                 input.style.cssText = 'width: 100%; box-sizing: border-box; font-size: 0.7em; text-align: center; padding: 3px; border: 1px solid #7c3aed; background: #1a1a24; color: #e5e7eb; border-radius: 4px;';
 
                 originalNoteDiv.parentNode.insertBefore(input, originalNoteDiv);
@@ -859,8 +984,23 @@
                     const newNote = input.value.trim();
                     seriesData[char.originalSeries].characters[char.originalIndex].note = newNote;
                     saveToLocalStorage();
-                    displaySeries();
+
+                    if (currentGrouping === 'note') {
+                        displaySeries();
+                    } else {
+                        const newHasNote = newNote !== '';
+                        originalNoteDiv.textContent = newHasNote ? newNote : 'No note!';
+                        originalNoteDiv.title = newHasNote ? newNote : 'Click to add note';
+                        originalNoteDiv.style.color = newHasNote ? '#9ca3af' : '#dc2626';
+                        originalNoteDiv.style.fontWeight = newHasNote ? 'normal' : 'bold';
+
+                        if (input.parentNode) {
+                            input.parentNode.removeChild(input);
+                        }
+                        originalNoteDiv.style.display = '';
+                    }
                 };
+
                 input.onblur = saveAndClose;
                 input.onkeydown = (event) => {
                     if (event.key === 'Enter') saveAndClose();
@@ -886,6 +1026,7 @@
             infoDiv.appendChild(noteDiv);
             infoDiv.appendChild(statsDiv);
 
+            charCard.appendChild(rankBadge);
             charCard.appendChild(img);
             charCard.appendChild(infoDiv);
 
@@ -967,7 +1108,6 @@
             grid.innerHTML = '';
             if (Object.keys(seriesData).length === 0) return;
 
-            // Step 1: Group all characters based on the current setting.
             const groups = {};
             for (const seriesName in seriesData) {
                 seriesData[seriesName].characters.forEach((char, idx) => {
@@ -988,25 +1128,12 @@
                             break;
                     }
                     if (!groups[groupKey]) {
-                        groups[groupKey] = {
-                            characters: [],
-                            ...(currentGrouping === 'series' && {
-                                owned: seriesData[seriesName].owned,
-                                total: seriesData[seriesName].total,
-                                note: seriesData[seriesName].note,
-                            })
-                        };
+                        groups[groupKey] = { characters: [] };
                     }
-                    // Store the character's original location so we can modify it later.
-                    groups[groupKey].characters.push({
-                        ...char,
-                        originalSeries: seriesName,
-                        originalIndex: idx
-                    });
+                    groups[groupKey].characters.push({ ...char, originalSeries: seriesName, originalIndex: idx });
                 });
             }
 
-            // Step 2: Sort the groups based on the current setting.
             const sortedGroupEntries = Object.entries(groups).sort((a, b) => {
                 const [keyA, dataA] = a;
                 const [keyB, dataB] = b;
@@ -1020,12 +1147,29 @@
             for (const [groupName, data] of sortedGroupEntries) {
                 const card = document.createElement('div');
                 card.className = 'series-card';
+
                 const headerDiv = document.createElement('div');
                 headerDiv.className = 'series-header';
                 const titleDiv = document.createElement('div');
                 titleDiv.className = 'series-title';
                 titleDiv.textContent = groupName;
                 titleDiv.title = groupName;
+
+                const countDiv = document.createElement('div');
+                countDiv.className = 'series-count';
+                const includedCount = data.characters.filter(c => !c.excluded).length;
+                countDiv.textContent = `${includedCount}/${data.characters.length}`;
+                card.dataset.totalChars = data.characters.length;
+
+                headerDiv.appendChild(titleDiv);
+                headerDiv.appendChild(countDiv);
+                card.appendChild(headerDiv);
+
+                const controlsDiv = document.createElement('div');
+                controlsDiv.className = 'card-controls';
+
+                const topControlsRow = document.createElement('div');
+                topControlsRow.className = 'controls-row';
 
                 const toggleBtn = document.createElement('button');
                 toggleBtn.className = 'series-toggle-btn';
@@ -1034,101 +1178,157 @@
                 toggleBtn.textContent = allExcluded ? 'Enable All' : 'Disable All';
                 toggleBtn.onclick = (e) => {
                     e.stopPropagation();
-                    toggleGroup(data.characters);
+                    toggleGroup(data.characters, e);
                 };
-                const countDiv = document.createElement('div');
-                countDiv.className = 'series-count';
-                if (currentGrouping === 'series') {
-                    countDiv.textContent = `${data.owned}/${data.total}`;
-                } else {
-                    const includedCount = data.characters.filter(c => !c.excluded).length;
-                    countDiv.textContent = `${includedCount}/${data.characters.length}`;
-                    card.dataset.totalChars = data.characters.length;
-                }
-                headerDiv.appendChild(titleDiv);
-                headerDiv.appendChild(toggleBtn);
-                headerDiv.appendChild(countDiv);
-                card.appendChild(headerDiv);
+                topControlsRow.appendChild(toggleBtn);
 
-                // Only show the "Apply note to series" input when grouping by series
-                if (currentGrouping === 'series') {
-                    const noteInputContainer = document.createElement('div');
-                    noteInputContainer.style.cssText = 'display: flex; gap: 5px; margin-bottom: 10px; padding: 8px; width: 100%;';
-                    const noteInput = document.createElement('input');
-                    noteInput.type = 'text';
-                    noteInput.className = 'note-input';
-                    noteInput.placeholder = 'Enter series note';
-                    noteInput.value = data.note || '';
-                    noteInput.style.flexGrow = '1';
-                    noteInput.onchange = function () {
-                        seriesData[groupName].note = this.value;
-                        saveToLocalStorage();
-                    };
-                    const applyButton = document.createElement('button');
-                    applyButton.className = 'series-apply-note-btn';
-                    applyButton.textContent = 'Apply';
-                    applyButton.style.cssText = 'background: #7c3aed; border-radius: 5px; padding: 10px; font-size: 0.8em; white-space: nowrap; height: fit-content;';
-                    applyButton.onclick = () => updateCharacterNotes(groupName, noteInput.value);
-                    noteInputContainer.appendChild(noteInput);
-                    noteInputContainer.appendChild(applyButton);
-                    card.appendChild(noteInputContainer);
-                }
+                const sortButtonsContainer = document.createElement('div');
+                sortButtonsContainer.className = 'sort-buttons';
+                sortButtonsContainer.innerHTML = `<span style="font-size: 0.8em; color: #9ca3af; margin-right: 5px;">Sort:</span>`;
+
+const sortAZ = document.createElement('button');
+sortAZ.textContent = 'A-Z';
+const sortByKa = document.createElement('button');
+sortByKa.textContent = 'Kakera';
+const sortByKeys = document.createElement('button');
+sortByKeys.textContent = 'Keys';
+const sortByOriginal = document.createElement('button');
+sortByOriginal.textContent = 'Original';
+
+sortButtonsContainer.appendChild(sortAZ);
+sortButtonsContainer.appendChild(sortByKa);
+sortButtonsContainer.appendChild(sortByKeys);
+sortButtonsContainer.appendChild(sortByOriginal);
+topControlsRow.appendChild(sortButtonsContainer);
+controlsDiv.appendChild(topControlsRow);
+
+                const noteInputContainer = document.createElement('div');
+                noteInputContainer.className = 'controls-row note-applicator';
+                const noteInput = document.createElement('input');
+                noteInput.type = 'text';
+                noteInput.className = 'note-input';
+                noteInput.placeholder = 'Enter group note...';
+                noteInput.style.flexGrow = '1';
+
+                const applyButton = document.createElement('button');
+                applyButton.className = 'apply-btn';
+                applyButton.textContent = 'Apply';
+                noteInputContainer.appendChild(noteInput);
+                noteInputContainer.appendChild(applyButton);
+                controlsDiv.appendChild(noteInputContainer);
+                card.appendChild(controlsDiv);
 
                 const charList = document.createElement('div');
                 charList.className = 'characters-list';
-                data.characters.forEach((char) => {
-                    charList.appendChild(createCharacterCard(char));
-                });
                 card.appendChild(charList);
-                grid.appendChild(card);
+
+                // --- Event Handlers & State Management for this card ---
+let currentlyDisplayedChars = [...data.characters];
+
+const reRankAndRender = (sortFunction) => {
+    const sortedChars = [...currentlyDisplayedChars].sort(sortFunction);
+    
+    sortedChars.forEach((char, index) => {
+        seriesData[char.originalSeries].characters[char.originalIndex].rank = index + 1;
+        char.rank = index + 1;
+    });
+    
+    saveToLocalStorage();
+    
+    currentlyDisplayedChars.sort((a, b) => a.rank - b.rank);
+
+    charList.innerHTML = '';
+    currentlyDisplayedChars.forEach(char => {
+        charList.appendChild(createCharacterCard(char, currentlyDisplayedChars));
+    });
+};
+
+sortAZ.onclick = () => reRankAndRender((a, b) => a.name.localeCompare(b.name));
+sortByKa.onclick = () => reRankAndRender((a, b) => parseInt(b.kakera || 0) - parseInt(a.kakera || 0));
+sortByKeys.onclick = () => reRankAndRender((a, b) => parseInt(b.keys || 0) - parseInt(a.keys || 0));
+sortByOriginal.onclick = () => reRankAndRender((a, b) => {
+    const seriesCompare = a.originalSeries.localeCompare(b.originalSeries);
+    if (seriesCompare !== 0) {
+        return seriesCompare;
+    }
+    return a.originalIndex - b.originalIndex;
+});
+
+applyButton.onclick = () => {
+    const newNote = noteInput.value.trim();
+
+    data.characters.forEach(char => {
+        seriesData[char.originalSeries].characters[char.originalIndex].note = newNote;
+        char.note = newNote;
+    });
+
+    saveToLocalStorage();
+    showMessage(`Applied note to ${data.characters.length} characters.`, 'success');
+
+    if (currentGrouping === 'note') {
+        displaySeries();
+    } else {
+        // We need to re-render the cards to show the new notes
+        const currentRanks = currentlyDisplayedChars.map(c => c.rank);
+        reRankAndRender((a, b) => currentRanks.indexOf(a.rank) - currentRanks.indexOf(b.rank));
+    }
+};
+
+const initialRender = () => {
+    if (currentlyDisplayedChars.every(c => c.rank === 0)) {
+        currentlyDisplayedChars.forEach((char, index) => {
+            char.rank = index + 1;
+            seriesData[char.originalSeries].characters[char.originalIndex].rank = index + 1;
+        });
+    }
+
+    currentlyDisplayedChars.sort((a, b) => a.rank - b.rank);
+    charList.innerHTML = '';
+    currentlyDisplayedChars.forEach(char => {
+        charList.appendChild(createCharacterCard(char, currentlyDisplayedChars));
+    });
+};
+
+initialRender();
+grid.appendChild(card);
             }
         }
 
-        function updateCharacterNotes(seriesName, newNote) {
-            if (!seriesData[seriesName]) return;
 
-            seriesData[seriesName].characters.forEach(function (char) {
-                char.note = newNote;
-            });
+        function toggleCharacter(seriesName, charIdx, cardElement) {
+            if (!seriesData[seriesName] || !seriesData[seriesName].characters[charIdx]) return;
 
-            displaySeries();
+            const char = seriesData[seriesName].characters[charIdx];
+            char.excluded = !char.excluded;
+
+            cardElement.classList.toggle('excluded', char.excluded);
+
+            const groupCard = cardElement.closest('.series-card');
+            if (groupCard) {
+                if (currentGrouping !== 'series') {
+                    const countEl = groupCard.querySelector('.series-count');
+                    if (countEl) {
+                        const parts = countEl.textContent.split('/');
+                        let includedCount = parseInt(parts[0], 10);
+                        includedCount += char.excluded ? -1 : 1;
+                        countEl.textContent = `${includedCount}/${parts[1]}`;
+                    }
+                }
+
+                const allExcludedInGroup = !groupCard.querySelector('.character-card:not(.excluded)');
+
+                const toggleBtn = groupCard.querySelector('.series-toggle-btn');
+                if (toggleBtn) {
+                    toggleBtn.classList.toggle('disabled', allExcludedInGroup);
+                    toggleBtn.textContent = allExcludedInGroup ? 'Enable All' : 'Disable All';
+                }
+            }
+
+            updateStats();
             saveToLocalStorage();
         }
 
-function toggleCharacter(seriesName, charIdx, cardElement) {
-    if (!seriesData[seriesName] || !seriesData[seriesName].characters[charIdx]) return;
-
-    const char = seriesData[seriesName].characters[charIdx];
-    char.excluded = !char.excluded;
-
-    cardElement.classList.toggle('excluded', char.excluded);
-
-    const groupCard = cardElement.closest('.series-card');
-    if (groupCard) {
-        if (currentGrouping !== 'series') {
-            const countEl = groupCard.querySelector('.series-count');
-            if (countEl) {
-                const parts = countEl.textContent.split('/');
-                let includedCount = parseInt(parts[0], 10);
-                includedCount += char.excluded ? -1 : 1;
-                countEl.textContent = `${includedCount}/${parts[1]}`;
-            }
-        }
-
-        const allExcludedInGroup = !groupCard.querySelector('.character-card:not(.excluded)');
-
-        const toggleBtn = groupCard.querySelector('.series-toggle-btn');
-        if (toggleBtn) {
-            toggleBtn.classList.toggle('disabled', allExcludedInGroup);
-            toggleBtn.textContent = allExcludedInGroup ? 'Enable All' : 'Disable All';
-        }
-    }
-
-    updateStats();
-    saveToLocalStorage();
-}
-
-        function toggleGroup(charactersInGroup) {
+        function toggleGroup(charactersInGroup, event) {
             if (!charactersInGroup || charactersInGroup.length === 0) return;
 
             const allExcluded = charactersInGroup.every(c => seriesData[c.originalSeries].characters[c.originalIndex].excluded);
@@ -1138,7 +1338,26 @@ function toggleCharacter(seriesName, charIdx, cardElement) {
                 seriesData[char.originalSeries].characters[char.originalIndex].excluded = shouldExclude;
             });
 
-            displaySeries();
+            const button = event.currentTarget;
+            const groupCard = button.closest('.series-card');
+
+            if (groupCard) {
+                button.classList.toggle('disabled', shouldExclude);
+                button.textContent = shouldExclude ? 'Enable All' : 'Disable All';
+
+                const charCardsInGroup = groupCard.querySelectorAll('.character-card');
+                charCardsInGroup.forEach(card => {
+                    card.classList.toggle('excluded', shouldExclude);
+                });
+
+                const countEl = groupCard.querySelector('.series-count');
+                const total = groupCard.dataset.totalChars;
+                if (countEl && total) {
+                    const newCount = shouldExclude ? 0 : total;
+                    countEl.textContent = `${newCount}/${total}`;
+                }
+            }
+
             updateStats();
             saveToLocalStorage();
         }
@@ -1186,96 +1405,79 @@ function toggleCharacter(seriesName, charIdx, cardElement) {
     </div>`;
             const container = commandsDiv.querySelector('.commands-section');
 
-            const groups = {};
-            let charactersToGroup = [];
+            const commandsByNote = {};
+            let totalSelectedCharacters = 0;
 
-            for (const seriesName in seriesData) {
-                seriesData[seriesName].characters.forEach(char => {
-                    if (!char.excluded) {
-                        charactersToGroup.push({
-                            ...char,
-                            seriesName
-                        });
+            const allSelectedCards = document.querySelectorAll('#seriesGrid .character-card:not(.excluded)');
+
+            const orderedSelectedChars = Array.from(allSelectedCards).map(card => {
+                const seriesName = card.dataset.originalSeries;
+                const charIndex = parseInt(card.dataset.originalIndex, 10);
+                return seriesData[seriesName].characters[charIndex];
+            });
+
+            for (const char of orderedSelectedChars) {
+                if (!char.excluded) {
+                    totalSelectedCharacters++;
+                    const note = char.note ? char.note.trim() : '';
+                    if (!commandsByNote[note]) {
+                        commandsByNote[note] = [];
                     }
-                });
+                    commandsByNote[note].push(char);
+                }
             }
 
-            if (currentGrouping === 'nogroup') {
-                if (charactersToGroup.length > 0) {
-                    groups['All Characters'] = charactersToGroup;
-                }
-            } else {
-                charactersToGroup.forEach(char => {
-                    let groupKey;
-                    if (currentGrouping === 'note') {
-                        groupKey = char.note ? char.note.trim() : '(No note)';
-                    } else if (currentGrouping === 'series') {
-                        groupKey = char.seriesName;
-                    } else if (currentGrouping === 'keys') {
-                        groupKey = char.keys ? `${char.keys} key${parseInt(char.keys, 10) !== 1 ? 's' : ''}` : '0 keys';
-                    }
+            const sortedNotes = Object.keys(commandsByNote).sort((a, b) => a.localeCompare(b));
 
-                    if (!groups[groupKey]) {
-                        groups[groupKey] = [];
-                    }
-                    groups[groupKey].push(char);
-                });
-            }
+            for (const note of sortedNotes) {
+                const charsWithThisNote = commandsByNote[note];
+                const allCharsNames = charsWithThisNote.map(c => c.name);
 
-
-            const sortedGroupKeys = Object.keys(groups).sort((a, b) => a.localeCompare(b));
-
-            for (const groupKey of sortedGroupKeys) {
-                const charactersInGroup = groups[groupKey];
-                const allCharsNames = charactersInGroup.map(c => c.name);
-
-                let noteText = '';
-                if (currentGrouping === 'note' && groupKey !== '(No note)') {
-                    noteText = ' ' + groupKey;
-                } else if (currentGrouping === 'series') {
-                    const seriesNote = seriesData[groupKey] ? seriesData[groupKey].note : '';
-                    if (seriesNote) {
-                        noteText = ' ' + seriesNote;
-                    }
-                }
-
-                let currentCommand = '$n ';
                 let commandParts = [];
+                const commandPrefix = '$n ';
+                const commandSuffix = note ? ` $ ${note}` : '';
+                let currentCharacterString = '';
 
-                for (let i = 0; i < allCharsNames.length; i++) {
-                    let next = allCharsNames[i] + '$';
-                    if ((currentCommand + next + noteText).length > 1990) {
-                        currentCommand = currentCommand.slice(0, -1);
-                        currentCommand += noteText;
-                        commandParts.push(currentCommand);
-                        currentCommand = '$n ' + next;
+                for (const charName of allCharsNames) {
+                    const separator = currentCharacterString ? '$' : '';
+                    const potentialNextString = currentCharacterString + separator + charName;
+
+                    if ((commandPrefix.length + potentialNextString.length + commandSuffix.length) > 1990) {
+                        const finalCommand = commandPrefix + currentCharacterString + commandSuffix;
+                        commandParts.push(finalCommand);
+                        currentCharacterString = charName;
                     } else {
-                        currentCommand += next;
+                        currentCharacterString = potentialNextString;
                     }
                 }
 
-                if (currentCommand.length > 3) {
-                    currentCommand = currentCommand.slice(0, -1);
-                    currentCommand += noteText;
-                    commandParts.push(currentCommand);
+                if (currentCharacterString) {
+                    const finalCommand = commandPrefix + currentCharacterString + commandSuffix;
+                    commandParts.push(finalCommand);
                 }
 
                 commandParts.forEach((command, idx) => {
                     const commandItem = document.createElement('div');
                     commandItem.className = 'command-item';
 
+                    let headerText = `Note: ${note || 'None'}`;
+                    headerText += ` - ${allCharsNames.length} character${allCharsNames.length > 1 ? 's' : ''}`;
+                    if (commandParts.length > 1) {
+                        headerText += ` (Part ${idx + 1}/${commandParts.length})`;
+                    }
+
                     commandItem.innerHTML = `
-            <div class="command-header">
-                <div class="command-series">${groupKey} - ${allCharsNames.length} character${allCharsNames.length > 1 ? 's' : ''} ${commandParts.length > 1 ? `(Part ${idx + 1}/${commandParts.length})` : ''}</div>
-            </div>
-            <div class="command-text">${command}</div>
-            <button class="copy-btn" onclick="copyCommand(this, \`${command.replace(/`/g, '\\`')}\`)">Copy Command</button>
-        `;
+                        <div class="command-header">
+                            <div class="command-series">${headerText}</div>
+                        </div>
+                        <div class="command-text">${command}</div>
+                        <button class="copy-btn" onclick="copyCommand(this, \`${command.replace(/`/g, '\\`')}\`)">Copy Command</button>
+                    `;
                     container.appendChild(commandItem);
                 });
             }
 
-            if (sortedGroupKeys.length === 0) {
+            if (totalSelectedCharacters === 0) {
                 const p = document.createElement('p');
                 p.style.color = '#6b7280';
                 p.style.padding = '20px';

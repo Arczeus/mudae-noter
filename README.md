@@ -32,23 +32,24 @@ The app works offline, but images require an internet connection.
 
 - Large collections may take some time to load.
 - This website doesn't won't work on phones.
-
+- It may break unexpectedly.
 
 ## To-Do
 
 - ~~Add local storage~~
 - ~~Sorting~~
-- ~~add note to a specific character~~
-- ~~add [c+] option~~
+- ~~Add note to a specific character~~
+- ~~Add [c+] option~~
 - ~~Parse kakera values~~
-- ~~fix characters not getting disabled~~
-- ~~delete any ($togglewestern) or other things that can appear~~
-- ~~cut the name short if it's too long~~
+- ~~Fix characters not getting disabled~~
+- ~~Delete any ($togglewestern) or other things that can appear~~
+- ~~Cut the name short if it's too long~~
 - ~~Go to generated commands button :)~~
+
 Top priority:
-- Make groupings work
-- Filter functionality (automatically deselect or something)
-- Sort functionality (in groupings)
+- ~~Make groupings work~~
+- Deselect by some filter (or something like that)
+- ~~Sort functionality (in groupings)~~
 - Index characters and let the user moves them around or something
 
 The less important:
