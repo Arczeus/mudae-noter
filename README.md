@@ -38,8 +38,8 @@ The app works offline, but images require an internet connection.
 - ~~Add local storage~~
 - ~~Sorting~~
 - add note to a specific character
-- add [c+] option
+- ~~add [c+] option~~
 - Group by note
-- Parse kakera values
+- ~~Parse kakera values~~
 - Search and filter functionality
 - Generate `$sortmarry` commands for your collection

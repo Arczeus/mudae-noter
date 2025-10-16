@@ -105,7 +105,6 @@
         .quick-note:hover {
             background: #7c3aed;
             color: white;
-            transform: scale(1.05);
         }
 
         .quick-note-remove {
@@ -290,7 +289,6 @@
 
         .character-card:hover {
             transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
         .character-card.excluded {
@@ -306,6 +304,39 @@
             height: 210px;
             object-fit: cover;
             display: block;
+        }
+
+        .character-card.permanently-disabled {
+            position: relative;
+            opacity: 0.75;
+        }
+
+        .character-card.permanently-disabled::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 5%;
+            right: 5%;
+            height: 5px;
+            background: #dc2626;
+            transform: translateY(-50%) rotate(-45deg);
+            z-index: 10;
+            border-radius: 2px;
+            box-shadow: 0 0 5px rgba(220, 38, 38, 0.8);
+        }
+
+        .character-card.permanently-disabled .character-info::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 5%;
+            right: 5%;
+            height: 5px;
+            background: #dc2626;
+            transform: translateY(-50%) rotate(45deg);
+            z-index: 10;
+            border-radius: 2px;
+            box-shadow: 0 0 5px rgba(220, 38, 38, 0.8);
         }
 
         .character-info {
@@ -465,17 +496,19 @@
     <div class="container">
         <div class="header-row">
             <h1>Mudae Note Manager</h1>
-            <p class="subtitle">Parse your $mmasi-[y+][k][n] (brackets are optional) output and create note commands for
+            <p class="subtitle">Parse your $mmasi-[y+][k][c+][x+][n] (brackets are optional) output and create note
+                commands for
                 your characters</p>
             <div class="instructions">
                 <div>• Click characters to disable</div>
                 <div>• Click "Disable All" to toggle entire series</div>
                 <div>• Add notes to group characters</div>
+                <div>• You can also use this to generate $ec commands</div>
             </div>
         </div>
 
         <div class="input-section">
-            <label for="input">Paste your $mmasi-[y+][k][n] (brackets are optional) output here:</label>
+            <label for="input">Paste your $mmasi-[y+][k][c+][x+][n] (brackets are optional) output here:</label>
             <textarea id="input"
                 placeholder="Series Name - 5/20&#10;Character Name - https://mudae.net/uploads/...&#10;Another Character - https://mudae.net/uploads/...&#10;&#10;Another Series - 3/15&#10;Character Name - https://mudae.net/uploads/...&#10;...and so on"></textarea>
             <div style="margin-top: 10px;">
@@ -609,47 +642,59 @@
                         note: ''
                     };
                 } else if (currentSeries) {
-                    // Match: Name | notes · :keytype: (count) kakera ka - url
-                    // or: Name | notes kakera ka - url
-                    // or: Name · :keytype: (count) kakera ka - url
-                    // or: Name kakera ka - url
-                    // or: Name - url
+                    // General structure: Name [| note] [· :keytype: (count) (#color)] [kakera ka] - url
                     const charMatch = line.match(/^(.+?)\s+-\s+(https?:\/\/.+)$/);
                     if (charMatch) {
                         let fullInfo = charMatch[1].trim();
                         const imageUrl = charMatch[2].trim();
 
-                        let fullName = fullInfo;
-                        let displayName = fullInfo;
-                        let cleanName = fullInfo;
                         let kakera = '';
                         let keys = '';
+                        let color = '';
+                        let note = '';
+                        let cleanName = fullInfo;
+                        let isDisabled = false;
 
+                        // 1. Extract Kakera (always at the end before URL)
                         const kakeraMatch = fullInfo.match(/([\d,]+)\s*ka\s*$/);
                         if (kakeraMatch) {
                             kakera = kakeraMatch[1].replace(/,/g, '');
                             fullInfo = fullInfo.substring(0, kakeraMatch.index).trim();
                         }
 
+                        // 2. Extract Color, Keys, Keytype, Count (part of fullInfo)
+                        // This part is the most variable. We'll search for the color pattern (#xxxxxx)
+                        const colorMatch = fullInfo.match(/\(#([0-9a-fA-F]{6})\)/);
+                        if (colorMatch) {
+                            color = '#' + colorMatch[1];
+                            fullInfo = fullInfo.replace(colorMatch[0], '').trim();
+                        }
+
+                        // 3. Extract Key Count (part of fullInfo, usually after color removal if present)
                         const keysMatch = fullInfo.match(/\((\d+)\)/);
                         if (keysMatch) {
                             keys = keysMatch[1];
+                            fullInfo = fullInfo.replace(keysMatch[0], '').trim();
                         }
 
-                        fullName = fullInfo.replace(/\(\d+\)/g, '').trim();
-                        fullName = fullName.replace(/:(?:bronze|silver|gold|chaos)key:/gi, '').trim();
-                        fullName = fullName.replace(/\s*·\s*$/, '').trim();
+                        // 4. Clean up Key Type and separator
+                        fullInfo = fullInfo.replace(/:(?:bronze|silver|gold|chaos)key:/gi, '').trim();
 
-                        displayName = fullName;
-                        cleanName = fullName;
+                        // Check for the disabled symbol 🚫
+                        if (fullInfo.includes('🚫')) {
+                            isDisabled = true;
+                            fullInfo = fullInfo.replace('🚫', '').trim();
+                        }
 
-                        let characterNote = '';
-                        const pipeIndex = fullName.indexOf('|');
+                        fullInfo = fullInfo.replace(/\s*·\s*$/, '').trim();
+
+                        // 5. Extract Name and Note (Name | Note or just Name)
+                        const pipeIndex = fullInfo.indexOf('|');
                         if (pipeIndex !== -1) {
-                            cleanName = fullName.substring(0, pipeIndex).trim();
-                            characterNote = fullName.substring(pipeIndex + 1).trim();
+                            cleanName = fullInfo.substring(0, pipeIndex).trim();
+                            note = fullInfo.substring(pipeIndex + 1).trim();
                         } else {
-                            cleanName = fullName;
+                            cleanName = fullInfo;
                         }
 
                         seriesData[currentSeries].characters.push({
@@ -659,7 +704,9 @@
                             excluded: false,
                             kakera: kakera,
                             keys: keys,
-                            note: characterNote
+                            note: note,
+                            color: color,
+                            isDisabled: isDisabled
                         });
                     }
                 }
@@ -801,6 +848,14 @@
                 data.characters.forEach(function (char, idx) {
                     const charCard = document.createElement('div');
                     charCard.className = 'character-card' + (char.excluded ? ' excluded' : '');
+
+                    if (char.isDisabled) {
+                        charCard.className += ' permanently-disabled';
+                    }
+
+                    const colorCode = char.color || '#670d08';
+                    charCard.style.borderLeft = '5px solid ' + colorCode;
+
                     charCard.onclick = function () {
                         toggleCharacter(seriesName, idx);
                     };
@@ -863,24 +918,61 @@
 
         function toggleCharacter(seriesName, charIdx) {
             if (seriesData[seriesName] && seriesData[seriesName].characters[charIdx]) {
-                seriesData[seriesName].characters[charIdx].excluded =
-                    !seriesData[seriesName].characters[charIdx].excluded;
-                displaySeries();
+                const char = seriesData[seriesName].characters[charIdx];
+                char.excluded = !char.excluded;
+
+                const seriesId = seriesName.replace(/[^a-zA-Z0-9]/g, '_');
+                const charCard = document.querySelector(`#chars-${seriesId} > div:nth-child(${charIdx + 1})`);
+                if (charCard) {
+                    charCard.classList.toggle('excluded', char.excluded);
+                }
+
+                updateSeriesToggleButton(seriesName);
+
                 updateStats();
             }
             saveToLocalStorage();
         }
+        function updateSeriesToggleButton(seriesName) {
+            const data = seriesData[seriesName];
+            const allExcluded = data.characters.every(function (c) { return c.excluded; });
 
+            const grid = document.getElementById('seriesGrid');
+            const seriesElements = grid.querySelectorAll('.series-card');
+            let toggleBtn;
+
+            for (let i = 0; i < seriesElements.length; i++) {
+                const titleDiv = seriesElements[i].querySelector('.series-title');
+                if (titleDiv && titleDiv.textContent === seriesName) {
+                    toggleBtn = seriesElements[i].querySelector('.series-toggle-btn');
+                    break;
+                }
+            }
+
+            if (toggleBtn) {
+                toggleBtn.classList.toggle('disabled', allExcluded);
+                toggleBtn.textContent = allExcluded ? 'Enable All' : 'Disable All';
+            }
+        }
         function toggleSeries(seriesName) {
             if (!seriesData[seriesName]) return;
 
-            const allExcluded = seriesData[seriesName].characters.every(function (c) { return c.excluded; });
+            const data = seriesData[seriesName];
+            const allExcluded = data.characters.every(function (c) { return c.excluded; });
+            const shouldExclude = !allExcluded;
 
-            seriesData[seriesName].characters.forEach(function (char) {
-                char.excluded = !allExcluded;
+            const seriesId = seriesName.replace(/[^a-zA-Z0-9]/g, '_');
+            const charList = document.getElementById('chars-' + seriesId);
+
+            data.characters.forEach(function (char, idx) {
+                char.excluded = shouldExclude;
+                const charCard = charList.querySelector(`div:nth-child(${idx + 1})`);
+                if (charCard) {
+                    charCard.classList.toggle('excluded', shouldExclude);
+                }
             });
 
-            displaySeries();
+            updateSeriesToggleButton(seriesName);
             updateStats();
             saveToLocalStorage();
         }
