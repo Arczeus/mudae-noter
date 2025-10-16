@@ -488,6 +488,11 @@
                 <button onclick="sortSeries('alpha')">A-Z</button>
                 <button onclick="sortSeries('count')">Character Count</button>
             </div>
+            <div style="margin-top: 15px;">
+                <button onclick="selectAllCharacters()">Select All</button>
+                <button onclick="deselectAllCharacters()">Deselect All</button>
+            </div>
+
         </div>
 
         <div id="message"></div>
@@ -699,6 +704,42 @@
 
             displaySeries();
             saveToLocalStorage();
+        }
+
+        function selectAllCharacters() {
+            if (Object.keys(seriesData).length === 0) {
+                showMessage('No characters to select!', 'error');
+                return;
+            }
+
+            for (let seriesName in seriesData) {
+                seriesData[seriesName].characters.forEach(function (char) {
+                    char.excluded = false;
+                });
+            }
+
+            displaySeries();
+            updateStats();
+            saveToLocalStorage();
+            showMessage('All characters selected', 'success');
+        }
+
+        function deselectAllCharacters() {
+            if (Object.keys(seriesData).length === 0) {
+                showMessage('No characters to deselect!', 'error');
+                return;
+            }
+
+            for (let seriesName in seriesData) {
+                seriesData[seriesName].characters.forEach(function (char) {
+                    char.excluded = true;
+                });
+            }
+
+            displaySeries();
+            updateStats();
+            saveToLocalStorage();
+            showMessage('All characters deselected', 'success');
         }
 
         function displaySeries() {
