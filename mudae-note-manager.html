@@ -195,6 +195,11 @@
             min-width: 0;
         }
 
+        .add-note-input:focus {
+            outline: none;
+            border-color: #7c3aed;
+        }
+
         .hidden-char {
             display: none !important;
         }
@@ -832,7 +837,9 @@
                     <div class="main-buttons">
                         <button onclick="parseInput()" class="btn-primary">Parse Input</button>
                         <button onclick="clearAll()" class="btn-primary">Clear All</button>
-                        <button onclick="generateCommands()" id="generateBtn" disabled>Generate Commands</button>
+                        <button onclick="generateNoteCommands()" id="generateBtn" disabled>Generate Notes</button>
+                        <button onclick="generateColorCommands()" id="generateColorBtn" disabled>Generate
+                            Colors</button>
                         <button onclick="scrollToCommands()" id="goToCommandsBtn" style="display: none;">Go to Commands
                             ↓</button>
                     </div>
@@ -849,6 +856,7 @@
                             <button onclick="setGrouping('nogroup')" id="group-nogroup-btn">None</button>
                             <button onclick="setGrouping('series')" id="group-series-btn" class="active">Series</button>
                             <button onclick="setGrouping('note')" id="group-note-btn">Note</button>
+                            <button onclick="setGrouping('color')" id="group-color-btn">Color</button>
                             <button onclick="setGrouping('keys')" id="group-keys-btn">Keys</button>
                             <button onclick="setGrouping('kakera')" id="group-kakera-btn">Kakera</button>
                         </div>
@@ -959,7 +967,7 @@
 
         function setGrouping(method) {
             currentGrouping = method;
-            const buttons = document.querySelectorAll('#group-series-btn, #group-note-btn, #group-keys-btn, #group-nogroup-btn, #group-kakera-btn');
+            const buttons = document.querySelectorAll('#group-series-btn, #group-note-btn, #group-keys-btn, #group-nogroup-btn, #group-kakera-btn, #group-color-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
             document.getElementById(`group-${method}-btn`).classList.add('active');
 
@@ -1198,6 +1206,7 @@
             displaySeries();
             updateStats();
             document.getElementById('generateBtn').disabled = false;
+            document.getElementById('generateColorBtn').disabled = false;
             saveToLocalStorage();
         }
 
@@ -1445,6 +1454,9 @@
                             break;
                         case 'keys':
                             groupKey = char.keys ? `${char.keys} Keys` : '0 Keys';
+                            break;
+                        case 'color':
+                            groupKey = char.color.trim().toUpperCase() || '(No Color)';
                             break;
                         case 'nogroup':
                             groupKey = 'All Characters';
@@ -1790,16 +1802,15 @@
         function scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
-        function generateCommands() {
+        function generateNoteCommands() {
             const commandsDiv = document.getElementById('commands');
             commandsDiv.innerHTML = `
-    <div class="commands-section">
-        <h2 style="display: flex; justify-content: space-between; align-items: center;">
-            Generated Commands
-            <button onclick="scrollToTop()" style="font-size: 0.7em; padding: 6px 12px;">Go to Top ↑</button>
-        </h2>
-    </div>`;
+    <div class="commands-section">
+        <h2 style="display: flex; justify-content: space-between; align-items: center;">
+            Generated Commands
+            <button onclick="scrollToTop()" style="font-size: 0.7em; padding: 6px 12px;">Go to Top ↑</button>
+        </h2>
+    </div>`;
             const container = commandsDiv.querySelector('.commands-section');
 
             const commandsByNote = {};
@@ -1864,12 +1875,12 @@
                     }
 
                     commandItem.innerHTML = `
-                        <div class="command-header">
-                            <div class="command-series">${headerText}</div>
-                        </div>
-                        <div class="command-text">${command}</div>
-                        <button class="copy-btn" onclick="copyCommand(this, \`${command.replace(/`/g, '\\`')}\`)">Copy Command</button>
-                    `;
+                        <div class="command-header">
+                            <div class="command-series">${headerText}</div>
+                        </div>
+                        <div class="command-text">${command}</div>
+                        <button class="copy-btn" onclick="copyCommand(this, \`${command.replace(/`/g, '\\`')}\`)">Copy Command</button>
+                    `;
                     container.appendChild(commandItem);
                 });
             }
@@ -1879,6 +1890,105 @@
                 p.style.color = '#6b7280';
                 p.style.padding = '20px';
                 p.textContent = 'No commands to generate. Please select at least one character.';
+                container.appendChild(p);
+            }
+
+            const commandsContainer = document.getElementById('commands').querySelector('.command-item');
+            if (commandsContainer) {
+                document.getElementById('goToCommandsBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('goToCommandsBtn').style.display = 'none';
+            }
+        }
+
+        function generateColorCommands() {
+            const commandsDiv = document.getElementById('commands');
+            commandsDiv.innerHTML = `
+    <div class="commands-section">
+        <h2 style="display: flex; justify-content: space-between; align-items: center;">
+            Generated Color Commands ($ec)
+            <button onclick="scrollToTop()" style="font-size: 0.7em; padding: 6px 12px;">Go to Top ↑</button>
+        </h2>
+    </div>`;
+            const container = commandsDiv.querySelector('.commands-section');
+
+            const commandsByColor = {};
+            let totalSelectedCharacters = 0;
+
+            const allSelectedCards = document.querySelectorAll('#seriesGrid .character-card:not(.excluded)');
+
+            const orderedSelectedChars = Array.from(allSelectedCards).map(card => {
+                const seriesName = card.dataset.originalSeries;
+                const charIndex = parseInt(card.dataset.originalIndex, 10);
+                return seriesData[seriesName].characters[charIndex];
+            });
+
+            for (const char of orderedSelectedChars) {
+                if (!char.excluded && char.color) {
+                    totalSelectedCharacters++;
+                    const color = char.color.trim().toLowerCase();
+                    if (!commandsByColor[color]) {
+                        commandsByColor[color] = [];
+                    }
+                    commandsByColor[color].push(char);
+                }
+            }
+
+            const sortedColors = Object.keys(commandsByColor).sort((a, b) => a.localeCompare(b));
+
+            for (const color of sortedColors) {
+                const charsWithThisColor = commandsByColor[color];
+                const allCharsNames = charsWithThisColor.map(c => c.name);
+
+                let commandParts = [];
+                const commandPrefix = '$ec ';
+                const commandSuffix = ` $ ${color}`;
+                let currentCharacterString = '';
+
+                for (const charName of allCharsNames) {
+                    const separator = currentCharacterString ? '$' : '';
+                    const potentialNextString = currentCharacterString + separator + charName;
+
+                    if ((commandPrefix.length + potentialNextString.length + commandSuffix.length) > 1990) {
+                        const finalCommand = commandPrefix + currentCharacterString + commandSuffix;
+                        commandParts.push(finalCommand);
+                        currentCharacterString = charName;
+                    } else {
+                        currentCharacterString = potentialNextString;
+                    }
+                }
+
+                if (currentCharacterString) {
+                    const finalCommand = commandPrefix + currentCharacterString + commandSuffix;
+                    commandParts.push(finalCommand);
+                }
+
+                commandParts.forEach((command, idx) => {
+                    const commandItem = document.createElement('div');
+                    commandItem.className = 'command-item';
+
+                    let headerText = `Color: ${color}`;
+                    headerText += ` - ${charsWithThisColor.length} character${charsWithThisColor.length > 1 ? 's' : ''}`;
+                    if (commandParts.length > 1) {
+                        headerText += ` (Part ${idx + 1}/${commandParts.length})`;
+                    }
+
+                    commandItem.innerHTML = `
+                        <div class="command-header">
+                            <div class="command-series">${headerText}</div>
+                        </div>
+                        <div class="command-text">${command}</div>
+                        <button class="copy-btn" onclick="copyCommand(this, \`${command.replace(/`/g, '\\`')}\`)">Copy Command</button>
+                    `;
+                    container.appendChild(commandItem);
+                });
+            }
+
+            if (totalSelectedCharacters === 0) {
+                const p = document.createElement('p');
+                p.style.color = '#6b7280';
+                p.style.padding = '20px';
+                p.textContent = 'No characters with a custom color selected to generate commands.';
                 container.appendChild(p);
             }
 
@@ -1925,6 +2035,7 @@
             document.getElementById('message').innerHTML = '';
             document.getElementById('message').className = 'empty';
             document.getElementById('generateBtn').disabled = true;
+            document.getElementById('generateColorBtn').disabled = true;
             document.getElementById('goToCommandsBtn').style.display = 'none';
             localStorage.removeItem('mudaeSeriesData');
             localStorage.removeItem('mudaeQuickNotes');
@@ -1996,6 +2107,7 @@
                     displaySeries();
                     updateStats();
                     document.getElementById('generateBtn').disabled = Object.keys(seriesData).length === 0;
+                    document.getElementById('generateColorBtn').disabled = Object.keys(seriesData).length === 0;
                 }
 
                 if (savedNotes) {
