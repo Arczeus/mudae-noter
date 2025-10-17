@@ -1661,9 +1661,9 @@
                     const newNote = noteInput.value.trim();
 
                     data.characters.forEach(char => {
-                        if (!char.excluded) {
-                            seriesData[char.originalSeries].characters[char.originalIndex].note = newNote;
-                            char.note = newNote;
+                        const masterChar = seriesData[char.originalSeries].characters[char.originalIndex];
+                        if (!masterChar.excluded) {
+                            masterChar.note = newNote;
                         }
                     });
 
@@ -2068,37 +2068,37 @@
             });
         }
 
-function clearAll() {
-            if (Object.keys(seriesData).length > 0) {
-                if (!confirm('Are you sure you want to clear all data?')) return;
-            }
+        function clearAll() {
+            if (Object.keys(seriesData).length > 0) {
+                if (!confirm('Are you sure you want to clear all data?')) return;
+            }
 
-            seriesData = {};
-            currentGrouping = 'series';
-            currentSortMethod = 'alpha';
+            seriesData = {};
+            currentGrouping = 'series';
+            currentSortMethod = 'alpha';
 
-            document.getElementById('input').value = '';
-            document.getElementById('seriesGrid').innerHTML = '';
-            document.getElementById('commands').innerHTML = '';
-            document.getElementById('stats').innerHTML = '';
-            document.getElementById('message').innerHTML = '';
-            document.getElementById('message').className = 'empty';
-            document.getElementById('generateBtn').disabled = true;
-            document.getElementById('generateColorBtn').disabled = true;
-            document.getElementById('goToCommandsBtn').style.display = 'none';
+            document.getElementById('input').value = '';
+            document.getElementById('seriesGrid').innerHTML = '';
+            document.getElementById('commands').innerHTML = '';
+            document.getElementById('stats').innerHTML = '';
+            document.getElementById('message').innerHTML = '';
+            document.getElementById('message').className = 'empty';
+            document.getElementById('generateBtn').disabled = true;
+            document.getElementById('generateColorBtn').disabled = true;
+            document.getElementById('goToCommandsBtn').style.display = 'none';
 
-            const groupButtons = document.querySelectorAll('#group-series-btn, #group-note-btn, #group-keys-btn, #group-nogroup-btn, #group-kakera-btn, #group-color-btn');
-            groupButtons.forEach(btn => btn.classList.remove('active'));
-            document.getElementById('group-series-btn').classList.add('active');
-            document.getElementById('kakera-range-container').style.display = 'none';
+            const groupButtons = document.querySelectorAll('#group-series-btn, #group-note-btn, #group-keys-btn, #group-nogroup-btn, #group-kakera-btn, #group-color-btn');
+            groupButtons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById('group-series-btn').classList.add('active');
+            document.getElementById('kakera-range-container').style.display = 'none';
 
-            const sortButtons = document.querySelectorAll('#sort-alpha-btn, #sort-count-btn');
-            sortButtons.forEach(btn => btn.classList.remove('active'));
-            document.getElementById('sort-alpha-btn').classList.add('active');
+            const sortButtons = document.querySelectorAll('#sort-alpha-btn, #sort-count-btn');
+            sortButtons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById('sort-alpha-btn').classList.add('active');
 
-            localStorage.removeItem('mudaeSeriesData');
-            localStorage.removeItem('mudaeQuickNotes');
-        }
+            localStorage.removeItem('mudaeSeriesData');
+            localStorage.removeItem('mudaeQuickNotes');
+        }
 
         function applyFilter() {
             if (Object.keys(seriesData).length === 0) {
