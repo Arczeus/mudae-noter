@@ -223,6 +223,161 @@
             background: #34c965;
         }
 
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .controls-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto 1fr;
+            gap: 30px;
+            align-items: stretch;
+        }
+
+        .actions-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .actions-panel textarea {
+            flex-grow: 1;
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        .actions-panel,
+        .options-panel {
+            background: #1a1a24;
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid #2a2a3a;
+        }
+
+        .options-panel {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        .options-panel h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            border-bottom: 1px solid #2a2a3a;
+            padding-bottom: 10px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group h3 {
+            color: #e5e7eb;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .button-group label {
+            margin-bottom: 0;
+            font-size: 0.9em;
+            color: #9ca3af;
+            margin-right: 5px;
+        }
+
+        .button-group button {
+            margin-right: 0;
+            padding: 8px 15px;
+            font-size: 0.9em;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .button-group button:not(.active) {
+            background: #2a2a3a;
+            color: #9ca3af;
+        }
+
+        .button-group button:hover {
+            transform: translateY(-1px);
+        }
+
+        .button-group button.active {
+            background: #7c3aed;
+            color: white;
+            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
+        }
+
+        .main-buttons {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: #7c3aed;
+        }
+
+        .btn-primary:hover {
+            background: #6d28d9;
+        }
+
+        .btn-secondary {
+            background: #4b5563;
+        }
+
+        .btn-secondary:hover {
+            background: #374151;
+        }
+
+        .btn-tertiary {
+            background: #2a2a3a;
+            padding: 6px 12px;
+            font-size: 0.9em;
+        }
+
+        #filter-section {
+            margin-top: 0;
+            padding: 0;
+            background: transparent;
+            border: none;
+        }
+
+        .stats-panel {
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin-top: auto;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            padding-top: 15px;
+        }
+
+        .filter-controls-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 5px;
+        }
+
         .series-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(300px, 1fr));
@@ -466,16 +621,6 @@
             font-size: 0.9em;
         }
 
-        .stats {
-            display: flex;
-            gap: 20px;
-            margin: 20px 0;
-            padding: 15px;
-            background: #1a1a24;
-            border-radius: 8px;
-            border: 1px solid #2a2a3a;
-        }
-
         .stat-item {
             flex: 1;
         }
@@ -598,96 +743,111 @@
         </div>
 
         <div class="input-section">
-            <label for="input">Paste your $mmasi-[y+][k][c+][x+][n] (brackets are optional) output here:</label>
-            <textarea id="input"
-                placeholder="Series Name - 5/20&#10;Character Name - https://mudae.net/uploads/...&#10;Another Character - https://mudae.net/uploads/...&#10;&#10;Another Series - 3/15&#10;Character Name - https://mudae.net/uploads/...&#10;...and so on"></textarea>
-            <div style="margin-top: 15px;">
-                <button onclick="parseInput()">Parse Input</button>
-                <button onclick="clearAll()">Clear All</button>
-                <button onclick="generateCommands()" id="generateBtn" disabled>Generate Commands</button>
-                <button onclick="scrollToCommands()" id="goToCommandsBtn" style="display: none;">Go to Commands
-                    ↓</button>
-            </div>
+            <div class="controls-container">
+                <div class="actions-panel">
+                    <label for="input">Paste your $mmasi output here:</label>
+                    <textarea id="input"
+                        placeholder="Dungeon Meshi - 4/10&#10;Laios Touden 5680 ka - https://mudae.net/uploads/dm1.png&#10;Marcille Donato | Elf ✨ · :goldkey: (3) (#fde2e2) 7250 ka - https://mudae.net/uploads/dm2.png&#10;Chilchuck Tims · :silverkey: (1) 2800 ka - https://mudae.net/uploads/dm3.png&#10;Izutsumi | KIBTY!! :3 (#6f4e37) 3100 ka - https://mudae.net/uploads/dm4.png&#10;&#10;Vocaloid - 3/25&#10;Hatsune Miku 🚫 9980 ka - https://mudae.net/uploads/v1.png&#10;Kagamine Rin · :goldkey: (2) (#ffcc00) 6100 ka - https://mudae.net/uploads/v2.png&#10;KAITO 4300 ka - https://mudae.net/uploads/v3.png"></textarea>
+                    <div class="main-buttons">
+                        <button onclick="parseInput()" class="btn-primary">Parse Input</button>
+                        <button onclick="clearAll()" class="btn-primary">Clear All</button>
+                        <button onclick="generateCommands()" id="generateBtn" disabled>Generate Commands</button>
+                        <button onclick="scrollToCommands()" id="goToCommandsBtn" style="display: none;">Go to Commands
+                            ↓</button>
+                    </div>
+                    <div id="stats" class="stats-panel"></div>
 
-            <div style="margin-top: 15px;">
-                <label style="display: inline; margin-right: 10px;">Group by:</label>
-                <button onclick="setGrouping('nogroup')" id="group-nogroup-btn">No Group</button>
-                <button onclick="setGrouping('series')" id="group-series-btn" class="active">Series</button>
-                <button onclick="setGrouping('note')" id="group-note-btn">Note</button>
-                <button onclick="setGrouping('keys')" id="group-keys-btn">Keys</button>
-                <button onclick="setGrouping('kakera')" id="group-kakera-btn">Kakera</button>
-            </div>
-            <div id="kakera-range-container" style="display: none; margin-top: 15px;">
-                <label for="kakera-range-input" style="display: inline; margin-right: 10px;">Kakera range size:</label>
-                <input type="number" id="kakera-range-input" value="1000" class="add-note-input" style="width: 120px; display: inline-block;">
-                <button onclick="displaySeries()">Apply Range</button>
-            </div>
-            <div style="margin-top: 15px;">
-                <label style="display: inline; margin-right: 10px;">Sort groups by:</label>
-                <button onclick="sortGroups('alpha')" id="sort-alpha-btn" class="active">A-Z</button>
-                <button onclick="sortGroups('count')" id="sort-count-btn">Character Count</button>
-            </div>
-            <div style="margin-top: 15px;">
-                <label style="display: inline; margin-right: 10px;">Ranking:</label>
-                <button onclick="toggleRanking(true)" id="ranking-on-btn" class="active">Enabled</button>
-                <button onclick="toggleRanking(false)" id="ranking-off-btn">Disabled</button>
-            </div>
-            <div style="margin-top: 15px;">
-                <label style="display: inline; margin-right: 10px;">Show Deselected:</label>
-                <button onclick="toggleDeselectedVisibility(true)" id="deselected-show-btn" class="active">Show</button>
-                <button onclick="toggleDeselectedVisibility(false)" id="deselected-hide-btn">Hide</button>
-            </div>
-            <div style="margin-top: 15px;">
-                <label style="display: inline; margin-right: 10px;">Grid Columns:</label>
-                <button onclick="changeGridColumns(1)" id="grid-btn-1"
-                    style="padding: 8px 15px; font-size: 0.9em;">1</button>
-                <button onclick="changeGridColumns(2)" id="grid-btn-2"
-                    style="padding: 8px 15px; font-size: 0.9em;">2</button>
-                <button onclick="changeGridColumns(3)" id="grid-btn-3"
-                    style="padding: 8px 15px; font-size: 0.9em;">3</button>
-                <button onclick="changeGridColumns(4)" id="grid-btn-4"
-                    style="padding: 8px 15px; font-size: 0.9em;">4</button>
-            </div>
+                </div>
 
-            <div style="margin-top: 15px;">
-                <button onclick="selectAllCharacters()">Select All</button>
-                <button onclick="deselectAllCharacters()">Deselect All</button>
-            </div>
+                <div class="options-panel">
+                    <h2>Options</h2>
 
-            <div id="filter-section"
-                style="margin-top: 15px; padding: 15px; background: #1a1a24; border-radius: 8px; border: 1px solid #2a2a3a;">
-                <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-end;">
-                    <div class="filter-control">
-                        <label for="min-kakera">Min Kakera</label>
-                        <input type="number" id="min-kakera" placeholder="0" class="add-note-input">
+                    <div class="control-group">
+                        <h3>Grouping</h3>
+                        <div class="button-group">
+                            <button onclick="setGrouping('nogroup')" id="group-nogroup-btn">None</button>
+                            <button onclick="setGrouping('series')" id="group-series-btn" class="active">Series</button>
+                            <button onclick="setGrouping('note')" id="group-note-btn">Note</button>
+                            <button onclick="setGrouping('keys')" id="group-keys-btn">Keys</button>
+                            <button onclick="setGrouping('kakera')" id="group-kakera-btn">Kakera</button>
+                        </div>
+                        <div id="kakera-range-container" style="display: none; margin-top: 10px;">
+                            <label for="kakera-range-input">Range Size:</label>
+                            <input type="number" id="kakera-range-input" value="1000" class="add-note-input"
+                                style="width: 100px;">
+                            <button onclick="displaySeries()" class="btn-tertiary">Apply</button>
+                        </div>
                     </div>
-                    <div class="filter-control">
-                        <label for="max-kakera">Max Kakera</label>
-                        <input type="number" id="max-kakera" placeholder="any" class="add-note-input">
+
+                    <div class="control-group">
+                        <h3>Sorting & Display</h3>
+                        <div class="button-group">
+                            <label>Sort Groups:</label>
+                            <button onclick="sortGroups('alpha')" id="sort-alpha-btn" class="active">A-Z</button>
+                            <button onclick="sortGroups('count')" id="sort-count-btn">Count</button>
+                        </div>
+                        <div class="button-group">
+                            <label>Ranking:</label>
+                            <button onclick="toggleRanking(true)" id="ranking-on-btn" class="active">On</button>
+                            <button onclick="toggleRanking(false)" id="ranking-off-btn">Off</button>
+                        </div>
+                        <div class="button-group">
+                            <label>Deselected:</label>
+                            <button onclick="toggleDeselectedVisibility(true)" id="deselected-show-btn"
+                                class="active">Show</button>
+                            <button onclick="toggleDeselectedVisibility(false)" id="deselected-hide-btn">Hide</button>
+                        </div>
+                        <div class="button-group">
+                            <label>Columns:</label>
+                            <button onclick="changeGridColumns(1)" id="grid-btn-1">1</button>
+                            <button onclick="changeGridColumns(2)" id="grid-btn-2">2</button>
+                            <button onclick="changeGridColumns(3)" id="grid-btn-3" class="active">3</button>
+                            <button onclick="changeGridColumns(4)" id="grid-btn-4">4</button>
+                        </div>
                     </div>
-                    <div class="filter-control">
-                        <label for="min-keys">Min Keys</label>
-                        <input type="number" id="min-keys" placeholder="0" class="add-note-input">
+
+                    <div class="control-group">
+                        <h3>Bulk Actions</h3>
+                        <div class="button-group">
+                            <button onclick="selectAllCharacters()">Select All</button>
+                            <button onclick="deselectAllCharacters()">Deselect All</button>
+                        </div>
                     </div>
-                    <div class="filter-control">
-                        <label for="max-keys">Max Keys</label>
-                        <input type="number" id="max-keys" placeholder="any" class="add-note-input">
-                    </div>
-                    <div>
-                        <button onclick="applyFilter()">Apply Filter</button>
+
+                    <div class="control-group" id="filter-section">
+                        <h3>Filter Characters</h3>
+                        <div class="filter-controls-container">
+                            <div class="filter-group">
+                                <div class="filter-control">
+                                    <label for="min-kakera">Min Ka</label>
+                                    <input type="number" id="min-kakera" placeholder="0" class="add-note-input">
+                                </div>
+                                <div class="filter-control">
+                                    <label for="max-kakera">Max Ka</label>
+                                    <input type="number" id="max-kakera" placeholder="any" class="add-note-input">
+                                </div>
+                            </div>
+                            <div class="filter-group">
+                                <div class="filter-control">
+                                    <label for="min-keys">Min Keys</label>
+                                    <input type="number" id="min-keys" placeholder="0" class="add-note-input">
+                                </div>
+                                <div class="filter-control">
+                                    <label for="max-keys">Max Keys</label>
+                                    <input type="number" id="max-keys" placeholder="any" class="add-note-input">
+                                </div>
+                            </div>
+                            <div>
+                                <button onclick="applyFilter()" class="btn-primary">Apply Filter</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
         <div id="message"></div>
-
-        <div id="stats"></div>
-
         <div id="seriesGrid" class="series-grid"></div>
-
         <div id="commands"></div>
-
         <div class="footer">
             <div class="footer-contact">
                 Questions or feedback? Contact <strong>arczeus</strong> on Discord.
@@ -730,12 +890,12 @@
             }
 
             displaySeries();
-            showMessage(`Grouping by ${method}`, 'success');
+            // showMessage(`Grouping by ${method}`, 'success');
         }
 
         function sortGroups(method) {
             if (Object.keys(seriesData).length === 0) {
-                showMessage('No data to sort!', 'error');
+                //showMessage('No data to sort!', 'error');
                 return;
             }
             currentSortMethod = method;
@@ -745,7 +905,7 @@
             document.getElementById(`sort-${method}-btn`).classList.add('active');
 
             displaySeries();
-            showMessage(`Sorted by ${method === 'alpha' ? 'A-Z' : 'character count'}`, 'success');
+            //showMessage(`Sorted by ${method === 'alpha' ? 'A-Z' : 'character count'}`, 'success');
         }
         function toggleRanking(enabled) {
             isRankingEnabled = enabled;
@@ -755,7 +915,7 @@
             if (Object.keys(seriesData).length > 0) {
                 displaySeries();
             }
-            showMessage(`Ranking is now ${enabled ? 'enabled' : 'disabled'}.`, 'success');
+            //showMessage(`Ranking is now ${enabled ? 'enabled' : 'disabled'}.`, 'success');
         }
         function changeGridColumns(columns) {
             const grid = document.getElementById('seriesGrid');
@@ -782,7 +942,7 @@
             }
 
             saveToLocalStorage();
-            showMessage(`Deselected characters are now ${shouldShow ? 'shown' : 'hidden'}.`, 'success');
+            //showMessage(`Deselected characters are now ${shouldShow ? 'shown' : 'hidden'}.`, 'success');
         }
         function displayQuickNotes() {
             const list = document.getElementById('quickNotesList');
@@ -848,7 +1008,7 @@
 
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(function () {
-                showMessage('Copied: ' + text, 'success');
+                // showMessage('Copied: ' + text, 'success');
             });
         }
 
@@ -860,7 +1020,7 @@
         function parseInput() {
             const input = document.getElementById('input').value.trim();
             if (!input) {
-                showMessage('Please paste your $mmasi-[y+][k][n] (brackets are optional) output first!', 'error');
+                // showMessage('Please paste your $mmasi-[y+][k][n] (brackets are optional) output first!', 'error');
                 return;
             }
 
@@ -955,13 +1115,13 @@
             }
 
             if (Object.keys(seriesData).length === 0) {
-                showMessage('No valid data found. Please check your input format.', 'error');
+                //showMessage('No valid data found. Please check your input format.', 'error');
                 return;
             }
 
             displaySeries();
             updateStats();
-            showMessage('Successfully parsed ' + Object.keys(seriesData).length + ' series!', 'success');
+            //showMessage('Successfully parsed ' + Object.keys(seriesData).length + ' series!', 'success');
             document.getElementById('generateBtn').disabled = false;
             saveToLocalStorage();
         }
@@ -1159,7 +1319,7 @@
 
         function selectAllCharacters() {
             if (Object.keys(seriesData).length === 0) {
-                showMessage('No characters to select!', 'error');
+                //showMessage('No characters to select!', 'error');
                 return;
             }
 
@@ -1172,12 +1332,12 @@
             updateSelectionView(false);
             updateStats();
             saveToLocalStorage();
-            showMessage('All characters selected', 'success');
+            //showMessage('All characters selected', 'success');
         }
 
         function deselectAllCharacters() {
             if (Object.keys(seriesData).length === 0) {
-                showMessage('No characters to deselect!', 'error');
+                //showMessage('No characters to deselect!', 'error');
                 return;
             }
 
@@ -1190,10 +1350,10 @@
             updateSelectionView(true);
             updateStats();
             saveToLocalStorage();
-            showMessage('All characters deselected', 'success');
+            //showMessage('All characters deselected', 'success');
         }
 
-function displaySeries() {
+        function displaySeries() {
             const grid = document.getElementById('seriesGrid');
             grid.innerHTML = '';
             if (Object.keys(seriesData).length === 0) return;
@@ -1364,7 +1524,7 @@ function displaySeries() {
                     });
 
                     saveToLocalStorage();
-                    showMessage(`Applied note to ${data.characters.length} characters.`, 'success');
+                    //showMessage(`Applied note to ${data.characters.length} characters.`, 'success');
 
                     if (currentGrouping === 'note') {
                         displaySeries();
@@ -1639,7 +1799,7 @@ function displaySeries() {
         }
         function applyFilter() {
             if (Object.keys(seriesData).length === 0) {
-                showMessage('No data to filter!', 'error');
+                //showMessage('No data to filter!', 'error');
                 return;
             }
 
@@ -1673,7 +1833,7 @@ function displaySeries() {
             displaySeries();
             updateStats();
             saveToLocalStorage();
-            showMessage(`Deselected ${deselectedCount} characters based on the filter.`, 'success');
+            //showMessage(`Deselected ${deselectedCount} characters based on the filter.`, 'success');
         }
         function showMessage(text, type) {
             const messageDiv = document.getElementById('message');
