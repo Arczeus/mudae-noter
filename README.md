@@ -61,13 +61,14 @@ The less important:
 - Add generate $ec command
 - Add generate $sm command
 - Make qucik notes draggable (maybe seperate them into colors and notes)
-- Add button to apply to selected characters only
+- ~~Add button to apply to selected characters only~~
 
 ## Bugs
 
 - ~~Apply button changes the selected characters~~
 - ~~Sorting changes the selected characters~~
 - ~~Some characters can have (2434) in their name and parser gets confused~~
+- When clicking and deselected is set to hide characters should hide
 
 ## Images
 

@@ -1476,9 +1476,16 @@
 
                 const applyButton = document.createElement('button');
                 applyButton.className = 'apply-btn';
-                applyButton.textContent = 'Apply';
+                applyButton.textContent = 'Apply All';
+
+                const applySelectedButton = document.createElement('button');
+                applySelectedButton.className = 'apply-btn';
+                applySelectedButton.textContent = 'Apply Selected';
+                applySelectedButton.style.backgroundColor = '#6d28d9';
+
                 noteInputContainer.appendChild(noteInput);
                 noteInputContainer.appendChild(applyButton);
+                noteInputContainer.appendChild(applySelectedButton);
                 controlsDiv.appendChild(noteInputContainer);
                 card.appendChild(controlsDiv);
 
@@ -1537,7 +1544,33 @@
                         });
                     }
                 };
+                applySelectedButton.onclick = () => {
+                    const newNote = noteInput.value.trim();
 
+                    data.characters.forEach(char => {
+                        if (!char.excluded) {
+                            seriesData[char.originalSeries].characters[char.originalIndex].note = newNote;
+                            char.note = newNote;
+                        }
+                    });
+
+                    saveToLocalStorage();
+
+                    if (currentGrouping === 'note') {
+                        displaySeries();
+                    } else {
+                        charList.querySelectorAll('.character-card:not(.excluded)').forEach(cardElement => {
+                            const noteDiv = cardElement.querySelector('.character-note');
+                            if (noteDiv) {
+                                const hasNote = newNote !== '';
+                                noteDiv.textContent = hasNote ? newNote : 'No note!';
+                                noteDiv.title = hasNote ? newNote : 'Click to add note';
+                                noteDiv.style.color = hasNote ? '#9ca3af' : '#dc2626';
+                                noteDiv.style.fontWeight = hasNote ? 'normal' : 'bold';
+                            }
+                        });
+                    }
+                };
                 const initialRender = () => {
                     if (isRankingEnabled) {
                         if (currentlyDisplayedChars.every(c => c.rank === 0)) {
