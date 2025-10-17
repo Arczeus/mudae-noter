@@ -799,7 +799,9 @@
                     <b>Parse Input</b>.
                 </p>
                 <p class="instruction-item">
-                    <strong>Command:</strong> Use <code> $mmasi-y+kc+x+r </code>to include rank, keys, colors and extra
+
+                    <strong>Command:</strong> Use <code> $mmsaty+ri-c+x+kt </code>to include rank, keys, colors and
+                    extra
                     info.
                 </p>
                 <p class="instruction-item">
@@ -831,7 +833,8 @@
         <div class="input-section">
             <div class="controls-container">
                 <div class="actions-panel">
-                    <label for="input">Paste your $mmasi-[y+][k][c+][x+][r/l][n] (brackets are optional; "/" means or)
+                    <label for="input">Paste your $mmsai-[y+][k][c+][x+][r/l][t][n] (brackets are optional; "/" means
+                        or)
                         output here:</label>
                     <textarea id="input"
                         placeholder="Dungeon Meshi - 4/10&#10;Laios Touden 5680 ka - https://mudae.net/uploads/dm1.png&#10;#1,234 - Marcille Donato | Elf ✨ · :goldkey: (3) (#fde2e2) 7250 ka - https://mudae.net/uploads/dm2.png&#10;Chilchuck Tims · :silverkey: (1) 2800 ka - https://mudae.net/uploads/dm3.png&#10;#1 - Izutsumi | KIBTY!! :3 (#6f4e37) 3100 ka - https://mudae.net/uploads/dm4.png&#10;&#10;Vocaloid - 3/25&#10;Hatsune Miku 🚫 9980 ka - https://mudae.net/uploads/v1.png&#10;Kagamine Rin · :goldkey: (2) (#ffcc00) 6100 ka - https://mudae.net/uploads/v2.png&#10;KAITO 4300 ka - https://mudae.net/uploads/v3.png"></textarea>
@@ -956,7 +959,7 @@
 
     <script>
         let seriesData = {};
-        let quickNotes = ['⭐', '✨', '💕', '#fefefe', '#000000'];
+        let quickNotes = ['⭐', '✨', '💕', '🧠', '#fefefe', '#000000'];
         let currentGrouping = 'series';
         let currentSortMethod = 'alpha';
         let isRankingEnabled = true;
@@ -1150,6 +1153,17 @@
                             fullInfo = fullInfo.substring(0, kakeraMatch.index).trim();
                         }
 
+                        let mudaeTags = [];
+                        const tagsMatch = fullInfo.match(/\(\s*\$[^)]+\s*\)/);
+                        if (tagsMatch) {
+                            const tagsString = tagsMatch[0];
+                            const rawTags = tagsString.match(/\$([a-zA-Z]{2})/g);
+                            if (rawTags) {
+                                mudaeTags = rawTags.map(tag => tag.substring(1));
+                            }
+                            fullInfo = fullInfo.replace(tagsString, '').trim().replace(/·\s*·/g, '·').trim();
+                        }
+
                         let namePart = fullInfo;
                         let metaPart = '';
                         const metaSeparatorIndex = fullInfo.lastIndexOf('·');
@@ -1194,7 +1208,8 @@
                             color: color,
                             isDisabled: isDisabled,
                             rank: 0,
-                            globalRank: globalRank
+                            globalRank: globalRank,
+                            mudaeTags: mudaeTags
                         });
                     }
                 }
@@ -1226,6 +1241,35 @@
             const colorCode = char.color || '#670d08';
             charCard.style.borderColor = colorCode;
             charCard.onclick = (event) => toggleCharacter(char.originalSeries, char.originalIndex, event.currentTarget);
+
+            const genderContainer = document.createElement('div');
+            genderContainer.style.cssText = 'position: absolute; top: 5px; right: 5px; z-index: 10; display: flex; gap: 3px;';
+
+            const genders = new Set();
+            if (char.mudaeTags) {
+                char.mudaeTags.forEach(tag => {
+                    const gender = tag[0].toLowerCase();
+                    if (gender === 'w' || gender === 'h') {
+                        genders.add(gender);
+                    }
+                });
+            }
+
+            genders.forEach(gender => {
+                const genderBadge = document.createElement('div');
+                genderBadge.textContent = gender.toUpperCase();
+                genderBadge.style.cssText = 'font-size: 0.9em; font-weight: 700; padding: 2px 6px; border-radius: 4px; background-color: rgba(10, 10, 15, 0.8); border: 1px solid;';
+                if (gender === 'w') {
+                    genderBadge.style.color = '#ff8f8f';
+                    genderBadge.style.borderColor = '#ff8f8f';
+                } else {
+                    genderBadge.style.color = '#8fafff';
+                    genderBadge.style.borderColor = '#8fafff';
+                }
+                genderContainer.appendChild(genderBadge);
+            });
+            charCard.appendChild(genderContainer);
+
             const img = document.createElement('img');
             img.src = char.image;
             img.alt = char.name;
@@ -1233,7 +1277,7 @@
                 this.style.display = 'none';
                 const placeholder = document.createElement('div');
                 placeholder.style.cssText = 'width: 135px; height: 210px; background: #2a2a3a; display: flex; align-items: center; justify-content: center; color: #6b7280; font-size: 0.8em; text-align: center; padding: 10px;';
-                placeholder.textContent = 'No Image';
+                placeholder.textContent = 'No Image Available';
                 this.parentNode.insertBefore(placeholder, this);
             };
 
@@ -1371,6 +1415,37 @@
 
             charCard.appendChild(img);
             charCard.appendChild(infoDiv);
+
+            const rouletteContainer = document.createElement('div');
+            rouletteContainer.style.cssText = 'display: flex;';
+
+            const roulettes = new Set();
+            if (char.mudaeTags) {
+                char.mudaeTags.forEach(tag => {
+                    const roulette = tag[1].toLowerCase();
+                    if (roulette === 'a' || roulette === 'g') {
+                        roulettes.add(roulette);
+                    }
+                });
+            }
+
+            const animangaBar = document.createElement('div');
+            animangaBar.style.cssText = 'flex: 1; height: 5px; background-color: #1f1f2e;';
+            if (roulettes.has('a')) {
+                animangaBar.style.backgroundColor = '#a78bfa';
+                animangaBar.title = 'Animanga';
+            }
+
+            const gameBar = document.createElement('div');
+            gameBar.style.cssText = 'flex: 1; height: 5px; background-color: #1f1f2e;';
+            if (roulettes.has('g')) {
+                gameBar.style.backgroundColor = '#ffcb70';
+                gameBar.title = 'Game';
+            }
+
+            rouletteContainer.appendChild(animangaBar);
+            rouletteContainer.appendChild(gameBar);
+            charCard.appendChild(rouletteContainer);
 
             return charCard;
         }

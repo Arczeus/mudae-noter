@@ -50,18 +50,18 @@ Top priority:
 - ~~Make groupings work~~
 - ~~Deselect by some filter~~
 - ~~Sort functionality (in groupings)~~
-- ~~Index characters~~ and let the user move them around or something [[it's too laggy :c]]
+- ~~Index characters~~ and let the user reorder them by dragging (it's too laggy :c)
 - ~~Hide deselected characters~~
 - ~~Add ranks~~
-- Add gender
+- ~~Add gender~~
 
 The less important:
 - ~~change sort group parse buttons/select buttons ui~~
 - ~~Search characters~~ (redundant)
 - ~~Add generate $ec command~~
 - ~~Add generate $sm command~~ (redundant)
-- Make quick notes draggable (maybe seperate them into colors and notes)
 - ~~Add button to apply to selected characters only~~
+- Make quick notes draggable (maybe seperate them into colors and notes)
 
 ## Bugs
 
