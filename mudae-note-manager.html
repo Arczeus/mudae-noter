@@ -52,11 +52,60 @@
             font-size: 0.9em;
         }
 
-        .instructions {
-            margin-top: 10px;
-            font-size: 0.8em;
-            color: #6b7280;
-            line-height: 1.6;
+        .instructions-list {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px 20px;
+            color: #d1d5db;
+        }
+
+        .instruction-item {
+            font-size: 0.9em;
+            line-height: 1.4;
+            display: flex;
+            align-items: baseline;
+        }
+
+        .instruction-item b {
+            margin-left: 2px;
+            margin-right: 2px;
+            flex-shrink: 0;
+        }
+        .instruction-item strong {
+            color: #a78bfa;
+            margin-right: 5px;
+            flex-shrink: 0;
+        }
+
+        .instruction-item code {
+            background: #2a2a3a;
+            padding: 2px 4px;
+            border-radius: 4px;
+            margin-right: 5px;
+            margin-left: 5px;
+            font-size: 0.9em;
+            color: #4ade80;
+        }
+
+        .instruction-badge {
+            background: #a78bfa;
+            color: #0a0a0f;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.85em;
+            margin: 0 5px;
+        }
+
+        .dimmed {
+            opacity: 0.6;
+            font-style: italic;
+            color: #9ca3af;
+            margin-left: 2px;
+            margin-right: 2px;
         }
 
         .quick-notes {
@@ -160,7 +209,7 @@
             transition: background-color 0.2s;
         }
 
-        c .add-note-btn:hover {
+        .add-note-btn:hover {
             background-color: #6d28d9;
         }
 
@@ -737,23 +786,46 @@
     <div class="container">
         <div class="header-row">
             <h1>Mudae Note Manager</h1>
-            <p class="subtitle">Parse your $mmasi-[y+][k][c+][x+][n] (brackets are optional) output and create note
-                commands for
-                your characters</p>
-            <div class="instructions">
-                <div>Click characters to disable</div>
-                <div>Click "Disable All" to select/deselect groups</div>
-                <div>Add notes to group characters</div>
-                <div>You can also use this to generate $ec/$wish commands or rank characters</div>
+            <div class="instructions-list">
+                <p class="instruction-item">
+                    <strong>Quick Start:</strong> Paste your <code>$mmasi-</code> output below and click
+                    <b>Parse Input</b>.
+                </p>
+                <p class="instruction-item">
+                    <strong>Command:</strong> Use <code> $mmasi-y+kc+x+r </code>to include rank, keys, colors and extra
+                    info.
+                </p>
+                <p class="instruction-item">
+                    <strong>Select Characters:</strong> Click cards to toggle selection (<span class="dimmed">grayed =
+                        deselected</span>).
+                </p>
+                <p class="instruction-item">
+                    <strong>Add Notes:</strong> Click the note area or use the group input to apply notes in bulk.
+                </p>
+                <p class="instruction-item">
+                    <strong>Sorting:</strong> Use the sort buttons in each group: Original, A-Z, Global, Rank,  Kakera, Keys.
+                </p>
+                <p class="instruction-item">
+                    <strong>Ranking:</strong> Click the <span class="instruction-badge">#</span> badge to set your custom order.
+                </p>
+                <p class="instruction-item">
+                    <strong>Generate:</strong> Click <b>Generate Commands</b> to create your <code>$n</code> commands
+                    with your selected characters.
+                </p>
+                <p class="instruction-item">
+                    <strong>Quick Notes:</strong> Use the sidebar to store frequently used emojis, notes, and colors for
+                    easy reuse.
+                </p>
             </div>
         </div>
 
         <div class="input-section">
             <div class="controls-container">
                 <div class="actions-panel">
-                    <label for="input">Paste your $mmasi-[y+][k][c+][x+][n] output here:</label>
+                    <label for="input">Paste your $mmasi-[y+][k][c+][x+][r/l][n] (brackets are optional; "/" means or)
+                        output here:</label>
                     <textarea id="input"
-                        placeholder="Dungeon Meshi - 4/10&#10;Laios Touden 5680 ka - https://mudae.net/uploads/dm1.png&#10;Marcille Donato | Elf ✨ · :goldkey: (3) (#fde2e2) 7250 ka - https://mudae.net/uploads/dm2.png&#10;Chilchuck Tims · :silverkey: (1) 2800 ka - https://mudae.net/uploads/dm3.png&#10;Izutsumi | KIBTY!! :3 (#6f4e37) 3100 ka - https://mudae.net/uploads/dm4.png&#10;&#10;Vocaloid - 3/25&#10;Hatsune Miku 🚫 9980 ka - https://mudae.net/uploads/v1.png&#10;Kagamine Rin · :goldkey: (2) (#ffcc00) 6100 ka - https://mudae.net/uploads/v2.png&#10;KAITO 4300 ka - https://mudae.net/uploads/v3.png"></textarea>
+                        placeholder="Dungeon Meshi - 4/10&#10;Laios Touden 5680 ka - https://mudae.net/uploads/dm1.png&#10;#1,234 - Marcille Donato | Elf ✨ · :goldkey: (3) (#fde2e2) 7250 ka - https://mudae.net/uploads/dm2.png&#10;Chilchuck Tims · :silverkey: (1) 2800 ka - https://mudae.net/uploads/dm3.png&#10;#1 - Izutsumi | KIBTY!! :3 (#6f4e37) 3100 ka - https://mudae.net/uploads/dm4.png&#10;&#10;Vocaloid - 3/25&#10;Hatsune Miku 🚫 9980 ka - https://mudae.net/uploads/v1.png&#10;Kagamine Rin · :goldkey: (2) (#ffcc00) 6100 ka - https://mudae.net/uploads/v2.png&#10;KAITO 4300 ka - https://mudae.net/uploads/v3.png"></textarea>
                     <div class="main-buttons">
                         <button onclick="parseInput()" class="btn-primary">Parse Input</button>
                         <button onclick="clearAll()" class="btn-primary">Clear All</button>
@@ -1052,6 +1124,13 @@
                         let note = '';
                         let cleanName = '';
                         let isDisabled = false;
+                        let globalRank = '';
+
+                        const globalRankMatch = fullInfo.match(/^#([\d,]+)\s+-\s+/);
+                        if (globalRankMatch) {
+                            globalRank = globalRankMatch[1].replace(/,/g, '');
+                            fullInfo = fullInfo.substring(globalRankMatch[0].length).trim();
+                        }
 
                         const kakeraMatch = fullInfo.match(/([\d,]+)\s*ka\s*$/);
                         if (kakeraMatch) {
@@ -1102,7 +1181,8 @@
                             note: note,
                             color: color,
                             isDisabled: isDisabled,
-                            rank: 0
+                            rank: 0,
+                            globalRank: globalRank
                         });
                     }
                 }
@@ -1205,6 +1285,11 @@
 
             const statsDiv = document.createElement('div');
             statsDiv.className = 'character-stats';
+
+            const globalRankBadge = document.createElement('div');
+            globalRankBadge.className = 'stat-badge';
+            globalRankBadge.innerHTML = `<div class="stat-badge-label">Rank</div><div class="stat-badge-value">${char.globalRank ? '#' + char.globalRank : '#?'}</div>`;
+            statsDiv.appendChild(globalRankBadge);
             const kakeraBadge = document.createElement('div');
             kakeraBadge.className = 'stat-badge';
             kakeraBadge.innerHTML = `<div class="stat-badge-label">Ka</div><div class="stat-badge-value">${char.kakera || '?'}</div>`;
@@ -1445,6 +1530,7 @@
                         }
                     },
                     { label: 'A-Z', func: (a, b) => a.name.localeCompare(b.name) },
+                    { label: 'Global Rank', func: (a, b) => parseInt(a.globalRank || 999999) - parseInt(b.globalRank || 999999) },
                     { label: 'Kakera', func: (a, b) => parseInt(b.kakera || 0) - parseInt(a.kakera || 0) },
                     { label: 'Keys', func: (a, b) => parseInt(b.keys || 0) - parseInt(a.keys || 0) }
                 ];
