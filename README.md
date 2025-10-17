@@ -57,6 +57,10 @@ The less important:
 - ~~change sort group parse buttons/select buttons ui~~
 - Search characters
 
+## Bugs
+
+- ~~Apply button changes the selected characters~~
+
 ## Images
 
 ![Parsing and Options](image.png)

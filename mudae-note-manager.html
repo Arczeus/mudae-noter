@@ -697,6 +697,11 @@
             transform: translateY(-1px);
         }
 
+        .sort-buttons button.active {
+            background: #7c3aed;
+            color: white;
+        }
+
         .note-applicator .apply-btn {
             padding: 8px 15px;
             font-size: 0.8em;
@@ -1161,6 +1166,7 @@
             nameDiv.title = char.name;
 
             const noteDiv = document.createElement('div');
+            noteDiv.className = 'character-note';
             const hasNote = char.note && char.note.trim() !== '';
             noteDiv.style.cssText = 'background: #13131a; padding: 4px 4px; font-size: 0.7em; color: ' + (hasNote ? '#9ca3af' : '#dc2626; font-weight: bold') + '; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; border-radius: 4px;';
             noteDiv.title = hasNote ? char.note : 'Click to add note';
@@ -1448,19 +1454,33 @@
                 sortButtonsContainer.className = 'sort-buttons';
                 sortButtonsContainer.innerHTML = `<span style="font-size: 0.8em; color: #9ca3af; margin-right: 5px;">Sort:</span>`;
 
-                const sortAZ = document.createElement('button');
-                sortAZ.textContent = 'A-Z';
-                const sortByKa = document.createElement('button');
-                sortByKa.textContent = 'Kakera';
-                const sortByKeys = document.createElement('button');
-                sortByKeys.textContent = 'Keys';
-                const sortByOriginal = document.createElement('button');
-                sortByOriginal.textContent = 'Original';
+                const sortOptions = [
+                    {
+                        label: 'Original', default: true, func: (a, b) => {
+                            const seriesCompare = a.originalSeries.localeCompare(b.originalSeries);
+                            if (seriesCompare !== 0) return seriesCompare;
+                            return a.originalIndex - b.originalIndex;
+                        }
+                    },
+                    { label: 'A-Z', func: (a, b) => a.name.localeCompare(b.name) },
+                    { label: 'Kakera', func: (a, b) => parseInt(b.kakera || 0) - parseInt(a.kakera || 0) },
+                    { label: 'Keys', func: (a, b) => parseInt(b.keys || 0) - parseInt(a.keys || 0) }
+                ];
 
-                sortButtonsContainer.appendChild(sortAZ);
-                sortButtonsContainer.appendChild(sortByKa);
-                sortButtonsContainer.appendChild(sortByKeys);
-                sortButtonsContainer.appendChild(sortByOriginal);
+                sortOptions.forEach(option => {
+                    const button = document.createElement('button');
+                    button.textContent = option.label;
+                    if (option.default) {
+                        button.classList.add('active');
+                    }
+                    button.onclick = (e) => {
+                        e.target.parentElement.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                        e.target.classList.add('active');
+                        reRankAndRender(option.func);
+                    };
+                    sortButtonsContainer.appendChild(button);
+                });
+
                 topControlsRow.appendChild(sortButtonsContainer);
                 controlsDiv.appendChild(topControlsRow);
 
@@ -1487,6 +1507,11 @@
                 let currentlyDisplayedChars = [...data.characters];
 
                 const reRankAndRender = (sortFunction) => {
+                    currentlyDisplayedChars.forEach(char => {
+                        const freshCharData = seriesData[char.originalSeries].characters[char.originalIndex];
+                        char.excluded = freshCharData.excluded;
+                    });
+
                     const sortedChars = [...currentlyDisplayedChars].sort(sortFunction);
 
                     if (isRankingEnabled) {
@@ -1505,17 +1530,6 @@
                     });
                 };
 
-                sortAZ.onclick = () => reRankAndRender((a, b) => a.name.localeCompare(b.name));
-                sortByKa.onclick = () => reRankAndRender((a, b) => parseInt(b.kakera || 0) - parseInt(a.kakera || 0));
-                sortByKeys.onclick = () => reRankAndRender((a, b) => parseInt(b.keys || 0) - parseInt(a.keys || 0));
-                sortByOriginal.onclick = () => reRankAndRender((a, b) => {
-                    const seriesCompare = a.originalSeries.localeCompare(b.originalSeries);
-                    if (seriesCompare !== 0) {
-                        return seriesCompare;
-                    }
-                    return a.originalIndex - b.originalIndex;
-                });
-
                 applyButton.onclick = () => {
                     const newNote = noteInput.value.trim();
 
@@ -1530,8 +1544,17 @@
                     if (currentGrouping === 'note') {
                         displaySeries();
                     } else {
-                        const currentRanks = currentlyDisplayedChars.map(c => c.rank);
-                        reRankAndRender((a, b) => currentRanks.indexOf(a.rank) - currentRanks.indexOf(b.rank));
+                        // Just update the DOM, don't re-render the whole group
+                        charList.querySelectorAll('.character-card').forEach(cardElement => {
+                            const noteDiv = cardElement.querySelector('.character-note');
+                            if (noteDiv) {
+                                const hasNote = newNote !== '';
+                                noteDiv.textContent = hasNote ? newNote : 'No note!';
+                                noteDiv.title = hasNote ? newNote : 'Click to add note';
+                                noteDiv.style.color = hasNote ? '#9ca3af' : '#dc2626';
+                                noteDiv.style.fontWeight = hasNote ? 'normal' : 'bold';
+                            }
+                        });
                     }
                 };
 
