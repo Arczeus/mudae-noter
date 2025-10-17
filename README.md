@@ -6,10 +6,11 @@ Designed for use with the [Mudae bot](https://top.gg/bot/432610292342587392) on 
 
 ## Features
 
--   **Parse & Display:** Imports your collection from the `$mmasi-[kc+x+y+]` command, showing characters with their images, series, kakera, and key values.
--   **Organize:** Group characters by **Series**, **Note**, or **Keys**. Sort them by name, kakera or keys.
--   **Rank & Note:** Use the toggleable ranking system to number characters. Add notes individually or to entire groups at once.
--   **Generate Commands:** Automatically creates note commands for your selected characters, splitting them to respect Discord's character limit.
+-   Import your collection from the `$mmasi-[kc+x+y+]` command and show characters with their images, series, kakera, and key values.
+-   Group characters by **Series**, **Note**, or **Keys**. Sort them by name, kakera or keys.
+-   A ranking system to number characters. 
+-   Add notes individually or to entire groups at once.
+-   Automatically create note commands for your selected characters.
 
 ## How to Open
 
@@ -53,5 +54,5 @@ Top priority:
 - ~~Hide deselected characters~~
 
 The less important:
-- change sort group parse buttons/select buttons ui
+- ~~change sort group parse buttons/select buttons ui~~
 - Search characters
