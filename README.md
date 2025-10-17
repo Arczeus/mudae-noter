@@ -52,7 +52,7 @@ Top priority:
 - ~~Sort functionality (in groupings)~~
 - ~~Index characters~~ and let the user move them around or something [[it's too laggy :c]]
 - ~~Hide deselected characters~~
-- Add ranks
+- ~~Add ranks~~
 - Add gender
 
 The less important:
@@ -60,7 +60,7 @@ The less important:
 - Search characters
 - Add generate $ec command
 - Add generate $sm command
-- Make qucik notes draggable (maybe seperate them into colors and notes)
+- Make quick notes draggable (maybe seperate them into colors and notes)
 - ~~Add button to apply to selected characters only~~
 
 ## Bugs
@@ -68,7 +68,7 @@ The less important:
 - ~~Apply button changes the selected characters~~
 - ~~Sorting changes the selected characters~~
 - ~~Some characters can have (2434) in their name and parser gets confused~~
-- When clicking and deselected is set to hide characters should hide
+- ~~When clicking a character and deselected is set to hide characters should hide~~
 
 ## Images
 

@@ -74,6 +74,7 @@
             margin-right: 2px;
             flex-shrink: 0;
         }
+
         .instruction-item strong {
             color: #a78bfa;
             margin-right: 5px;
@@ -803,10 +804,12 @@
                     <strong>Add Notes:</strong> Click the note area or use the group input to apply notes in bulk.
                 </p>
                 <p class="instruction-item">
-                    <strong>Sorting:</strong> Use the sort buttons in each group: Original, A-Z, Global, Rank,  Kakera, Keys.
+                    <strong>Sorting:</strong> Use the sort buttons in each group: Original, A-Z, Global, Rank, Kakera,
+                    Keys.
                 </p>
                 <p class="instruction-item">
-                    <strong>Ranking:</strong> Click the <span class="instruction-badge">#</span> badge to set your custom order.
+                    <strong>Ranking:</strong> Click the <span class="instruction-badge">#</span> badge to set your
+                    custom order.
                 </p>
                 <p class="instruction-item">
                     <strong>Generate:</strong> Click <b>Generate Commands</b> to create your <code>$n</code> commands
@@ -1690,6 +1693,12 @@
             char.excluded = !char.excluded;
 
             cardElement.classList.toggle('excluded', char.excluded);
+
+            if (char.excluded && !showDeselected) {
+                cardElement.classList.add('hidden-char');
+            } else {
+                cardElement.classList.remove('hidden-char');
+            }
 
             const groupCard = cardElement.closest('.series-card');
             if (groupCard) {
