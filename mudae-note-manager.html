@@ -800,9 +800,7 @@
                 </p>
                 <p class="instruction-item">
 
-                    <strong>Command:</strong> Use <code> $mmsaty+ri-c+x+kt </code>to include rank, keys, colors and
-                    extra
-                    info.
+                    <strong>Command:</strong> Use <code> $mmsaty+ri-c+x+kt </code>to include extra info.
                 </p>
                 <p class="instruction-item">
                     <strong>Select Characters:</strong> Click cards to toggle selection (<span class="dimmed">grayed =
@@ -833,9 +831,7 @@
         <div class="input-section">
             <div class="controls-container">
                 <div class="actions-panel">
-                    <label for="input">Paste your $mmsai-[y+][k][c+][x+][r/l][t][n] (brackets are optional; "/" means
-                        or)
-                        output here:</label>
+                    <label for="input">Paste your output here:</label>
                     <textarea id="input"
                         placeholder="Dungeon Meshi - 4/10&#10;Laios Touden 5680 ka - https://mudae.net/uploads/dm1.png&#10;#1,234 - Marcille Donato | Elf ✨ · :goldkey: (3) (#fde2e2) 7250 ka - https://mudae.net/uploads/dm2.png&#10;Chilchuck Tims · :silverkey: (1) 2800 ka - https://mudae.net/uploads/dm3.png&#10;#1 - Izutsumi | KIBTY!! :3 (#6f4e37) 3100 ka - https://mudae.net/uploads/dm4.png&#10;&#10;Vocaloid - 3/25&#10;Hatsune Miku 🚫 9980 ka - https://mudae.net/uploads/v1.png&#10;Kagamine Rin · :goldkey: (2) (#ffcc00) 6100 ka - https://mudae.net/uploads/v2.png&#10;KAITO 4300 ka - https://mudae.net/uploads/v3.png"></textarea>
                     <div class="main-buttons">
@@ -863,6 +859,8 @@
                             <button onclick="setGrouping('color')" id="group-color-btn">Color</button>
                             <button onclick="setGrouping('keys')" id="group-keys-btn">Keys</button>
                             <button onclick="setGrouping('kakera')" id="group-kakera-btn">Kakera</button>
+                            <button onclick="setGrouping('gender')" id="group-gender-btn">Gender</button>
+                            <button onclick="setGrouping('roulette')" id="group-roulette-btn">Roulette</button>
                         </div>
                         <div id="kakera-range-container" style="display: none; margin-top: 10px;">
                             <label for="kakera-range-input">Range Size:</label>
@@ -971,7 +969,7 @@
 
         function setGrouping(method) {
             currentGrouping = method;
-            const buttons = document.querySelectorAll('#group-series-btn, #group-note-btn, #group-keys-btn, #group-nogroup-btn, #group-kakera-btn, #group-color-btn');
+            const buttons = document.querySelectorAll('#group-series-btn, #group-note-btn, #group-keys-btn, #group-nogroup-btn, #group-kakera-btn, #group-color-btn, #group-gender-btn, #group-roulette-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
             document.getElementById(`group-${method}-btn`).classList.add('active');
 
@@ -1544,6 +1542,44 @@
                             const lowerBound = Math.floor(charKakera / rangeSize) * rangeSize;
                             const upperBound = lowerBound + rangeSize - 1;
                             groupKey = `${lowerBound} - ${upperBound} ka`;
+                            break;
+                        case 'gender':
+                            const genders = new Set();
+                            if (char.mudaeTags) {
+                                char.mudaeTags.forEach(tag => {
+                                    const gender = tag[0].toLowerCase();
+                                    if (gender === 'w' || gender === 'h') genders.add(gender);
+                                });
+                            }
+                            if (genders.has('w') && genders.has('h')) {
+                                groupKey = 'Waifu & Husbando';
+                            } else if (genders.has('w')) {
+                                groupKey = 'Waifu';
+                            } else if (genders.has('h')) {
+                                groupKey = 'Husbando';
+                            } else {
+                                groupKey = 'Genderless / Other';
+                            }
+                            break;
+                        case 'roulette':
+                            const roulettes = new Set();
+                            if (char.mudaeTags) {
+                                char.mudaeTags.forEach(tag => {
+                                    if (tag.length > 1) {
+                                        const roulette = tag[1].toLowerCase();
+                                        if (roulette === 'a' || roulette === 'g') roulettes.add(roulette);
+                                    }
+                                });
+                            }
+                            if (roulettes.has('a') && roulettes.has('g')) {
+                                groupKey = 'Animanga & Game';
+                            } else if (roulettes.has('a')) {
+                                groupKey = 'Animanga';
+                            } else if (roulettes.has('g')) {
+                                groupKey = 'Game';
+                            } else {
+                                groupKey = 'Unknown Roulette';
+                            }
                             break;
                         case 'series':
                         default:
