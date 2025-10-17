@@ -56,6 +56,8 @@ Top priority:
 The less important:
 - ~~change sort group parse buttons/select buttons ui~~
 - Search characters
+- Add generate $ec command
+- Add generate $sm command
 
 ## Bugs
 
