@@ -54,6 +54,7 @@ Top priority:
 - ~~Hide deselected characters~~
 - ~~Add ranks~~
 - ~~Add gender~~
+- Add apply to colors
 
 The less important:
 - ~~change sort group parse buttons/select buttons ui~~
