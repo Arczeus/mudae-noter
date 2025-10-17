@@ -56,3 +56,9 @@ Top priority:
 The less important:
 - ~~change sort group parse buttons/select buttons ui~~
 - Search characters
+
+## Images
+
+![Parsing and Options](image.png)
+
+![Characters](image-1.png)
