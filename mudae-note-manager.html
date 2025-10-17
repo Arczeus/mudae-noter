@@ -744,6 +744,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            margin-bottom: 5px;
         }
 
         .sort-buttons button:hover {
@@ -1200,6 +1201,7 @@
             }
 
             if (Object.keys(seriesData).length === 0) {
+                showMessage('Parsing failed. Please ensure your input format is correct and contains at least one series.', 'error');
                 return;
             }
 
@@ -1532,6 +1534,16 @@
                 };
                 topControlsRow.appendChild(toggleBtn);
 
+                const invertBtn = document.createElement('button');
+                invertBtn.textContent = 'Invert';
+                invertBtn.className = 'series-toggle-btn';
+                invertBtn.style.backgroundColor = '#4b5563';
+                invertBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    invertGroup(data.characters, e);
+                };
+                topControlsRow.appendChild(invertBtn);
+
                 const sortButtonsContainer = document.createElement('div');
                 sortButtonsContainer.className = 'sort-buttons';
                 sortButtonsContainer.innerHTML = `<span style="font-size: 0.8em; color: #9ca3af; margin-right: 5px;">Sort:</span>`;
@@ -1545,7 +1557,7 @@
                         }
                     },
                     { label: 'A-Z', func: (a, b) => a.name.localeCompare(b.name) },
-                    { label: 'Global Rank', func: (a, b) => parseInt(a.globalRank || 999999) - parseInt(b.globalRank || 999999) },
+                    { label: 'Rank', func: (a, b) => parseInt(a.globalRank || 999999) - parseInt(b.globalRank || 999999) },
                     { label: 'Kakera', func: (a, b) => parseInt(b.kakera || 0) - parseInt(a.kakera || 0) },
                     { label: 'Keys', func: (a, b) => parseInt(b.keys || 0) - parseInt(a.keys || 0) }
                 ];
@@ -1577,11 +1589,11 @@
 
                 const applyButton = document.createElement('button');
                 applyButton.className = 'apply-btn';
-                applyButton.textContent = 'Apply All';
+                applyButton.textContent = 'Apply to All';
 
                 const applySelectedButton = document.createElement('button');
                 applySelectedButton.className = 'apply-btn';
-                applySelectedButton.textContent = 'Apply Selected';
+                applySelectedButton.textContent = 'Apply to Selected';
                 applySelectedButton.style.backgroundColor = '#6d28d9';
 
                 noteInputContainer.appendChild(noteInput);
@@ -1770,7 +1782,44 @@
             updateStats();
             saveToLocalStorage();
         }
+        function invertGroup(charactersInGroup, event) {
+            if (!charactersInGroup || charactersInGroup.length === 0) return;
 
+            charactersInGroup.forEach(char => {
+                const charData = seriesData[char.originalSeries].characters[char.originalIndex];
+                charData.excluded = !charData.excluded;
+            });
+
+            const button = event.currentTarget;
+            const groupCard = button.closest('.series-card');
+
+            if (groupCard) {
+                const charCardsInGroup = groupCard.querySelectorAll('.character-card');
+                charCardsInGroup.forEach(card => {
+                    const seriesName = card.dataset.originalSeries;
+                    const charIndex = parseInt(card.dataset.originalIndex, 10);
+                    const charData = seriesData[seriesName].characters[charIndex];
+                    card.classList.toggle('excluded', charData.excluded);
+                });
+
+                const includedCount = charactersInGroup.filter(c => !seriesData[c.originalSeries].characters[c.originalIndex].excluded).length;
+                const countEl = groupCard.querySelector('.series-count');
+                const total = groupCard.dataset.totalChars;
+                if (countEl && total) {
+                    countEl.textContent = `${includedCount}/${total}`;
+                }
+
+                const allExcludedInGroup = includedCount === 0;
+                const toggleBtn = groupCard.querySelector('.series-toggle-btn');
+                if (toggleBtn) {
+                    toggleBtn.classList.toggle('disabled', allExcludedInGroup);
+                    toggleBtn.textContent = allExcludedInGroup ? 'Enable All' : 'Disable All';
+                }
+            }
+
+            updateStats();
+            saveToLocalStorage();
+        }
         function updateStats() {
             const totalSeries = Object.keys(seriesData).length;
             let totalChars = 0;
@@ -2019,27 +2068,38 @@
             });
         }
 
-        function clearAll() {
-            if (Object.keys(seriesData).length > 0) {
-                if (!confirm('Are you sure you want to clear all data?')) return;
-            }
+function clearAll() {
+            if (Object.keys(seriesData).length > 0) {
+                if (!confirm('Are you sure you want to clear all data?')) return;
+            }
 
-            seriesData = {};
-            currentGrouping = 'series';
-            currentSortMethod = 'alpha';
+            seriesData = {};
+            currentGrouping = 'series';
+            currentSortMethod = 'alpha';
 
-            document.getElementById('input').value = '';
-            document.getElementById('seriesGrid').innerHTML = '';
-            document.getElementById('commands').innerHTML = '';
-            document.getElementById('stats').innerHTML = '';
-            document.getElementById('message').innerHTML = '';
-            document.getElementById('message').className = 'empty';
-            document.getElementById('generateBtn').disabled = true;
-            document.getElementById('generateColorBtn').disabled = true;
-            document.getElementById('goToCommandsBtn').style.display = 'none';
-            localStorage.removeItem('mudaeSeriesData');
-            localStorage.removeItem('mudaeQuickNotes');
-        }
+            document.getElementById('input').value = '';
+            document.getElementById('seriesGrid').innerHTML = '';
+            document.getElementById('commands').innerHTML = '';
+            document.getElementById('stats').innerHTML = '';
+            document.getElementById('message').innerHTML = '';
+            document.getElementById('message').className = 'empty';
+            document.getElementById('generateBtn').disabled = true;
+            document.getElementById('generateColorBtn').disabled = true;
+            document.getElementById('goToCommandsBtn').style.display = 'none';
+
+            const groupButtons = document.querySelectorAll('#group-series-btn, #group-note-btn, #group-keys-btn, #group-nogroup-btn, #group-kakera-btn, #group-color-btn');
+            groupButtons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById('group-series-btn').classList.add('active');
+            document.getElementById('kakera-range-container').style.display = 'none';
+
+            const sortButtons = document.querySelectorAll('#sort-alpha-btn, #sort-count-btn');
+            sortButtons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById('sort-alpha-btn').classList.add('active');
+
+            localStorage.removeItem('mudaeSeriesData');
+            localStorage.removeItem('mudaeQuickNotes');
+        }
+
         function applyFilter() {
             if (Object.keys(seriesData).length === 0) {
                 return;
