@@ -58,6 +58,7 @@ The less important:
 - Search characters
 - Add generate $ec command
 - Add generate $sm command
+- Make qucik notes draggable (maybe seperate them into colors and notes)
 
 ## Bugs
 
