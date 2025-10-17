@@ -47,11 +47,11 @@ The app works offline, but images require an internet connection.
 
 Top priority:
 - ~~Make groupings work~~
-- Deselect by some filter (or something like that)
+- ~~Deselect by some filter~~
 - ~~Sort functionality (in groupings)~~
-- Index characters and let the user moves them around or something
+- ~~Index characters~~ and let the user move them around or something [[it's too laggy :c]]
+- ~~Hide deselected characters~~
 
 The less important:
 - change sort group parse buttons/select buttons ui
-- Generate `$sortmarry` commands for your collection based on series order (another thing to add is to index groups which the user can change uhh)
 - Search characters

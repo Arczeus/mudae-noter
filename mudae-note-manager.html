@@ -144,6 +144,10 @@
             min-width: 0;
         }
 
+        .hidden-char {
+            display: none !important;
+        }
+
         .add-note-btn {
             padding: 6px 15px;
             font-size: 0.9em;
@@ -182,6 +186,12 @@
         textarea:focus {
             outline: none;
             border-color: #7c3aed;
+        }
+
+        .filter-control {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
 
         button {
@@ -605,6 +615,12 @@
                 <button onclick="setGrouping('series')" id="group-series-btn" class="active">Series</button>
                 <button onclick="setGrouping('note')" id="group-note-btn">Note</button>
                 <button onclick="setGrouping('keys')" id="group-keys-btn">Keys</button>
+                <button onclick="setGrouping('kakera')" id="group-kakera-btn">Kakera</button>
+            </div>
+            <div id="kakera-range-container" style="display: none; margin-top: 15px;">
+                <label for="kakera-range-input" style="display: inline; margin-right: 10px;">Kakera range size:</label>
+                <input type="number" id="kakera-range-input" value="1000" class="add-note-input" style="width: 120px; display: inline-block;">
+                <button onclick="displaySeries()">Apply Range</button>
             </div>
             <div style="margin-top: 15px;">
                 <label style="display: inline; margin-right: 10px;">Sort groups by:</label>
@@ -617,6 +633,11 @@
                 <button onclick="toggleRanking(false)" id="ranking-off-btn">Disabled</button>
             </div>
             <div style="margin-top: 15px;">
+                <label style="display: inline; margin-right: 10px;">Show Deselected:</label>
+                <button onclick="toggleDeselectedVisibility(true)" id="deselected-show-btn" class="active">Show</button>
+                <button onclick="toggleDeselectedVisibility(false)" id="deselected-hide-btn">Hide</button>
+            </div>
+            <div style="margin-top: 15px;">
                 <label style="display: inline; margin-right: 10px;">Grid Columns:</label>
                 <button onclick="changeGridColumns(1)" id="grid-btn-1"
                     style="padding: 8px 15px; font-size: 0.9em;">1</button>
@@ -627,9 +648,35 @@
                 <button onclick="changeGridColumns(4)" id="grid-btn-4"
                     style="padding: 8px 15px; font-size: 0.9em;">4</button>
             </div>
+
             <div style="margin-top: 15px;">
                 <button onclick="selectAllCharacters()">Select All</button>
                 <button onclick="deselectAllCharacters()">Deselect All</button>
+            </div>
+
+            <div id="filter-section"
+                style="margin-top: 15px; padding: 15px; background: #1a1a24; border-radius: 8px; border: 1px solid #2a2a3a;">
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-end;">
+                    <div class="filter-control">
+                        <label for="min-kakera">Min Kakera</label>
+                        <input type="number" id="min-kakera" placeholder="0" class="add-note-input">
+                    </div>
+                    <div class="filter-control">
+                        <label for="max-kakera">Max Kakera</label>
+                        <input type="number" id="max-kakera" placeholder="any" class="add-note-input">
+                    </div>
+                    <div class="filter-control">
+                        <label for="min-keys">Min Keys</label>
+                        <input type="number" id="min-keys" placeholder="0" class="add-note-input">
+                    </div>
+                    <div class="filter-control">
+                        <label for="max-keys">Max Keys</label>
+                        <input type="number" id="max-keys" placeholder="any" class="add-note-input">
+                    </div>
+                    <div>
+                        <button onclick="applyFilter()">Apply Filter</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -663,6 +710,7 @@
         let currentGrouping = 'series';
         let currentSortMethod = 'alpha';
         let isRankingEnabled = true;
+        let showDeselected = true;
 
         function initQuickNotes() {
             displayQuickNotes();
@@ -670,9 +718,17 @@
 
         function setGrouping(method) {
             currentGrouping = method;
-            const buttons = document.querySelectorAll('#group-series-btn, #group-note-btn, #group-keys-btn, #group-nogroup-btn');
+            const buttons = document.querySelectorAll('#group-series-btn, #group-note-btn, #group-keys-btn, #group-nogroup-btn, #group-kakera-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
             document.getElementById(`group-${method}-btn`).classList.add('active');
+
+            const kakeraRangeContainer = document.getElementById('kakera-range-container');
+            if (method === 'kakera') {
+                kakeraRangeContainer.style.display = 'block';
+            } else {
+                kakeraRangeContainer.style.display = 'none';
+            }
+
             displaySeries();
             showMessage(`Grouping by ${method}`, 'success');
         }
@@ -716,7 +772,18 @@
 
             localStorage.setItem('mudaeGridColumns', columns);
         }
+        function toggleDeselectedVisibility(shouldShow) {
+            showDeselected = shouldShow;
+            document.getElementById('deselected-show-btn').classList.toggle('active', shouldShow);
+            document.getElementById('deselected-hide-btn').classList.toggle('active', !shouldShow);
 
+            if (Object.keys(seriesData).length > 0) {
+                displaySeries();
+            }
+
+            saveToLocalStorage();
+            showMessage(`Deselected characters are now ${shouldShow ? 'shown' : 'hidden'}.`, 'success');
+        }
         function displayQuickNotes() {
             const list = document.getElementById('quickNotesList');
             list.innerHTML = '';
@@ -903,10 +970,13 @@
             const charCard = document.createElement('div');
             charCard.dataset.originalSeries = char.originalSeries;
             charCard.dataset.originalIndex = char.originalIndex;
-            charCard.className = 'character-card' + (char.excluded ? ' excluded' : '');
-            if (char.isDisabled) {
-                charCard.className += ' permanently-disabled';
-            }
+
+            let classNames = ['character-card'];
+            if (char.excluded) classNames.push('excluded');
+            if (char.isDisabled) classNames.push('permanently-disabled');
+            if (char.excluded && !showDeselected) classNames.push('hidden-char');
+            charCard.className = classNames.join(' ');
+
             const colorCode = char.color || '#670d08';
             charCard.style.borderColor = colorCode;
             charCard.onclick = (event) => toggleCharacter(char.originalSeries, char.originalIndex, event.currentTarget);
@@ -1123,7 +1193,7 @@
             showMessage('All characters deselected', 'success');
         }
 
-        function displaySeries() {
+function displaySeries() {
             const grid = document.getElementById('seriesGrid');
             grid.innerHTML = '';
             if (Object.keys(seriesData).length === 0) return;
@@ -1141,6 +1211,13 @@
                             break;
                         case 'nogroup':
                             groupKey = 'All Characters';
+                            break;
+                        case 'kakera':
+                            const rangeSize = parseInt(document.getElementById('kakera-range-input').value) || 1000;
+                            const charKakera = parseInt(char.kakera) || 0;
+                            const lowerBound = Math.floor(charKakera / rangeSize) * rangeSize;
+                            const upperBound = lowerBound + rangeSize - 1;
+                            groupKey = `${lowerBound} - ${upperBound} ka`;
                             break;
                         case 'series':
                         default:
@@ -1160,10 +1237,14 @@
                 if (currentSortMethod === 'count') {
                     return dataB.characters.length - dataA.characters.length;
                 }
+                if (currentGrouping === 'kakera') {
+                    const valA = parseInt(keyA.split(' ')[0]);
+                    const valB = parseInt(keyB.split(' ')[0]);
+                    return valA - valB;
+                }
                 return keyA.localeCompare(keyB);
             });
 
-            // Step 3: Create and display a card for each group.
             for (const [groupName, data] of sortedGroupEntries) {
                 const card = document.createElement('div');
                 card.className = 'series-card';
@@ -1242,7 +1323,6 @@
                 charList.className = 'characters-list';
                 card.appendChild(charList);
 
-                // --- Event Handlers & State Management for this card ---
                 let currentlyDisplayedChars = [...data.characters];
 
                 const reRankAndRender = (sortFunction) => {
@@ -1289,7 +1369,6 @@
                     if (currentGrouping === 'note') {
                         displaySeries();
                     } else {
-                        // We need to re-render the cards to show the new notes
                         const currentRanks = currentlyDisplayedChars.map(c => c.rank);
                         reRankAndRender((a, b) => currentRanks.indexOf(a.rank) - currentRanks.indexOf(b.rank));
                     }
@@ -1313,7 +1392,11 @@
                 };
 
                 initialRender();
-                grid.appendChild(card);
+
+                const hasVisibleChars = charList.querySelector('.character-card:not(.hidden-char)');
+                if (showDeselected || hasVisibleChars) {
+                    grid.appendChild(card);
+                }
             }
         }
 
@@ -1554,7 +1637,44 @@
             localStorage.removeItem('mudaeSeriesData');
             localStorage.removeItem('mudaeQuickNotes');
         }
+        function applyFilter() {
+            if (Object.keys(seriesData).length === 0) {
+                showMessage('No data to filter!', 'error');
+                return;
+            }
 
+            const minKakera = parseInt(document.getElementById('min-kakera').value) || 0;
+            const maxKakera = parseInt(document.getElementById('max-kakera').value) || Infinity;
+            const minKeys = parseInt(document.getElementById('min-keys').value) || 0;
+            const maxKeys = parseInt(document.getElementById('max-keys').value) || Infinity;
+
+            let deselectedCount = 0;
+
+            for (const seriesName in seriesData) {
+                seriesData[seriesName].characters.forEach(char => {
+                    const charKakera = parseInt(char.kakera) || 0;
+                    const charKeys = parseInt(char.keys) || 0;
+
+                    const shouldDeselect =
+                        charKakera < minKakera ||
+                        charKakera > maxKakera ||
+                        charKeys < minKeys ||
+                        charKeys > maxKeys;
+
+                    if (shouldDeselect) {
+                        if (!char.excluded) {
+                            deselectedCount++;
+                        }
+                        char.excluded = true;
+                    }
+                });
+            }
+
+            displaySeries();
+            updateStats();
+            saveToLocalStorage();
+            showMessage(`Deselected ${deselectedCount} characters based on the filter.`, 'success');
+        }
         function showMessage(text, type) {
             const messageDiv = document.getElementById('message');
             messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
@@ -1570,6 +1690,7 @@
                 localStorage.setItem('mudaeSeriesData', JSON.stringify(seriesData));
                 localStorage.setItem('mudaeQuickNotes', JSON.stringify(quickNotes));
                 localStorage.setItem('mudaeRankingEnabled', JSON.stringify(isRankingEnabled));
+                localStorage.setItem('mudaeShowDeselected', JSON.stringify(showDeselected));
             } catch (e) {
                 console.error('Failed to save to localStorage:', e);
             }
@@ -1602,6 +1723,11 @@
                 const savedRankingState = localStorage.getItem('mudaeRankingEnabled');
                 if (savedRankingState !== null) {
                     toggleRanking(JSON.parse(savedRankingState));
+                }
+
+                const savedShowDeselected = localStorage.getItem('mudaeShowDeselected');
+                if (savedShowDeselected !== null) {
+                    toggleDeselectedVisibility(JSON.parse(savedShowDeselected));
                 }
             } catch (e) {
                 console.error('Failed to load from localStorage:', e);
