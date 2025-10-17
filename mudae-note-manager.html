@@ -833,7 +833,7 @@
                 <div class="actions-panel">
                     <label for="input">Paste your output here:</label>
                     <textarea id="input"
-                        placeholder="Dungeon Meshi - 4/10&#10;Laios Touden 5680 ka - https://mudae.net/uploads/dm1.png&#10;#1,234 - Marcille Donato | Elf ✨ · :goldkey: (3) (#fde2e2) 7250 ka - https://mudae.net/uploads/dm2.png&#10;Chilchuck Tims · :silverkey: (1) 2800 ka - https://mudae.net/uploads/dm3.png&#10;#1 - Izutsumi | KIBTY!! :3 (#6f4e37) 3100 ka - https://mudae.net/uploads/dm4.png&#10;&#10;Vocaloid - 3/25&#10;Hatsune Miku 🚫 9980 ka - https://mudae.net/uploads/v1.png&#10;Kagamine Rin · :goldkey: (2) (#ffcc00) 6100 ka - https://mudae.net/uploads/v2.png&#10;KAITO 4300 ka - https://mudae.net/uploads/v3.png"></textarea>
+                        placeholder="Dungeon Meshi - 4/10&#10;Laios Touden · ($ha) 5680 ka - https://mudae.net/uploads/dm1.png&#10;#1,234 - Marcille Donato | Elf ✨ · :goldkey: (3) (#fde2e2) 7250 ka - https://mudae.net/uploads/dm2.png&#10;Chilchuck Tims · :silverkey: (1) 2800 ka - https://mudae.net/uploads/dm3.png&#10;#1 - Izutsumi | KIBTY!! :3 (#6f4e37) 3100 ka - https://mudae.net/uploads/dm4.png&#10;&#10;Vocaloid - 3/25&#10;Hatsune Miku 🚫 9980 ka - https://mudae.net/uploads/v1.png&#10;Kagamine Rin · :goldkey: (2) (#ffcc00) 6100 ka - https://mudae.net/uploads/v2.png&#10;KAITO 4300 ka - https://mudae.net/uploads/v3.png"></textarea>
                     <div class="main-buttons">
                         <button onclick="parseInput()" class="btn-primary">Parse Input</button>
                         <button onclick="clearAll()" class="btn-primary">Clear All</button>
@@ -1130,6 +1130,8 @@
                     if (charMatch) {
                         let fullInfo = charMatch[1].trim();
                         const imageUrl = charMatch[2].trim();
+
+                        fullInfo = fullInfo.replace(/\(\s*\$(?:toggle(?:western|irl)|serverdisable)\s*\)\s*·?\s*/g, '');
 
                         let kakera = '';
                         let keys = '';
