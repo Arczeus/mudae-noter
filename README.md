@@ -57,9 +57,9 @@ Top priority:
 
 The less important:
 - ~~change sort group parse buttons/select buttons ui~~
-- Search characters
-- Add generate $ec command
-- Add generate $sm command
+- ~~Search characters~~ (redundant)
+- ~~Add generate $ec command~~
+- ~~Add generate $sm command~~ (redundant)
 - Make quick notes draggable (maybe seperate them into colors and notes)
 - ~~Add button to apply to selected characters only~~
 
