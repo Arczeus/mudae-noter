@@ -527,7 +527,7 @@
             background: #2a2a3a;
             color: #9ca3af;
             border: 1px solid transparent;
-            padding: 6px 12px;
+            padding: 6px 10px;
             border-radius: 5px;
             font-size: 0.8em;
             font-weight: 600;
@@ -608,8 +608,13 @@
             </div>
             <div style="margin-top: 15px;">
                 <label style="display: inline; margin-right: 10px;">Sort groups by:</label>
-                <button onclick="sortGroups('alpha')">A-Z</button>
-                <button onclick="sortGroups('count')">Character Count</button>
+                <button onclick="sortGroups('alpha')" id="sort-alpha-btn" class="active">A-Z</button>
+                <button onclick="sortGroups('count')" id="sort-count-btn">Character Count</button>
+            </div>
+            <div style="margin-top: 15px;">
+                <label style="display: inline; margin-right: 10px;">Ranking:</label>
+                <button onclick="toggleRanking(true)" id="ranking-on-btn" class="active">Enabled</button>
+                <button onclick="toggleRanking(false)" id="ranking-off-btn">Disabled</button>
             </div>
             <div style="margin-top: 15px;">
                 <label style="display: inline; margin-right: 10px;">Grid Columns:</label>
@@ -657,6 +662,7 @@
         let quickNotes = ['⭐', '✨', '💕', '#fefefe', '#000000'];
         let currentGrouping = 'series';
         let currentSortMethod = 'alpha';
+        let isRankingEnabled = true;
 
         function initQuickNotes() {
             displayQuickNotes();
@@ -677,10 +683,24 @@
                 return;
             }
             currentSortMethod = method;
+
+            const buttons = document.querySelectorAll('#sort-alpha-btn, #sort-count-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`sort-${method}-btn`).classList.add('active');
+
             displaySeries();
             showMessage(`Sorted by ${method === 'alpha' ? 'A-Z' : 'character count'}`, 'success');
         }
+        function toggleRanking(enabled) {
+            isRankingEnabled = enabled;
+            document.getElementById('ranking-on-btn').classList.toggle('active', enabled);
+            document.getElementById('ranking-off-btn').classList.toggle('active', !enabled);
 
+            if (Object.keys(seriesData).length > 0) {
+                displaySeries();
+            }
+            showMessage(`Ranking is now ${enabled ? 'enabled' : 'disabled'}.`, 'success');
+        }
         function changeGridColumns(columns) {
             const grid = document.getElementById('seriesGrid');
             if (grid) {
@@ -890,57 +910,6 @@
             const colorCode = char.color || '#670d08';
             charCard.style.borderColor = colorCode;
             charCard.onclick = (event) => toggleCharacter(char.originalSeries, char.originalIndex, event.currentTarget);
-
-            const rankBadge = document.createElement('div');
-            rankBadge.className = 'character-rank-badge';
-            rankBadge.textContent = char.rank > 0 ? char.rank : '#';
-
-            rankBadge.onclick = (e) => {
-                e.stopPropagation();
-                const currentBadge = e.target;
-                const oldRankText = currentBadge.textContent;
-                const oldRank = oldRankText === '#' ? 0 : parseInt(oldRankText);
-                currentBadge.style.display = 'none';
-
-                const input = document.createElement('input');
-                input.type = 'number';
-                input.className = 'rank-input';
-                input.value = oldRank > 0 ? oldRank : '';
-
-                charCard.prepend(input);
-                input.focus();
-                input.select();
-
-                const saveRank = () => {
-                    let newRank = parseInt(input.value);
-                    if (isNaN(newRank) || newRank < 1) newRank = oldRank;
-
-                    groupChars.forEach(otherChar => {
-                        const otherCharData = seriesData[otherChar.originalSeries].characters[otherChar.originalIndex];
-                        if (otherChar.originalSeries === char.originalSeries && otherChar.originalIndex === char.originalIndex) return;
-
-                        if (newRank < oldRank && otherCharData.rank >= newRank && otherCharData.rank < oldRank) {
-                            otherCharData.rank++;
-                        } else if (newRank > oldRank && otherCharData.rank <= newRank && otherCharData.rank > oldRank) {
-                            otherCharData.rank--;
-                        }
-                    });
-
-                    seriesData[char.originalSeries].characters[char.originalIndex].rank = newRank;
-                    saveToLocalStorage();
-                    displaySeries();
-                };
-
-                input.onblur = saveRank;
-                input.onkeydown = (event) => {
-                    if (event.key === 'Enter') saveRank();
-                    if (event.key === 'Escape') {
-                        if (input.parentNode) input.parentNode.removeChild(input);
-                        currentBadge.style.display = 'block';
-                    }
-                };
-            };
-
             const img = document.createElement('img');
             img.src = char.image;
             img.alt = char.name;
@@ -1025,8 +994,59 @@
             infoDiv.appendChild(nameDiv);
             infoDiv.appendChild(noteDiv);
             infoDiv.appendChild(statsDiv);
+            if (isRankingEnabled) {
+                const rankBadge = document.createElement('div');
+                rankBadge.className = 'character-rank-badge';
+                rankBadge.textContent = char.rank > 0 ? char.rank : '#';
 
-            charCard.appendChild(rankBadge);
+                rankBadge.onclick = (e) => {
+                    e.stopPropagation();
+                    const currentBadge = e.target;
+                    const oldRankText = currentBadge.textContent;
+                    const oldRank = oldRankText === '#' ? 0 : parseInt(oldRankText);
+                    currentBadge.style.display = 'none';
+
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.className = 'rank-input';
+                    input.value = oldRank > 0 ? oldRank : '';
+
+                    charCard.prepend(input);
+                    input.focus();
+                    input.select();
+
+                    const saveRank = () => {
+                        let newRank = parseInt(input.value);
+                        if (isNaN(newRank) || newRank < 1) newRank = oldRank;
+
+                        groupChars.forEach(otherChar => {
+                            const otherCharData = seriesData[otherChar.originalSeries].characters[otherChar.originalIndex];
+                            if (otherChar.originalSeries === char.originalSeries && otherChar.originalIndex === char.originalIndex) return;
+
+                            if (newRank < oldRank && otherCharData.rank >= newRank && otherCharData.rank < oldRank) {
+                                otherCharData.rank++;
+                            } else if (newRank > oldRank && otherCharData.rank <= newRank && otherCharData.rank > oldRank) {
+                                otherCharData.rank--;
+                            }
+                        });
+
+                        seriesData[char.originalSeries].characters[char.originalIndex].rank = newRank;
+                        saveToLocalStorage();
+                        displaySeries();
+                    };
+
+                    input.onblur = saveRank;
+                    input.onkeydown = (event) => {
+                        if (event.key === 'Enter') saveRank();
+                        if (event.key === 'Escape') {
+                            if (input.parentNode) input.parentNode.removeChild(input);
+                            currentBadge.style.display = 'block';
+                        }
+                    };
+                };
+                charCard.appendChild(rankBadge);
+            }
+
             charCard.appendChild(img);
             charCard.appendChild(infoDiv);
 
@@ -1186,21 +1206,21 @@
                 sortButtonsContainer.className = 'sort-buttons';
                 sortButtonsContainer.innerHTML = `<span style="font-size: 0.8em; color: #9ca3af; margin-right: 5px;">Sort:</span>`;
 
-const sortAZ = document.createElement('button');
-sortAZ.textContent = 'A-Z';
-const sortByKa = document.createElement('button');
-sortByKa.textContent = 'Kakera';
-const sortByKeys = document.createElement('button');
-sortByKeys.textContent = 'Keys';
-const sortByOriginal = document.createElement('button');
-sortByOriginal.textContent = 'Original';
+                const sortAZ = document.createElement('button');
+                sortAZ.textContent = 'A-Z';
+                const sortByKa = document.createElement('button');
+                sortByKa.textContent = 'Kakera';
+                const sortByKeys = document.createElement('button');
+                sortByKeys.textContent = 'Keys';
+                const sortByOriginal = document.createElement('button');
+                sortByOriginal.textContent = 'Original';
 
-sortButtonsContainer.appendChild(sortAZ);
-sortButtonsContainer.appendChild(sortByKa);
-sortButtonsContainer.appendChild(sortByKeys);
-sortButtonsContainer.appendChild(sortByOriginal);
-topControlsRow.appendChild(sortButtonsContainer);
-controlsDiv.appendChild(topControlsRow);
+                sortButtonsContainer.appendChild(sortAZ);
+                sortButtonsContainer.appendChild(sortByKa);
+                sortButtonsContainer.appendChild(sortByKeys);
+                sortButtonsContainer.appendChild(sortByOriginal);
+                topControlsRow.appendChild(sortButtonsContainer);
+                controlsDiv.appendChild(topControlsRow);
 
                 const noteInputContainer = document.createElement('div');
                 noteInputContainer.className = 'controls-row note-applicator';
@@ -1223,77 +1243,79 @@ controlsDiv.appendChild(topControlsRow);
                 card.appendChild(charList);
 
                 // --- Event Handlers & State Management for this card ---
-let currentlyDisplayedChars = [...data.characters];
+                let currentlyDisplayedChars = [...data.characters];
 
-const reRankAndRender = (sortFunction) => {
-    const sortedChars = [...currentlyDisplayedChars].sort(sortFunction);
-    
-    sortedChars.forEach((char, index) => {
-        seriesData[char.originalSeries].characters[char.originalIndex].rank = index + 1;
-        char.rank = index + 1;
-    });
-    
-    saveToLocalStorage();
-    
-    currentlyDisplayedChars.sort((a, b) => a.rank - b.rank);
+                const reRankAndRender = (sortFunction) => {
+                    const sortedChars = [...currentlyDisplayedChars].sort(sortFunction);
 
-    charList.innerHTML = '';
-    currentlyDisplayedChars.forEach(char => {
-        charList.appendChild(createCharacterCard(char, currentlyDisplayedChars));
-    });
-};
+                    if (isRankingEnabled) {
+                        sortedChars.forEach((char, index) => {
+                            seriesData[char.originalSeries].characters[char.originalIndex].rank = index + 1;
+                            char.rank = index + 1;
+                        });
+                        saveToLocalStorage();
+                    }
 
-sortAZ.onclick = () => reRankAndRender((a, b) => a.name.localeCompare(b.name));
-sortByKa.onclick = () => reRankAndRender((a, b) => parseInt(b.kakera || 0) - parseInt(a.kakera || 0));
-sortByKeys.onclick = () => reRankAndRender((a, b) => parseInt(b.keys || 0) - parseInt(a.keys || 0));
-sortByOriginal.onclick = () => reRankAndRender((a, b) => {
-    const seriesCompare = a.originalSeries.localeCompare(b.originalSeries);
-    if (seriesCompare !== 0) {
-        return seriesCompare;
-    }
-    return a.originalIndex - b.originalIndex;
-});
+                    currentlyDisplayedChars = sortedChars;
 
-applyButton.onclick = () => {
-    const newNote = noteInput.value.trim();
+                    charList.innerHTML = '';
+                    currentlyDisplayedChars.forEach(char => {
+                        charList.appendChild(createCharacterCard(char, currentlyDisplayedChars));
+                    });
+                };
 
-    data.characters.forEach(char => {
-        seriesData[char.originalSeries].characters[char.originalIndex].note = newNote;
-        char.note = newNote;
-    });
+                sortAZ.onclick = () => reRankAndRender((a, b) => a.name.localeCompare(b.name));
+                sortByKa.onclick = () => reRankAndRender((a, b) => parseInt(b.kakera || 0) - parseInt(a.kakera || 0));
+                sortByKeys.onclick = () => reRankAndRender((a, b) => parseInt(b.keys || 0) - parseInt(a.keys || 0));
+                sortByOriginal.onclick = () => reRankAndRender((a, b) => {
+                    const seriesCompare = a.originalSeries.localeCompare(b.originalSeries);
+                    if (seriesCompare !== 0) {
+                        return seriesCompare;
+                    }
+                    return a.originalIndex - b.originalIndex;
+                });
 
-    saveToLocalStorage();
-    showMessage(`Applied note to ${data.characters.length} characters.`, 'success');
+                applyButton.onclick = () => {
+                    const newNote = noteInput.value.trim();
 
-    if (currentGrouping === 'note') {
-        displaySeries();
-    } else {
-        // We need to re-render the cards to show the new notes
-        const currentRanks = currentlyDisplayedChars.map(c => c.rank);
-        reRankAndRender((a, b) => currentRanks.indexOf(a.rank) - currentRanks.indexOf(b.rank));
-    }
-};
+                    data.characters.forEach(char => {
+                        seriesData[char.originalSeries].characters[char.originalIndex].note = newNote;
+                        char.note = newNote;
+                    });
 
-const initialRender = () => {
-    if (currentlyDisplayedChars.every(c => c.rank === 0)) {
-        currentlyDisplayedChars.forEach((char, index) => {
-            char.rank = index + 1;
-            seriesData[char.originalSeries].characters[char.originalIndex].rank = index + 1;
-        });
-    }
+                    saveToLocalStorage();
+                    showMessage(`Applied note to ${data.characters.length} characters.`, 'success');
 
-    currentlyDisplayedChars.sort((a, b) => a.rank - b.rank);
-    charList.innerHTML = '';
-    currentlyDisplayedChars.forEach(char => {
-        charList.appendChild(createCharacterCard(char, currentlyDisplayedChars));
-    });
-};
+                    if (currentGrouping === 'note') {
+                        displaySeries();
+                    } else {
+                        // We need to re-render the cards to show the new notes
+                        const currentRanks = currentlyDisplayedChars.map(c => c.rank);
+                        reRankAndRender((a, b) => currentRanks.indexOf(a.rank) - currentRanks.indexOf(b.rank));
+                    }
+                };
 
-initialRender();
-grid.appendChild(card);
+                const initialRender = () => {
+                    if (isRankingEnabled) {
+                        if (currentlyDisplayedChars.every(c => c.rank === 0)) {
+                            currentlyDisplayedChars.forEach((char, index) => {
+                                char.rank = index + 1;
+                                seriesData[char.originalSeries].characters[char.originalIndex].rank = index + 1;
+                            });
+                        }
+                        currentlyDisplayedChars.sort((a, b) => a.rank - b.rank);
+                    }
+
+                    charList.innerHTML = '';
+                    currentlyDisplayedChars.forEach(char => {
+                        charList.appendChild(createCharacterCard(char, currentlyDisplayedChars));
+                    });
+                };
+
+                initialRender();
+                grid.appendChild(card);
             }
         }
-
 
         function toggleCharacter(seriesName, charIdx, cardElement) {
             if (!seriesData[seriesName] || !seriesData[seriesName].characters[charIdx]) return;
@@ -1518,8 +1540,8 @@ grid.appendChild(card);
             }
 
             seriesData = {};
-            currentGrouping = 'series'; // Reset to default
-            currentSortMethod = 'alpha'; // Reset to default
+            currentGrouping = 'series';
+            currentSortMethod = 'alpha';
 
             document.getElementById('input').value = '';
             document.getElementById('seriesGrid').innerHTML = '';
@@ -1547,6 +1569,7 @@ grid.appendChild(card);
             try {
                 localStorage.setItem('mudaeSeriesData', JSON.stringify(seriesData));
                 localStorage.setItem('mudaeQuickNotes', JSON.stringify(quickNotes));
+                localStorage.setItem('mudaeRankingEnabled', JSON.stringify(isRankingEnabled));
             } catch (e) {
                 console.error('Failed to save to localStorage:', e);
             }
@@ -1574,6 +1597,11 @@ grid.appendChild(card);
                     changeGridColumns(parseInt(savedColumns, 10));
                 } else {
                     changeGridColumns(3);
+                }
+
+                const savedRankingState = localStorage.getItem('mudaeRankingEnabled');
+                if (savedRankingState !== null) {
+                    toggleRanking(JSON.parse(savedRankingState));
                 }
             } catch (e) {
                 console.error('Failed to load from localStorage:', e);
