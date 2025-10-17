@@ -1417,34 +1417,47 @@
             charCard.appendChild(infoDiv);
 
             const rouletteContainer = document.createElement('div');
-            rouletteContainer.style.cssText = 'display: flex;';
+            rouletteContainer.style.cssText = 'display: flex; text-align: center; font-size: 0.65em; font-weight: 600;';
 
             const roulettes = new Set();
             if (char.mudaeTags) {
                 char.mudaeTags.forEach(tag => {
-                    const roulette = tag[1].toLowerCase();
-                    if (roulette === 'a' || roulette === 'g') {
-                        roulettes.add(roulette);
+                    if (tag.length > 1) {
+                        const roulette = tag[1].toLowerCase();
+                        if (roulette === 'a' || roulette === 'g') {
+                            roulettes.add(roulette);
+                        }
                     }
                 });
             }
 
-            const animangaBar = document.createElement('div');
-            animangaBar.style.cssText = 'flex: 1; height: 5px; background-color: #1f1f2e;';
-            if (roulettes.has('a')) {
-                animangaBar.style.backgroundColor = '#a78bfa';
+            const hasAnimanga = roulettes.has('a');
+            const hasGame = roulettes.has('g');
+
+            if (hasAnimanga) {
+                const animangaBar = document.createElement('div');
+                animangaBar.textContent = 'Animanga';
+                animangaBar.style.cssText = 'flex: 1; padding: 2px 0; background-color: #a78bfa; color: #0a0a0f;';
                 animangaBar.title = 'Animanga';
+                rouletteContainer.appendChild(animangaBar);
             }
 
-            const gameBar = document.createElement('div');
-            gameBar.style.cssText = 'flex: 1; height: 5px; background-color: #1f1f2e;';
-            if (roulettes.has('g')) {
-                gameBar.style.backgroundColor = '#ffcb70';
+            if (hasGame) {
+                const gameBar = document.createElement('div');
+                gameBar.textContent = 'Game';
+                gameBar.style.cssText = 'flex: 1; padding: 2px 0; background-color: #ffcb70; color: #0a0a0f;';
                 gameBar.title = 'Game';
+                rouletteContainer.appendChild(gameBar);
             }
 
-            rouletteContainer.appendChild(animangaBar);
-            rouletteContainer.appendChild(gameBar);
+            if (!hasAnimanga && !hasGame) {
+                const unknownBar = document.createElement('div');
+                unknownBar.textContent = 'Unknown';
+                unknownBar.style.cssText = 'flex: 1; padding: 2px 0; background-color: #1f1f2e; color: #6b7280; font-style: italic;';
+                unknownBar.title = 'Unknown Roulette';
+                rouletteContainer.appendChild(unknownBar);
+            }
+
             charCard.appendChild(rouletteContainer);
 
             return charCard;
@@ -2200,7 +2213,7 @@
             document.getElementById('generateColorBtn').disabled = true;
             document.getElementById('goToCommandsBtn').style.display = 'none';
 
-            const groupButtons = document.querySelectorAll('#group-series-btn, #group-note-btn, #group-keys-btn, #group-nogroup-btn, #group-kakera-btn, #group-color-btn');
+            const groupButtons = document.querySelectorAll('#group-series-btn, #group-note-btn, #group-keys-btn, #group-nogroup-btn, #group-kakera-btn, #group-color-btn, #group-gender-btn, #group-roulette-btn');
             groupButtons.forEach(btn => btn.classList.remove('active'));
             document.getElementById('group-series-btn').classList.add('active');
             document.getElementById('kakera-range-container').style.display = 'none';
