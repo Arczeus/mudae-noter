@@ -7,7 +7,7 @@ Designed for use with the [Mudae bot](https://top.gg/bot/432610292342587392) on 
 ## Features
 
 -   Import your collection from the `$mmasi-[kc+x+y+]` command and show characters with their images, series, kakera, and key values.
--   Group characters by **Series**, **Note**, or **Keys**. Sort them by name, kakera or keys.
+-   Group characters by **Series**, **Note**, or **Keys**. Sort them by **name**, **kakera** or **keys**.
 -   A ranking system to number characters. 
 -   Add notes individually or to entire groups at once.
 -   Automatically create note commands for your selected characters.
