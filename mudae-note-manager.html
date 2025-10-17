@@ -751,7 +751,7 @@
         <div class="input-section">
             <div class="controls-container">
                 <div class="actions-panel">
-                    <label for="input">Paste your $mmasi output here:</label>
+                    <label for="input">Paste your $mmasi-[y+][k][c+][x+][n] output here:</label>
                     <textarea id="input"
                         placeholder="Dungeon Meshi - 4/10&#10;Laios Touden 5680 ka - https://mudae.net/uploads/dm1.png&#10;Marcille Donato | Elf ✨ · :goldkey: (3) (#fde2e2) 7250 ka - https://mudae.net/uploads/dm2.png&#10;Chilchuck Tims · :silverkey: (1) 2800 ka - https://mudae.net/uploads/dm3.png&#10;Izutsumi | KIBTY!! :3 (#6f4e37) 3100 ka - https://mudae.net/uploads/dm4.png&#10;&#10;Vocaloid - 3/25&#10;Hatsune Miku 🚫 9980 ka - https://mudae.net/uploads/v1.png&#10;Kagamine Rin · :goldkey: (2) (#ffcc00) 6100 ka - https://mudae.net/uploads/v2.png&#10;KAITO 4300 ka - https://mudae.net/uploads/v3.png"></textarea>
                     <div class="main-buttons">
@@ -896,12 +896,10 @@
             }
 
             displaySeries();
-            // showMessage(`Grouping by ${method}`, 'success');
         }
 
         function sortGroups(method) {
             if (Object.keys(seriesData).length === 0) {
-                //showMessage('No data to sort!', 'error');
                 return;
             }
             currentSortMethod = method;
@@ -911,7 +909,6 @@
             document.getElementById(`sort-${method}-btn`).classList.add('active');
 
             displaySeries();
-            //showMessage(`Sorted by ${method === 'alpha' ? 'A-Z' : 'character count'}`, 'success');
         }
         function toggleRanking(enabled) {
             isRankingEnabled = enabled;
@@ -921,7 +918,6 @@
             if (Object.keys(seriesData).length > 0) {
                 displaySeries();
             }
-            //showMessage(`Ranking is now ${enabled ? 'enabled' : 'disabled'}.`, 'success');
         }
         function changeGridColumns(columns) {
             const grid = document.getElementById('seriesGrid');
@@ -948,7 +944,6 @@
             }
 
             saveToLocalStorage();
-            //showMessage(`Deselected characters are now ${shouldShow ? 'shown' : 'hidden'}.`, 'success');
         }
         function displayQuickNotes() {
             const list = document.getElementById('quickNotesList');
@@ -1014,7 +1009,6 @@
 
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(function () {
-                // showMessage('Copied: ' + text, 'success');
             });
         }
 
@@ -1026,7 +1020,6 @@
         function parseInput() {
             const input = document.getElementById('input').value.trim();
             if (!input) {
-                // showMessage('Please paste your $mmasi-[y+][k][n] (brackets are optional) output first!', 'error');
                 return;
             }
 
@@ -1048,7 +1041,6 @@
                         note: ''
                     };
                 } else if (currentSeries) {
-                    // General structure: Name [| note] [· :keytype: (count) (#color)] [kakera ka] - url
                     const charMatch = line.match(/^(.+?)\s+-\s+(https?:\/\/.+)$/);
                     if (charMatch) {
                         let fullInfo = charMatch[1].trim();
@@ -1058,50 +1050,46 @@
                         let keys = '';
                         let color = '';
                         let note = '';
-                        let cleanName = fullInfo;
+                        let cleanName = '';
                         let isDisabled = false;
 
-                        // 1. Extract Kakera (always at the end before URL)
                         const kakeraMatch = fullInfo.match(/([\d,]+)\s*ka\s*$/);
                         if (kakeraMatch) {
                             kakera = kakeraMatch[1].replace(/,/g, '');
                             fullInfo = fullInfo.substring(0, kakeraMatch.index).trim();
                         }
 
-                        // 2. Extract Color, Keys, Keytype, Count (part of fullInfo)
-                        const colorMatch = fullInfo.match(/\(#([0-9a-fA-F]{6})\)/);
-                        if (colorMatch) {
-                            color = '#' + colorMatch[1];
-                            fullInfo = fullInfo.replace(colorMatch[0], '').trim();
+                        let namePart = fullInfo;
+                        let metaPart = '';
+                        const metaSeparatorIndex = fullInfo.lastIndexOf('·');
+                        if (metaSeparatorIndex !== -1) {
+                            namePart = fullInfo.substring(0, metaSeparatorIndex).trim();
+                            metaPart = fullInfo.substring(metaSeparatorIndex + 1).trim();
                         }
 
-                        // 3. Extract Key Count (part of fullInfo, usually after color removal if present)
-                        const keysMatch = fullInfo.match(/\((\d+)\)/);
-                        if (keysMatch) {
-                            keys = keysMatch[1];
-                            fullInfo = fullInfo.replace(keysMatch[0], '').trim();
+                        if (metaPart) {
+                            const colorMatch = metaPart.match(/\(#([0-9a-fA-F]{6})\)/);
+                            if (colorMatch) {
+                                color = '#' + colorMatch[1];
+                            }
+
+                            const keysMatch = metaPart.match(/\((\d+)\)/);
+                            if (keysMatch) {
+                                keys = keysMatch[1];
+                            }
                         }
 
-                        // 4. Clean up Key Type and separator
-                        fullInfo = fullInfo.replace(/:(?:bronze|silver|gold|chaos)key:/gi, '').trim();
-
-                        fullInfo = fullInfo.replace(/\(\$toggle[a-zA-Z]+\)/g, '').trim();
-
-                        // Check for the disabled symbol 🚫
-                        if (fullInfo.includes('🚫')) {
+                        if (namePart.includes('🚫')) {
                             isDisabled = true;
-                            fullInfo = fullInfo.replace('🚫', '').trim();
+                            namePart = namePart.replace('🚫', '').trim();
                         }
 
-                        fullInfo = fullInfo.replace(/\s*·\s*$/, '').trim();
-
-                        // 5. Extract Name and Note (Name | Note or just Name)
-                        const pipeIndex = fullInfo.indexOf('|');
+                        const pipeIndex = namePart.indexOf('|');
                         if (pipeIndex !== -1) {
-                            cleanName = fullInfo.substring(0, pipeIndex).trim();
-                            note = fullInfo.substring(pipeIndex + 1).trim();
+                            cleanName = namePart.substring(0, pipeIndex).trim();
+                            note = namePart.substring(pipeIndex + 1).trim();
                         } else {
-                            cleanName = fullInfo;
+                            cleanName = namePart;
                         }
 
                         seriesData[currentSeries].characters.push({
@@ -1121,13 +1109,11 @@
             }
 
             if (Object.keys(seriesData).length === 0) {
-                //showMessage('No valid data found. Please check your input format.', 'error');
                 return;
             }
 
             displaySeries();
             updateStats();
-            //showMessage('Successfully parsed ' + Object.keys(seriesData).length + ' series!', 'success');
             document.getElementById('generateBtn').disabled = false;
             saveToLocalStorage();
         }
@@ -1326,7 +1312,6 @@
 
         function selectAllCharacters() {
             if (Object.keys(seriesData).length === 0) {
-                //showMessage('No characters to select!', 'error');
                 return;
             }
 
@@ -1339,12 +1324,10 @@
             updateSelectionView(false);
             updateStats();
             saveToLocalStorage();
-            //showMessage('All characters selected', 'success');
         }
 
         function deselectAllCharacters() {
             if (Object.keys(seriesData).length === 0) {
-                //showMessage('No characters to deselect!', 'error');
                 return;
             }
 
@@ -1357,7 +1340,6 @@
             updateSelectionView(true);
             updateStats();
             saveToLocalStorage();
-            //showMessage('All characters deselected', 'success');
         }
 
         function displaySeries() {
@@ -1539,12 +1521,10 @@
                     });
 
                     saveToLocalStorage();
-                    //showMessage(`Applied note to ${data.characters.length} characters.`, 'success');
 
                     if (currentGrouping === 'note') {
                         displaySeries();
                     } else {
-                        // Just update the DOM, don't re-render the whole group
                         charList.querySelectorAll('.character-card').forEach(cardElement => {
                             const noteDiv = cardElement.querySelector('.character-note');
                             if (noteDiv) {
@@ -1823,7 +1803,6 @@
         }
         function applyFilter() {
             if (Object.keys(seriesData).length === 0) {
-                //showMessage('No data to filter!', 'error');
                 return;
             }
 
@@ -1857,7 +1836,6 @@
             displaySeries();
             updateStats();
             saveToLocalStorage();
-            //showMessage(`Deselected ${deselectedCount} characters based on the filter.`, 'success');
         }
         function showMessage(text, type) {
             const messageDiv = document.getElementById('message');

@@ -52,6 +52,8 @@ Top priority:
 - ~~Sort functionality (in groupings)~~
 - ~~Index characters~~ and let the user move them around or something [[it's too laggy :c]]
 - ~~Hide deselected characters~~
+- Add ranks
+- Add gender
 
 The less important:
 - ~~change sort group parse buttons/select buttons ui~~
@@ -59,10 +61,13 @@ The less important:
 - Add generate $ec command
 - Add generate $sm command
 - Make qucik notes draggable (maybe seperate them into colors and notes)
+- Add button to apply to selected characters only
 
 ## Bugs
 
 - ~~Apply button changes the selected characters~~
+- ~~Sorting changes the selected characters~~
+- ~~Some characters can have (2434) in their name and parser gets confused~~
 
 ## Images
 
