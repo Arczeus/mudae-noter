@@ -6,11 +6,10 @@ Designed for use with the [Mudae bot](https://top.gg/bot/432610292342587392) on 
 
 ## Features
 
-- Import characters from `$mmasi-[kc+x+y+]` output  
-- Display characters with names, series, and images  
-- Organize notes for characters
-- Copy created commands
-
+-   **Parse & Display:** Imports your collection from the `$mmasi-[kc+x+y+]` command, showing characters with their images, series, kakera, and key values.
+-   **Organize:** Group characters by **Series**, **Note**, or **Keys**. Sort them by name, kakera, keys, or original input order.
+-   **Rank & Note:** Use the toggleable ranking system to number characters. Add notes individually or to entire groups at once.
+-   **Generate Commands:** Automatically creates note commands for your selected characters, splitting them to respect Discord's character limit.
 
 ## How to Open
 
@@ -31,8 +30,8 @@ The app works offline, but images require an internet connection.
 ## Notes
 
 - Large collections may take some time to load.
-- This website doesn't won't work on phones.
-- It may break unexpectedly.
+- This website doesn't and won't work on phones.
+- It also may break unexpectedly.
 
 ## To-Do
 
