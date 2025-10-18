@@ -1499,24 +1499,21 @@
             if (!hasAnimanga && !hasGame) rouletteBarHTML += '<div style="flex: 1; padding: 2px 0; background-color: #1f1f2e; color: #6b7280; font-style: italic;" title="Unknown Roulette">Unknown</div>';
             rouletteBarHTML += '</div>';
 
-            return `
-                <div class="${classNames.join(' ')}" data-original-series="${char.originalSeries}" data-original-index="${char.originalIndex}" style="--card-color: ${colorCode};">
-                    ${isRankingEnabled ? `<div class="character-rank-badge" data-action="edit-rank">${char.rank > 0 ? char.rank : '#'}</div>` : ''}
-                    <img src="${char.image}" alt="${char.name}" loading="lazy" onerror="handleImageError(this)">
-                    <div class="character-info">
-                        <div class="character-name" title="${char.name}">${char.name}</div>
-                        <div class="character-note" data-action="edit-note" title="${hasNote ? char.note : 'Click to add note'}" style="background: #13131a; padding: 4px; font-size: 0.7em; color: ${hasNote ? '#9ca3af' : '#dc2626; font-weight: bold'}; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; border-radius: 4px;">
-                            ${hasNote ? char.note : 'No note!'}
-                        </div>
-                        <div class="character-stats">
-                            <div class="stat-badge"><div class="stat-badge-label">Rank</div><div class="stat-badge-value">${char.globalRank ? '#' + char.globalRank : '#?'}</div></div>
-                            <div class="stat-badge"><div class="stat-badge-label">Ka</div><div class="stat-badge-value">${char.kakera || '?'}</div></div>
-                            <div class="stat-badge"><div class="stat-badge-label">Keys</div><div class="stat-badge-value">${char.keys || '?'}</div></div>
-                        </div>
-                    </div>
-                    ${genderBarHTML}
-                    ${rouletteBarHTML}
-                </div>`;
+            return `<div class="${classNames.join(' ')}" data-original-series="${char.originalSeries}" data-original-index="${char.originalIndex}" style="--card-color: ${colorCode};">
+${isRankingEnabled ? `<div class="character-rank-badge" data-action="edit-rank">${char.rank > 0 ? char.rank : '#'}</div>` : ''}
+<img src="${char.image}" alt="${char.name}" loading="lazy" onerror="handleImageError(this)">
+<div class="character-info">
+<div class="character-name" title="${char.name}">${char.name}</div>
+<div class="character-note" data-action="edit-note" title="${hasNote ? char.note : 'Click to add note'}" style="background: #13131a; padding: 4px; font-size: 0.7em; color: ${hasNote ? '#9ca3af' : '#dc2626; font-weight: bold'}; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; border-radius: 4px;">${hasNote ? char.note : 'No note!'}</div>
+<div class="character-stats">
+<div class="stat-badge"><div class="stat-badge-label">Rank</div><div class="stat-badge-value">${char.globalRank ? '#' + char.globalRank : '#?'}</div></div>
+<div class="stat-badge"><div class="stat-badge-label">Ka</div><div class="stat-badge-value">${char.kakera || '?'}</div></div>
+<div class="stat-badge"><div class="stat-badge-label">Keys</div><div class="stat-badge-value">${char.keys || '?'}</div></div>
+</div>
+</div>
+${genderBarHTML}
+${rouletteBarHTML}
+</div>`;
         }
 
         function selectAllCharacters() {
@@ -1646,46 +1643,45 @@
 
                 const charactersHTML = data.characters.map(char => createCharacterCardHTML(char)).join('');
 
-                const groupCardHTML = `
-                    <div class="series-card" data-group-name="${escapeHTML(groupName)}" data-characters="${escapeHTML(charIdentifiers)}">
-                        <div class="series-header">
-                            <div class="series-title" title="${displayName}">${displayName}</div>
-                            <div class="series-count">${includedCount}/${data.characters.length}</div>
-                        </div>
-                        <div class="card-controls">
-                            <div class="controls-row main-actions">
-                                <div style="display: flex; gap: 8px;">
-                                    <button class="series-toggle-btn ${allExcluded ? 'disabled' : ''}" data-action="toggle-group">${allExcluded ? 'Enable All' : 'Disable All'}</button>
-                                    <button class="series-toggle-btn" style="background-color: #4b5563;" data-action="invert-group">Invert</button>
-                                </div>
-                                <div class="sort-buttons">
-                                    <span class="sort-label">Sort:</span>
-                                    <button data-action="sort" data-sort-by="original" class="active">Original</button>
-                                    <button data-action="sort" data-sort-by="az">A-Z</button>
-                                    <button data-action="sort" data-sort-by="rank">Rank</button>
-                                    <button data-action="sort" data-sort-by="kakera">Kakera</button>
-                                    <button data-action="sort" data-sort-by="keys">Keys</button>
-                                </div>
-                            </div>
-                            <div class="controls-row">
-                                <div class="bulk-apply-group">
-                                    <input type="text" class="note-input" placeholder="Apply note...">
-                                    <div class="apply-btn-group">
-                                        <button data-action="bulk-note" data-target="all">All</button>
-                                        <button data-action="bulk-note" data-target="selected">Selected</button>
-                                    </div>
-                                </div>
-                                <div class="bulk-apply-group">
-                                    <input type="text" class="note-input" placeholder="Apply color...">
-                                    <div class="apply-btn-group">
-                                        <button data-action="bulk-color" data-target="all">All</button>
-                                        <button data-action="bulk-color" data-target="selected">Selected</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="characters-list">${charactersHTML}</div>
-                    </div>`;
+                const groupCardHTML = `<div class="series-card" data-group-name="${escapeHTML(groupName)}" data-characters="${escapeHTML(charIdentifiers)}">
+<div class="series-header">
+<div class="series-title" title="${displayName}">${displayName}</div>
+<div class="series-count">${includedCount}/${data.characters.length}</div>
+</div>
+<div class="card-controls">
+<div class="controls-row main-actions">
+<div style="display: flex; gap: 8px;">
+<button class="series-toggle-btn ${allExcluded ? 'disabled' : ''}" data-action="toggle-group">${allExcluded ? 'Enable All' : 'Disable All'}</button>
+<button class="series-toggle-btn" style="background-color: #4b5563;" data-action="invert-group">Invert</button>
+</div>
+<div class="sort-buttons">
+<span class="sort-label">Sort:</span>
+<button data-action="sort" data-sort-by="original" class="active">Original</button>
+<button data-action="sort" data-sort-by="az">A-Z</button>
+<button data-action="sort" data-sort-by="rank">Rank</button>
+<button data-action="sort" data-sort-by="kakera">Kakera</button>
+<button data-action="sort" data-sort-by="keys">Keys</button>
+</div>
+</div>
+<div class="controls-row">
+<div class="bulk-apply-group">
+<input type="text" class="note-input" placeholder="Apply note...">
+<div class="apply-btn-group">
+<button data-action="bulk-note" data-target="all">All</button>
+<button data-action="bulk-note" data-target="selected">Selected</button>
+</div>
+</div>
+<div class="bulk-apply-group">
+<input type="text" class="note-input" placeholder="Apply color...">
+<div class="apply-btn-group">
+<button data-action="bulk-color" data-target="all">All</button>
+<button data-action="bulk-color" data-target="selected">Selected</button>
+</div>
+</div>
+</div>
+</div>
+<div class="characters-list">${charactersHTML}</div>
+</div>`;
 
                 const hasVisibleChars = data.characters.some(c => !c.excluded);
                 if (showDeselected || hasVisibleChars) {
