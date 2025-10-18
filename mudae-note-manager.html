@@ -461,6 +461,7 @@
             color: #e5e7eb;
             font-size: 0.95em;
             flex: 1;
+            min-width: 0;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -858,8 +859,9 @@
                     <strong>Add Notes:</strong> Click the note area or use the group input to apply notes in bulk.
                 </p>
                 <p class="instruction-item">
-                    <strong>Sorting:</strong> Use the sort buttons in each group: Original, A-Z, Global, Rank, Kakera,
-                    Keys.
+                    <strong>Sorting:</strong> Use the sort buttons in each group (clicking on sort button again causes
+                    the
+                    ordering numbers to be recalculated)
                 </p>
                 <p class="instruction-item">
                     <strong>Ranking:</strong> Click the <span class="instruction-badge">#</span> badge to set your
@@ -1150,6 +1152,181 @@
         window.addEventListener('DOMContentLoaded', function () {
             initQuickNotes();
             loadFromLocalStorage();
+
+            document.getElementById('seriesGrid').addEventListener('click', (e) => {
+                const target = e.target;
+                const action = target.dataset.action;
+                const card = target.closest('.character-card');
+                const groupCard = target.closest('.series-card');
+
+                if (!action && card) {
+                    toggleCharacter(card.dataset.originalSeries, parseInt(card.dataset.originalIndex, 10));
+                    return;
+                }
+
+                if (card && (action === 'edit-note' || action === 'edit-rank')) {
+                    e.stopPropagation();
+                    const series = card.dataset.originalSeries;
+                    const index = parseInt(card.dataset.originalIndex, 10);
+                    const char = seriesData[series].characters[index];
+                    target.style.display = 'none';
+
+                    const input = document.createElement('input');
+                    input.type = (action === 'edit-rank') ? 'number' : 'text';
+                    input.className = (action === 'edit-rank') ? 'rank-input' : 'note-editor-input';
+                    input.value = (action === 'edit-rank') ? (char.rank > 0 ? char.rank : '') : char.note;
+
+                    if (action === 'edit-note') {
+                        input.style.cssText = 'width: 100%; box-sizing: border-box; font-size: 0.7em; text-align: center; padding: 3px; border: 1px solid #7c3aed; background: #1a1a24; color: #e5e7eb; border-radius: 4px; margin: 0;';
+                    }
+
+                    if (action === 'edit-rank') card.prepend(input);
+                    else target.parentNode.insertBefore(input, target);
+
+                    input.focus();
+                    input.select();
+
+                    const saveAndClose = () => {
+                        const newValue = input.value;
+                        let needsFullRender = false;
+
+                        if (action === 'edit-rank') {
+                            char.rank = parseInt(newValue) > 0 ? parseInt(newValue) : 0;
+                        } else {
+                            char.note = newValue.trim();
+                            if (currentGrouping === 'note') {
+                                needsFullRender = true;
+                            }
+                        }
+
+                        if (input.parentNode) input.parentNode.removeChild(input);
+                        target.style.display = '';
+
+                        saveToLocalStorage();
+
+                        if (needsFullRender) {
+                            displaySeries();
+                        } else {
+                            const hasNote = char.note && char.note.trim() !== '';
+                            target.textContent = hasNote ? char.note : 'No note!';
+                            target.title = hasNote ? char.note : 'Click to add note';
+                            target.style.color = hasNote ? '#9ca3af' : '#dc2626';
+                            target.style.fontWeight = hasNote ? 'normal' : 'bold';
+                        }
+                    };
+                    input.onblur = saveAndClose;
+                    input.onkeydown = (event) => { if (event.key === 'Enter') saveAndClose(); };
+                    return;
+                }
+
+
+                if (!groupCard || !action) return;
+
+                const getGroupChars = () => {
+                    try {
+                        const identifierObjects = JSON.parse(groupCard.dataset.characters);
+                        return identifierObjects.map(obj => {
+                            const { series, index } = obj;
+                            if (seriesData[series] && seriesData[series].characters[index]) {
+                                return { ...seriesData[series].characters[index], originalSeries: series, originalIndex: index };
+                            }
+                            return null;
+                        }).filter(Boolean);
+                    } catch (e) {
+                        console.error('Failed to parse character identifiers:', e);
+                        return [];
+                    }
+                };
+
+                switch (action) {
+                    case 'toggle-group':
+                    case 'invert-group': {
+                        const isToggle = action === 'toggle-group';
+                        const allCurrentlyExcluded = getGroupChars().every(c => c.excluded);
+
+                        groupCard.querySelectorAll('.character-card').forEach(cardEl => {
+                            const series = cardEl.dataset.originalSeries;
+                            const index = parseInt(cardEl.dataset.originalIndex, 10);
+                            const originalChar = seriesData[series]?.characters[index];
+                            if (!originalChar) return;
+
+                            const newExcludedState = isToggle ? !allCurrentlyExcluded : !originalChar.excluded;
+                            if (originalChar.excluded !== newExcludedState) {
+                                originalChar.excluded = newExcludedState;
+                                cardEl.classList.toggle('excluded', newExcludedState);
+                                if (!showDeselected) {
+                                    cardEl.classList.toggle('hidden-char', newExcludedState);
+                                }
+                            }
+                        });
+
+                        updateGroupUI(groupCard);
+                        break;
+                    }
+
+                    case 'sort': {
+                        const sortBy = target.dataset.sortBy;
+                        let groupCharsData = getGroupChars();
+
+                        const sortFunctions = {
+                            'original': (a, b) => a.originalIndex - b.originalIndex, 'az': (a, b) => a.name.localeCompare(b.name),
+                            'rank': (a, b) => parseInt(a.globalRank || 999999) - parseInt(b.globalRank || 999999),
+                            'kakera': (a, b) => parseInt(b.kakera || 0) - parseInt(a.kakera || 0),
+                            'keys': (a, b) => parseInt(b.keys || 0) - parseInt(a.keys || 0)
+                        };
+
+                        groupCharsData.sort(sortFunctions[sortBy]);
+
+                        if (isRankingEnabled) {
+                            groupCharsData.forEach((char, index) => {
+                                seriesData[char.originalSeries].characters[char.originalIndex].rank = index + 1;
+                            });
+                        }
+
+                        const charList = groupCard.querySelector('.characters-list');
+                        charList.innerHTML = groupCharsData.map(char => createCharacterCardHTML(char)).join('');
+
+                        groupCard.querySelectorAll('[data-action="sort"]').forEach(btn => btn.classList.remove('active'));
+                        target.classList.add('active');
+                        break;
+                    }
+
+                    case 'bulk-note':
+                    case 'bulk-color': {
+                        const isNote = action === 'bulk-note';
+                        const applyTo = target.dataset.target;
+                        const input = target.closest('.bulk-apply-group').querySelector('.note-input');
+                        const newValue = input.value;
+
+                        if (!isNote && newValue.trim() !== "" && !/^#([0-9a-fA-F]{3}){1,2}$/.test(newValue)) {
+                            showMessage('Invalid hex color format. Use #RRGGBB.', 'error');
+                            return;
+                        }
+
+                        getGroupChars().forEach(char => {
+                            const applies = (applyTo === 'all') || (applyTo === 'selected' && !char.excluded);
+                            if (applies) {
+                                const originalChar = seriesData[char.originalSeries].characters[char.originalIndex];
+                                if (isNote) originalChar.note = newValue;
+                                else originalChar.color = newValue.trim();
+                            }
+                        });
+
+                        input.value = '';
+
+                        if ((isNote && currentGrouping === 'note') || (!isNote && currentGrouping === 'color')) {
+                            displaySeries();
+                        } else {
+                            const charList = groupCard.querySelector('.characters-list');
+                            charList.innerHTML = getGroupChars().map(char => createCharacterCardHTML(char)).join('');
+                        }
+                        break;
+                    }
+                }
+
+                updateStats();
+                saveToLocalStorage();
+            });
         });
 
         function parseInput() {
@@ -1277,247 +1454,69 @@
             saveToLocalStorage();
         }
 
-        function createCharacterCard(char, groupChars) {
-            const charCard = document.createElement('div');
-            charCard.dataset.originalSeries = char.originalSeries;
-            charCard.dataset.originalIndex = char.originalIndex;
-
+        function createCharacterCardHTML(char) {
             let classNames = ['character-card'];
             if (char.excluded) classNames.push('excluded');
             if (char.isDisabled) classNames.push('permanently-disabled');
             if (char.excluded && !showDeselected) classNames.push('hidden-char');
-            charCard.className = classNames.join(' ');
 
             const colorCode = char.color || '#670d08';
-            charCard.style.setProperty('--card-color', colorCode);
-            charCard.onclick = (event) => toggleCharacter(char.originalSeries, char.originalIndex, event.currentTarget);
-
-            const img = document.createElement('img');
-            img.src = char.image;
-            img.alt = char.name;
-            img.onerror = function () {
-                this.style.display = 'none';
-                const placeholder = document.createElement('div');
-                placeholder.style.cssText = 'width: 135px; height: 210px; background: #2a2a3a; display: flex; align-items: center; justify-content: center; color: #6b7280; font-size: 0.8em; text-align: center; padding: 10px;';
-                placeholder.textContent = 'No Image Available';
-                this.parentNode.insertBefore(placeholder, this);
-            };
-
-            const infoDiv = document.createElement('div');
-            infoDiv.className = 'character-info';
-
-            const nameDiv = document.createElement('div');
-            nameDiv.className = 'character-name';
-            nameDiv.textContent = char.name;
-            nameDiv.title = char.name;
-
-            const noteDiv = document.createElement('div');
-            noteDiv.className = 'character-note';
             const hasNote = char.note && char.note.trim() !== '';
-            noteDiv.style.cssText = 'background: #13131a; padding: 4px 4px; font-size: 0.7em; color: ' + (hasNote ? '#9ca3af' : '#dc2626; font-weight: bold') + '; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; border-radius: 4px;';
-            noteDiv.title = hasNote ? char.note : 'Click to add note';
-            noteDiv.textContent = hasNote ? char.note : 'No note!';
-
-            noteDiv.onclick = function (e) {
-                e.stopPropagation();
-                const originalNoteDiv = this;
-                originalNoteDiv.style.display = 'none';
-
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.value = char.note;
-                input.style.cssText = 'width: 100%; box-sizing: border-box; font-size: 0.7em; text-align: center; padding: 3px; border: 1px solid #7c3aed; background: #1a1a24; color: #e5e7eb; border-radius: 4px;';
-
-                originalNoteDiv.parentNode.insertBefore(input, originalNoteDiv);
-                input.focus();
-                input.select();
-
-                const saveAndClose = () => {
-                    const newNote = input.value.trim();
-                    seriesData[char.originalSeries].characters[char.originalIndex].note = newNote;
-                    saveToLocalStorage();
-
-                    if (currentGrouping === 'note') {
-                        displaySeries();
-                    } else {
-                        const newHasNote = newNote !== '';
-                        originalNoteDiv.textContent = newHasNote ? newNote : 'No note!';
-                        originalNoteDiv.title = newHasNote ? newNote : 'Click to add note';
-                        originalNoteDiv.style.color = newHasNote ? '#9ca3af' : '#dc2626';
-                        originalNoteDiv.style.fontWeight = newHasNote ? 'normal' : 'bold';
-
-                        if (input.parentNode) {
-                            input.parentNode.removeChild(input);
-                        }
-                        originalNoteDiv.style.display = '';
-                    }
-                };
-
-                input.onblur = saveAndClose;
-                input.onkeydown = (event) => {
-                    if (event.key === 'Enter') saveAndClose();
-                    else if (event.key === 'Escape') {
-                        if (input.parentNode) input.parentNode.removeChild(input);
-                        originalNoteDiv.style.display = '';
-                    }
-                };
-            };
-
-            const statsDiv = document.createElement('div');
-            statsDiv.className = 'character-stats';
-
-            const globalRankBadge = document.createElement('div');
-            globalRankBadge.className = 'stat-badge';
-            globalRankBadge.innerHTML = `<div class="stat-badge-label">Rank</div><div class="stat-badge-value">${char.globalRank ? '#' + char.globalRank : '#?'}</div>`;
-            statsDiv.appendChild(globalRankBadge);
-            const kakeraBadge = document.createElement('div');
-            kakeraBadge.className = 'stat-badge';
-            kakeraBadge.innerHTML = `<div class="stat-badge-label">Ka</div><div class="stat-badge-value">${char.kakera || '?'}</div>`;
-            const keysBadge = document.createElement('div');
-            keysBadge.className = 'stat-badge';
-            keysBadge.innerHTML = `<div class="stat-badge-label">Keys</div><div class="stat-badge-value">${char.keys || '?'}</div>`;
-            statsDiv.appendChild(kakeraBadge);
-            statsDiv.appendChild(keysBadge);
-
-            infoDiv.appendChild(nameDiv);
-            infoDiv.appendChild(noteDiv);
-            infoDiv.appendChild(statsDiv);
-            if (isRankingEnabled) {
-                const rankBadge = document.createElement('div');
-                rankBadge.className = 'character-rank-badge';
-                rankBadge.textContent = char.rank > 0 ? char.rank : '#';
-
-                rankBadge.onclick = (e) => {
-                    e.stopPropagation();
-                    const currentBadge = e.target;
-                    const oldRankText = currentBadge.textContent;
-                    const oldRank = oldRankText === '#' ? 0 : parseInt(oldRankText);
-                    currentBadge.style.display = 'none';
-
-                    const input = document.createElement('input');
-                    input.type = 'number';
-                    input.className = 'rank-input';
-                    input.value = oldRank > 0 ? oldRank : '';
-
-                    charCard.prepend(input);
-                    input.focus();
-                    input.select();
-
-                    const saveRank = () => {
-                        let newRank = parseInt(input.value);
-                        if (isNaN(newRank) || newRank < 1) newRank = oldRank;
-
-                        groupChars.forEach(otherChar => {
-                            const otherCharData = seriesData[otherChar.originalSeries].characters[otherChar.originalIndex];
-                            if (otherChar.originalSeries === char.originalSeries && otherChar.originalIndex === char.originalIndex) return;
-
-                            if (newRank < oldRank && otherCharData.rank >= newRank && otherCharData.rank < oldRank) {
-                                otherCharData.rank++;
-                            } else if (newRank > oldRank && otherCharData.rank <= newRank && otherCharData.rank > oldRank) {
-                                otherCharData.rank--;
-                            }
-                        });
-
-                        seriesData[char.originalSeries].characters[char.originalIndex].rank = newRank;
-                        saveToLocalStorage();
-                        displaySeries();
-                    };
-
-                    input.onblur = saveRank;
-                    input.onkeydown = (event) => {
-                        if (event.key === 'Enter') saveRank();
-                        if (event.key === 'Escape') {
-                            if (input.parentNode) input.parentNode.removeChild(input);
-                            currentBadge.style.display = 'block';
-                        }
-                    };
-                };
-                charCard.appendChild(rankBadge);
-            }
-
-            charCard.appendChild(img);
-            charCard.appendChild(infoDiv);
-            const genderBarContainer = document.createElement('div');
-            genderBarContainer.style.cssText = 'display: flex; text-align: center; font-size: 0.65em; font-weight: 600;';
 
             const genders = new Set();
             if (char.mudaeTags) {
                 char.mudaeTags.forEach(tag => {
                     const gender = tag[0].toLowerCase();
-                    if (gender === 'w' || gender === 'h') {
-                        genders.add(gender);
-                    }
+                    if (gender === 'w' || gender === 'h') genders.add(gender);
                 });
             }
-
             const hasWaifu = genders.has('w');
             const hasHusbando = genders.has('h');
 
-            if (hasWaifu) {
-                const waifuBar = document.createElement('div');
-                waifuBar.textContent = 'Waifu';
-                waifuBar.style.cssText = 'flex: 1; padding: 2px 0; background-color: #ff8f8f; color: #0a0a0f;';
-                waifuBar.title = 'Waifu';
-                genderBarContainer.appendChild(waifuBar);
-            }
-
-            if (hasHusbando) {
-                const husbandoBar = document.createElement('div');
-                husbandoBar.textContent = 'Husbando';
-                husbandoBar.style.cssText = 'flex: 1; padding: 2px 0; background-color: #8fafff; color: #0a0a0f;';
-                husbandoBar.title = 'Husbando';
-                genderBarContainer.appendChild(husbandoBar);
-            }
-
+            let genderBarHTML = '';
             if (hasWaifu || hasHusbando) {
-                charCard.appendChild(genderBarContainer);
+                genderBarHTML += '<div style="display: flex; text-align: center; font-size: 0.65em; font-weight: 600;">';
+                if (hasWaifu) genderBarHTML += '<div style="flex: 1; padding: 2px 0; background-color: #ff8f8f; color: #0a0a0f;" title="Waifu">Waifu</div>';
+                if (hasHusbando) genderBarHTML += '<div style="flex: 1; padding: 2px 0; background-color: #8fafff; color: #0a0a0f;" title="Husbando">Husbando</div>';
+                genderBarHTML += '</div>';
             }
-
-            const rouletteContainer = document.createElement('div');
-            rouletteContainer.style.cssText = 'display: flex; text-align: center; font-size: 0.65em; font-weight: 600;';
 
             const roulettes = new Set();
             if (char.mudaeTags) {
                 char.mudaeTags.forEach(tag => {
                     if (tag.length > 1) {
                         const roulette = tag[1].toLowerCase();
-                        if (roulette === 'a' || roulette === 'g') {
-                            roulettes.add(roulette);
-                        }
+                        if (roulette === 'a' || roulette === 'g') roulettes.add(roulette);
                     }
                 });
             }
-
             const hasAnimanga = roulettes.has('a');
             const hasGame = roulettes.has('g');
 
-            if (hasAnimanga) {
-                const animangaBar = document.createElement('div');
-                animangaBar.textContent = 'Animanga';
-                animangaBar.style.cssText = 'flex: 1; padding: 2px 0; background-color: #a78bfa; color: #0a0a0f;';
-                animangaBar.title = 'Animanga';
-                rouletteContainer.appendChild(animangaBar);
-            }
+            let rouletteBarHTML = '<div style="display: flex; text-align: center; font-size: 0.65em; font-weight: 600;">';
+            if (hasAnimanga) rouletteBarHTML += '<div style="flex: 1; padding: 2px 0; background-color: #a78bfa; color: #0a0a0f;" title="Animanga">Animanga</div>';
+            if (hasGame) rouletteBarHTML += '<div style="flex: 1; padding: 2px 0; background-color: #ffcb70; color: #0a0a0f;" title="Game">Game</div>';
+            if (!hasAnimanga && !hasGame) rouletteBarHTML += '<div style="flex: 1; padding: 2px 0; background-color: #1f1f2e; color: #6b7280; font-style: italic;" title="Unknown Roulette">Unknown</div>';
+            rouletteBarHTML += '</div>';
 
-            if (hasGame) {
-                const gameBar = document.createElement('div');
-                gameBar.textContent = 'Game';
-                gameBar.style.cssText = 'flex: 1; padding: 2px 0; background-color: #ffcb70; color: #0a0a0f;';
-                gameBar.title = 'Game';
-                rouletteContainer.appendChild(gameBar);
-            }
-
-            if (!hasAnimanga && !hasGame) {
-                const unknownBar = document.createElement('div');
-                unknownBar.textContent = 'Unknown';
-                unknownBar.style.cssText = 'flex: 1; padding: 2px 0; background-color: #1f1f2e; color: #6b7280; font-style: italic;';
-                unknownBar.title = 'Unknown Roulette';
-                rouletteContainer.appendChild(unknownBar);
-            }
-
-            charCard.appendChild(rouletteContainer);
-
-            return charCard;
+            return `
+                <div class="${classNames.join(' ')}" data-original-series="${char.originalSeries}" data-original-index="${char.originalIndex}" style="--card-color: ${colorCode};">
+                    ${isRankingEnabled ? `<div class="character-rank-badge" data-action="edit-rank">${char.rank > 0 ? char.rank : '#'}</div>` : ''}
+                    <img src="${char.image}" alt="${char.name}" loading="lazy" onerror="handleImageError(this)">
+                    <div class="character-info">
+                        <div class="character-name" title="${char.name}">${char.name}</div>
+                        <div class="character-note" data-action="edit-note" title="${hasNote ? char.note : 'Click to add note'}" style="background: #13131a; padding: 4px; font-size: 0.7em; color: ${hasNote ? '#9ca3af' : '#dc2626; font-weight: bold'}; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; border-radius: 4px;">
+                            ${hasNote ? char.note : 'No note!'}
+                        </div>
+                        <div class="character-stats">
+                            <div class="stat-badge"><div class="stat-badge-label">Rank</div><div class="stat-badge-value">${char.globalRank ? '#' + char.globalRank : '#?'}</div></div>
+                            <div class="stat-badge"><div class="stat-badge-label">Ka</div><div class="stat-badge-value">${char.kakera || '?'}</div></div>
+                            <div class="stat-badge"><div class="stat-badge-label">Keys</div><div class="stat-badge-value">${char.keys || '?'}</div></div>
+                        </div>
+                    </div>
+                    ${genderBarHTML}
+                    ${rouletteBarHTML}
+                </div>`;
         }
 
         function selectAllCharacters() {
@@ -1563,17 +1562,13 @@
                     let groupKey;
                     switch (currentGrouping) {
                         case 'note':
-                            groupKey = char.note.trim() || '(No Note)';
+                            groupKey = char.note.trim();
                             break;
-                        case 'keys':
-                            groupKey = char.keys ? `${char.keys} Keys` : '0 Keys';
-                            break;
+                        case 'keys': groupKey = char.keys ? `${char.keys} Keys` : '0 Keys'; break;
                         case 'color':
-                            groupKey = char.color.trim().toUpperCase() || '(No Color)';
+                            groupKey = char.color.trim().toUpperCase() || '#670D08';
                             break;
-                        case 'nogroup':
-                            groupKey = 'All Characters';
-                            break;
+                        case 'nogroup': groupKey = 'All Characters'; break;
                         case 'kakera':
                             const rangeSize = parseInt(document.getElementById('kakera-range-input').value) || 1000;
                             const charKakera = parseInt(char.kakera) || 0;
@@ -1589,15 +1584,10 @@
                                     if (gender === 'w' || gender === 'h') genders.add(gender);
                                 });
                             }
-                            if (genders.has('w') && genders.has('h')) {
-                                groupKey = 'Waifu & Husbando';
-                            } else if (genders.has('w')) {
-                                groupKey = 'Waifu';
-                            } else if (genders.has('h')) {
-                                groupKey = 'Husbando';
-                            } else {
-                                groupKey = 'Genderless / Other';
-                            }
+                            if (genders.has('w') && genders.has('h')) groupKey = 'Waifu & Husbando';
+                            else if (genders.has('w')) groupKey = 'Waifu';
+                            else if (genders.has('h')) groupKey = 'Husbando';
+                            else groupKey = 'Genderless / Other';
                             break;
                         case 'roulette':
                             const roulettes = new Set();
@@ -1609,362 +1599,152 @@
                                     }
                                 });
                             }
-                            if (roulettes.has('a') && roulettes.has('g')) {
-                                groupKey = 'Animanga & Game';
-                            } else if (roulettes.has('a')) {
-                                groupKey = 'Animanga';
-                            } else if (roulettes.has('g')) {
-                                groupKey = 'Game';
-                            } else {
-                                groupKey = 'Unknown Roulette';
-                            }
+                            if (roulettes.has('a') && roulettes.has('g')) groupKey = 'Animanga & Game';
+                            else if (roulettes.has('a')) groupKey = 'Animanga';
+                            else if (roulettes.has('g')) groupKey = 'Game';
+                            else groupKey = 'Unknown Roulette';
                             break;
-                        case 'series':
-                        default:
-                            groupKey = seriesName;
-                            break;
+                        case 'series': default: groupKey = seriesName; break;
                     }
                     if (!groups[groupKey]) {
-                        groups[groupKey] = { characters: [] };
+                        groups[groupKey] = { characters: [], sort: 'original' };
                     }
                     groups[groupKey].characters.push({ ...char, originalSeries: seriesName, originalIndex: idx });
                 });
             }
 
             const sortedGroupEntries = Object.entries(groups).sort((a, b) => {
-                const [keyA, dataA] = a;
-                const [keyB, dataB] = b;
-                if (currentSortMethod === 'count') {
-                    return dataB.characters.length - dataA.characters.length;
-                }
+                const [keyA, dataA] = a; const [keyB, dataB] = b;
+                if (currentSortMethod === 'count') return dataB.characters.length - dataA.characters.length;
                 if (currentGrouping === 'kakera') {
-                    const valA = parseInt(keyA.split(' ')[0]);
-                    const valB = parseInt(keyB.split(' ')[0]);
+                    const valA = parseInt(keyA.split(' ')[0]); const valB = parseInt(keyB.split(' ')[0]);
                     return valA - valB;
                 }
                 return keyA.localeCompare(keyB);
             });
 
+            let finalHTML = '';
             for (const [groupName, data] of sortedGroupEntries) {
-                const card = document.createElement('div');
-                card.className = 'series-card';
-
-                const headerDiv = document.createElement('div');
-                headerDiv.className = 'series-header';
-                const titleDiv = document.createElement('div');
-                titleDiv.className = 'series-title';
-                titleDiv.textContent = groupName;
-                titleDiv.title = groupName;
-
-                const countDiv = document.createElement('div');
-                countDiv.className = 'series-count';
                 const includedCount = data.characters.filter(c => !c.excluded).length;
-                countDiv.textContent = `${includedCount}/${data.characters.length}`;
-                card.dataset.totalChars = data.characters.length;
-
-                headerDiv.appendChild(titleDiv);
-                headerDiv.appendChild(countDiv);
-                card.appendChild(headerDiv);
-
-                const controlsDiv = document.createElement('div');
-                controlsDiv.className = 'card-controls';
-
-                const mainActionsRow = document.createElement('div');
-                mainActionsRow.className = 'controls-row main-actions';
-
-                const actionButtons = document.createElement('div');
-                actionButtons.style.display = 'flex';
-                actionButtons.style.gap = '8px';
-
-                const toggleBtn = document.createElement('button');
-                toggleBtn.className = 'series-toggle-btn';
                 const allExcluded = data.characters.every(c => c.excluded);
-                toggleBtn.classList.toggle('disabled', allExcluded);
-                toggleBtn.textContent = allExcluded ? 'Enable All' : 'Disable All';
-                toggleBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    toggleGroup(data.characters, e);
-                };
-                actionButtons.appendChild(toggleBtn);
+                const charIdentifiers = JSON.stringify(data.characters.map(c => ({
+                    series: c.originalSeries,
+                    index: c.originalIndex
+                })));
 
-                const invertBtn = document.createElement('button');
-                invertBtn.textContent = 'Invert';
-                invertBtn.className = 'series-toggle-btn';
-                invertBtn.style.backgroundColor = '#4b5563';
-                invertBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    invertGroup(data.characters, e);
-                };
-                actionButtons.appendChild(invertBtn);
+                let displayName = groupName;
+                if (currentGrouping === 'note' && groupName === '') {
+                    displayName = '(No Note)';
+                } else if (currentGrouping === 'color' && groupName.toUpperCase() === '#670D08') {
+                    displayName = '(No Color)';
+                }
 
-                mainActionsRow.appendChild(actionButtons);
+                if (isRankingEnabled && data.characters.every(c => c.rank === 0)) {
+                    data.characters.forEach((char, index) => char.rank = index + 1);
+                }
+                data.characters.sort((a, b) => a.rank - b.rank);
 
-                const sortButtonsContainer = document.createElement('div');
-                sortButtonsContainer.className = 'sort-buttons';
-                sortButtonsContainer.innerHTML = `<span class="sort-label">Sort:</span>`;
+                const charactersHTML = data.characters.map(char => createCharacterCardHTML(char)).join('');
 
-                const sortOptions = [
-                    {
-                        label: 'Original', default: true, func: (a, b) => {
-                            const seriesCompare = a.originalSeries.localeCompare(b.originalSeries);
-                            if (seriesCompare !== 0) return seriesCompare;
-                            return a.originalIndex - b.originalIndex;
-                        }
-                    },
-                    { label: 'A-Z', func: (a, b) => a.name.localeCompare(b.name) },
-                    { label: 'Rank', func: (a, b) => parseInt(a.globalRank || 999999) - parseInt(b.globalRank || 999999) },
-                    { label: 'Kakera', func: (a, b) => parseInt(b.kakera || 0) - parseInt(a.kakera || 0) },
-                    { label: 'Keys', func: (a, b) => parseInt(b.keys || 0) - parseInt(a.keys || 0) }
-                ];
+                const groupCardHTML = `
+                    <div class="series-card" data-group-name="${escapeHTML(groupName)}" data-characters="${escapeHTML(charIdentifiers)}">
+                        <div class="series-header">
+                            <div class="series-title" title="${displayName}">${displayName}</div>
+                            <div class="series-count">${includedCount}/${data.characters.length}</div>
+                        </div>
+                        <div class="card-controls">
+                            <div class="controls-row main-actions">
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="series-toggle-btn ${allExcluded ? 'disabled' : ''}" data-action="toggle-group">${allExcluded ? 'Enable All' : 'Disable All'}</button>
+                                    <button class="series-toggle-btn" style="background-color: #4b5563;" data-action="invert-group">Invert</button>
+                                </div>
+                                <div class="sort-buttons">
+                                    <span class="sort-label">Sort:</span>
+                                    <button data-action="sort" data-sort-by="original" class="active">Original</button>
+                                    <button data-action="sort" data-sort-by="az">A-Z</button>
+                                    <button data-action="sort" data-sort-by="rank">Rank</button>
+                                    <button data-action="sort" data-sort-by="kakera">Kakera</button>
+                                    <button data-action="sort" data-sort-by="keys">Keys</button>
+                                </div>
+                            </div>
+                            <div class="controls-row">
+                                <div class="bulk-apply-group">
+                                    <input type="text" class="note-input" placeholder="Apply note...">
+                                    <div class="apply-btn-group">
+                                        <button data-action="bulk-note" data-target="all">All</button>
+                                        <button data-action="bulk-note" data-target="selected">Selected</button>
+                                    </div>
+                                </div>
+                                <div class="bulk-apply-group">
+                                    <input type="text" class="note-input" placeholder="Apply color...">
+                                    <div class="apply-btn-group">
+                                        <button data-action="bulk-color" data-target="all">All</button>
+                                        <button data-action="bulk-color" data-target="selected">Selected</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="characters-list">${charactersHTML}</div>
+                    </div>`;
 
-                sortOptions.forEach(option => {
-                    const button = document.createElement('button');
-                    button.textContent = option.label;
-                    if (option.default) {
-                        button.classList.add('active');
-                    }
-                    button.onclick = (e) => {
-                        e.stopPropagation();
-                        e.target.parentElement.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
-                        e.target.classList.add('active');
-                        reRankAndRender(option.func);
-                    };
-                    sortButtonsContainer.appendChild(button);
-                });
-
-                mainActionsRow.appendChild(sortButtonsContainer);
-                controlsDiv.appendChild(mainActionsRow);
-
-                const bulkApplyRow = document.createElement('div');
-                bulkApplyRow.className = 'controls-row';
-
-                const noteApplyGroup = document.createElement('div');
-                noteApplyGroup.className = 'bulk-apply-group';
-
-                const noteInput = document.createElement('input');
-                noteInput.type = 'text';
-                noteInput.className = 'note-input';
-                noteInput.placeholder = 'Apply note...';
-
-                const noteBtnGroup = document.createElement('div');
-                noteBtnGroup.className = 'apply-btn-group';
-
-                const applyNoteButton = document.createElement('button');
-                applyNoteButton.textContent = 'All';
-                applyNoteButton.title = 'Apply note to all characters in this group';
-
-                const applySelectedNoteButton = document.createElement('button');
-                applySelectedNoteButton.textContent = 'Selected';
-                applySelectedNoteButton.title = 'Apply note to selected characters in this group';
-
-                noteBtnGroup.appendChild(applyNoteButton);
-                noteBtnGroup.appendChild(applySelectedNoteButton);
-                noteApplyGroup.appendChild(noteInput);
-                noteApplyGroup.appendChild(noteBtnGroup);
-                bulkApplyRow.appendChild(noteApplyGroup);
-
-                const colorApplyGroup = document.createElement('div');
-                colorApplyGroup.className = 'bulk-apply-group';
-
-                const colorInput = document.createElement('input');
-                colorInput.type = 'text';
-                colorInput.className = 'note-input';
-                colorInput.placeholder = 'Apply color...';
-
-                const colorBtnGroup = document.createElement('div');
-                colorBtnGroup.className = 'apply-btn-group';
-
-                const applyColorButton = document.createElement('button');
-                applyColorButton.textContent = 'All';
-                applyColorButton.title = 'Apply color to all characters in this group';
-
-                const applySelectedColorButton = document.createElement('button');
-                applySelectedColorButton.textContent = 'Selected';
-                applySelectedColorButton.title = 'Apply color to selected characters in this group';
-
-                colorBtnGroup.appendChild(applyColorButton);
-                colorBtnGroup.appendChild(applySelectedColorButton);
-                colorApplyGroup.appendChild(colorInput);
-                colorApplyGroup.appendChild(colorBtnGroup);
-                bulkApplyRow.appendChild(colorApplyGroup);
-
-                controlsDiv.appendChild(bulkApplyRow);
-                card.appendChild(controlsDiv);
-
-                const charList = document.createElement('div');
-                charList.className = 'characters-list';
-                card.appendChild(charList);
-
-                let currentlyDisplayedChars = [...data.characters];
-
-                const reRankAndRender = (sortFunction) => {
-                    currentlyDisplayedChars.forEach(char => {
-                        const freshCharData = seriesData[char.originalSeries].characters[char.originalIndex];
-                        char.excluded = freshCharData.excluded;
-                    });
-
-                    const sortedChars = [...currentlyDisplayedChars].sort(sortFunction);
-
-                    if (isRankingEnabled) {
-                        sortedChars.forEach((char, index) => {
-                            seriesData[char.originalSeries].characters[char.originalIndex].rank = index + 1;
-                            char.rank = index + 1;
-                        });
-                        saveToLocalStorage();
-                    }
-
-                    currentlyDisplayedChars = sortedChars;
-
-                    charList.innerHTML = '';
-                    currentlyDisplayedChars.forEach(char => {
-                        charList.appendChild(createCharacterCard(char, currentlyDisplayedChars));
-                    });
-                };
-
-                applyNoteButton.onclick = () => {
-                    const newNote = noteInput.value.trim();
-                    data.characters.forEach(char => {
-                        seriesData[char.originalSeries].characters[char.originalIndex].note = newNote;
-                    });
-                    saveToLocalStorage();
-                    if (currentGrouping === 'note') {
-                        displaySeries();
-                    } else {
-                        charList.querySelectorAll('.character-card .character-note').forEach(noteDiv => {
-                            const hasNote = newNote !== '';
-                            noteDiv.textContent = hasNote ? newNote : 'No note!';
-                            noteDiv.title = hasNote ? newNote : 'Click to add note';
-                            noteDiv.style.color = hasNote ? '#9ca3af' : '#dc2626';
-                            noteDiv.style.fontWeight = hasNote ? 'normal' : 'bold';
-                        });
-                    }
-                };
-
-                applySelectedNoteButton.onclick = () => {
-                    const newNote = noteInput.value.trim();
-                    data.characters.forEach(char => {
-                        if (!seriesData[char.originalSeries].characters[char.originalIndex].excluded) {
-                            seriesData[char.originalSeries].characters[char.originalIndex].note = newNote;
-                        }
-                    });
-                    saveToLocalStorage();
-                    if (currentGrouping === 'note') {
-                        displaySeries();
-                    } else {
-                        charList.querySelectorAll('.character-card:not(.excluded) .character-note').forEach(noteDiv => {
-                            const hasNote = newNote !== '';
-                            noteDiv.textContent = hasNote ? newNote : 'No note!';
-                            noteDiv.title = hasNote ? newNote : 'Click to add note';
-                            noteDiv.style.color = hasNote ? '#9ca3af' : '#dc2626';
-                            noteDiv.style.fontWeight = hasNote ? 'normal' : 'bold';
-                        });
-                    }
-                };
-
-                const isValidHex = (color) => /^#([0-9a-fA-F]{3}){1,2}$/.test(color);
-
-                applyColorButton.onclick = () => {
-                    const newColor = colorInput.value.trim();
-                    if (!isValidHex(newColor)) return showMessage('Invalid hex color format. Use #RRGGBB.', 'error');
-                    data.characters.forEach(char => {
-                        seriesData[char.originalSeries].characters[char.originalIndex].color = newColor;
-                    });
-                    saveToLocalStorage();
-                    if (currentGrouping === 'color') {
-                        displaySeries();
-                    } else {
-                        charList.querySelectorAll('.character-card').forEach(cardEl => {
-                            cardEl.style.borderColor = newColor;
-                        });
-                    }
-                };
-
-                applySelectedColorButton.onclick = () => {
-                    const newColor = colorInput.value.trim();
-                    if (!isValidHex(newColor)) return showMessage('Invalid hex color format. Use #RRGGBB.', 'error');
-                    data.characters.forEach(char => {
-                        if (!seriesData[char.originalSeries].characters[char.originalIndex].excluded) {
-                            seriesData[char.originalSeries].characters[char.originalIndex].color = newColor;
-                        }
-                    });
-                    saveToLocalStorage();
-                    if (currentGrouping === 'color') {
-                        displaySeries();
-                    } else {
-                        charList.querySelectorAll('.character-card:not(.excluded)').forEach(cardEl => {
-                            cardEl.style.borderColor = newColor;
-                        });
-                    }
-                };
-
-                const initialRender = () => {
-                    if (isRankingEnabled) {
-                        if (currentlyDisplayedChars.every(c => c.rank === 0)) {
-                            currentlyDisplayedChars.forEach((char, index) => {
-                                char.rank = index + 1;
-                                seriesData[char.originalSeries].characters[char.originalIndex].rank = index + 1;
-                            });
-                        }
-                        currentlyDisplayedChars.sort((a, b) => a.rank - b.rank);
-                    }
-
-                    charList.innerHTML = '';
-                    currentlyDisplayedChars.forEach(char => {
-                        charList.appendChild(createCharacterCard(char, currentlyDisplayedChars));
-                    });
-                };
-
-                initialRender();
-
-                const hasVisibleChars = charList.querySelector('.character-card:not(.hidden-char)');
+                const hasVisibleChars = data.characters.some(c => !c.excluded);
                 if (showDeselected || hasVisibleChars) {
-                    grid.appendChild(card);
+                    finalHTML += groupCardHTML;
                 }
             }
+            grid.innerHTML = finalHTML;
         }
 
-        function toggleCharacter(seriesName, charIdx, cardElement) {
+        function toggleCharacter(seriesName, charIdx) {
             if (!seriesData[seriesName] || !seriesData[seriesName].characters[charIdx]) return;
 
             const char = seriesData[seriesName].characters[charIdx];
             char.excluded = !char.excluded;
 
-            cardElement.classList.toggle('excluded', char.excluded);
+            const cardElement = document.querySelector(`.character-card[data-original-series="${seriesName}"][data-original-index="${charIdx}"]`);
+            if (cardElement) {
+                cardElement.classList.toggle('excluded', char.excluded);
 
-            if (char.excluded && !showDeselected) {
-                cardElement.classList.add('hidden-char');
-            } else {
-                cardElement.classList.remove('hidden-char');
-            }
-
-            const groupCard = cardElement.closest('.series-card');
-            if (groupCard) {
-                if (!showDeselected) {
-                    const hasVisibleChars = groupCard.querySelector('.character-card:not(.hidden-char)');
-                    groupCard.style.display = hasVisibleChars ? '' : 'none';
+                if (char.excluded && !showDeselected) {
+                    cardElement.classList.add('hidden-char');
+                } else {
+                    cardElement.classList.remove('hidden-char');
                 }
 
-                if (currentGrouping !== 'series') {
-                    const countEl = groupCard.querySelector('.series-count');
-                    if (countEl) {
-                        const parts = countEl.textContent.split('/');
-                        let includedCount = parseInt(parts[0], 10);
-                        includedCount += char.excluded ? -1 : 1;
-                        countEl.textContent = `${includedCount}/${parts[1]}`;
-                    }
-                }
-
-                const allExcludedInGroup = !groupCard.querySelector('.character-card:not(.excluded)');
-
-                const toggleBtn = groupCard.querySelector('.series-toggle-btn');
-                if (toggleBtn) {
-                    toggleBtn.classList.toggle('disabled', allExcludedInGroup);
-                    toggleBtn.textContent = allExcludedInGroup ? 'Enable All' : 'Disable All';
+                const groupCard = cardElement.closest('.series-card');
+                if (groupCard) {
+                    updateGroupUI(groupCard);
                 }
             }
 
             updateStats();
             saveToLocalStorage();
+        }
+
+        function updateGroupUI(groupCard) {
+            const identifiers = groupCard.dataset.characters.split(',');
+            const groupChars = identifiers.map(id => {
+                const [series, index] = id.split('|');
+                return seriesData[series] ? seriesData[series].characters[index] : null;
+            }).filter(Boolean);
+
+            const includedCount = groupChars.filter(c => !c.excluded).length;
+            const allExcluded = includedCount === 0;
+
+            const countEl = groupCard.querySelector('.series-count');
+            if (countEl) {
+                countEl.textContent = `${includedCount}/${groupChars.length}`;
+            }
+
+            const toggleBtn = groupCard.querySelector('[data-action="toggle-group"]');
+            if (toggleBtn) {
+                toggleBtn.textContent = allExcluded ? 'Enable All' : 'Disable All';
+                toggleBtn.classList.toggle('disabled', allExcluded);
+            }
+
+            if (!showDeselected) {
+                groupCard.style.display = includedCount > 0 ? '' : 'none';
+            }
         }
 
         function toggleGroup(charactersInGroup, event) {
@@ -2399,6 +2179,15 @@
             saveToLocalStorage();
         }
 
+        function escapeHTML(str) {
+            if (typeof str !== 'string') return str;
+            return str.replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         function showMessage(text, type) {
             const messageDiv = document.getElementById('message');
             messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
@@ -2416,7 +2205,7 @@
             placeholder.textContent = 'No Image Available';
             imgElement.parentNode.insertBefore(placeholder, imgElement);
         }
-        
+
         function saveToLocalStorage() {
             try {
                 localStorage.setItem('mudaeSeriesData', JSON.stringify(seriesData));

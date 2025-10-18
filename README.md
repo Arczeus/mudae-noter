@@ -70,7 +70,7 @@ The less important:
 - ~~Sorting changes the selected characters~~
 - ~~Some characters can have (2434) in their name and parser gets confused~~
 - ~~When clicking a character and deselected is set to hide characters should hide~~
-
+- Website lags when parsing and refreshing
 ## Images
 
 ![Input section](input.png)
