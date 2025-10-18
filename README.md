@@ -33,6 +33,7 @@ The app works offline, but images require an internet connection.
 - Large collections may take some time to load.
 - This website doesn't and won't work on phones.
 - It also may break unexpectedly.
+- Please report any bugs.
 
 ## To-Do
 
@@ -54,7 +55,7 @@ Top priority:
 - ~~Hide deselected characters~~
 - ~~Add ranks~~
 - ~~Add gender~~
-- Add apply to colors
+- ~~Add apply to colors~~
 
 The less important:
 - ~~change sort group parse buttons/select buttons ui~~
@@ -70,7 +71,8 @@ The less important:
 - ~~Sorting changes the selected characters~~
 - ~~Some characters can have (2434) in their name and parser gets confused~~
 - ~~When clicking a character and deselected is set to hide characters should hide~~
-- Website lags when parsing and refreshing
+- ~~Website lags when parsing and refreshing~~
+
 ## Images
 
 ![Input section](input.png)
