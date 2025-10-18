@@ -1242,34 +1242,6 @@
             charCard.style.borderColor = colorCode;
             charCard.onclick = (event) => toggleCharacter(char.originalSeries, char.originalIndex, event.currentTarget);
 
-            const genderContainer = document.createElement('div');
-            genderContainer.style.cssText = 'position: absolute; top: 5px; right: 5px; z-index: 10; display: flex; gap: 3px;';
-
-            const genders = new Set();
-            if (char.mudaeTags) {
-                char.mudaeTags.forEach(tag => {
-                    const gender = tag[0].toLowerCase();
-                    if (gender === 'w' || gender === 'h') {
-                        genders.add(gender);
-                    }
-                });
-            }
-
-            genders.forEach(gender => {
-                const genderBadge = document.createElement('div');
-                genderBadge.textContent = gender.toUpperCase();
-                genderBadge.style.cssText = 'font-size: 0.9em; font-weight: 700; padding: 2px 6px; border-radius: 4px; background-color: rgba(10, 10, 15, 0.8); border: 1px solid;';
-                if (gender === 'w') {
-                    genderBadge.style.color = '#ff8f8f';
-                    genderBadge.style.borderColor = '#ff8f8f';
-                } else {
-                    genderBadge.style.color = '#8fafff';
-                    genderBadge.style.borderColor = '#8fafff';
-                }
-                genderContainer.appendChild(genderBadge);
-            });
-            charCard.appendChild(genderContainer);
-
             const img = document.createElement('img');
             img.src = char.image;
             img.alt = char.name;
@@ -1415,6 +1387,41 @@
 
             charCard.appendChild(img);
             charCard.appendChild(infoDiv);
+            const genderBarContainer = document.createElement('div');
+            genderBarContainer.style.cssText = 'display: flex; text-align: center; font-size: 0.65em; font-weight: 600;';
+
+            const genders = new Set();
+            if (char.mudaeTags) {
+                char.mudaeTags.forEach(tag => {
+                    const gender = tag[0].toLowerCase();
+                    if (gender === 'w' || gender === 'h') {
+                        genders.add(gender);
+                    }
+                });
+            }
+
+            const hasWaifu = genders.has('w');
+            const hasHusbando = genders.has('h');
+
+            if (hasWaifu) {
+                const waifuBar = document.createElement('div');
+                waifuBar.textContent = 'Waifu';
+                waifuBar.style.cssText = 'flex: 1; padding: 2px 0; background-color: #ff8f8f; color: #0a0a0f;';
+                waifuBar.title = 'Waifu';
+                genderBarContainer.appendChild(waifuBar);
+            }
+
+            if (hasHusbando) {
+                const husbandoBar = document.createElement('div');
+                husbandoBar.textContent = 'Husbando';
+                husbandoBar.style.cssText = 'flex: 1; padding: 2px 0; background-color: #8fafff; color: #0a0a0f;';
+                husbandoBar.title = 'Husbando';
+                genderBarContainer.appendChild(husbandoBar);
+            }
+
+            if (hasWaifu || hasHusbando) {
+                charCard.appendChild(genderBarContainer);
+            }
 
             const rouletteContainer = document.createElement('div');
             rouletteContainer.style.cssText = 'display: flex; text-align: center; font-size: 0.65em; font-weight: 600;';
