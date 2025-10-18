@@ -476,6 +476,7 @@
             cursor: pointer;
             transition: all 0.2s;
             white-space: nowrap;
+            margin-bottom: 10px;
         }
 
         .series-toggle-btn:hover {
@@ -720,53 +721,94 @@
         .card-controls {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 15px;
-            padding: 10px;
+            padding: 12px;
             background-color: #13131a;
             border-radius: 8px;
         }
 
-        .controls-row {
+        .controls-row.main-actions {
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .sort-buttons {
             display: flex;
-            gap: 8px;
             align-items: center;
+            gap: 5px;
             flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .sort-label {
+            font-size: 0.8em;
+            color: #9ca3af;
+            margin-right: 2px;
         }
 
         .sort-buttons button {
             background: #2a2a3a;
             color: #9ca3af;
-            border: 1px solid transparent;
+            border: none;
             padding: 6px 10px;
             border-radius: 5px;
             font-size: 0.8em;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            margin-bottom: 5px;
+            margin-bottom: 0;
         }
 
-        .sort-buttons button:hover {
-            background: #7c3aed;
-            color: white;
-            transform: translateY(-1px);
+        .bulk-apply-group {
+            display: flex;
+            flex-grow: 1;
+            gap: 8px;
+            background-color: #0a0a0f;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #2a2a3a;
+            align-items: center;
         }
 
-        .sort-buttons button.active {
-            background: #7c3aed;
-            color: white;
+        .bulk-apply-group .note-input {
+            flex-grow: 1;
+            margin-bottom: 0;
         }
 
-        .note-applicator .apply-btn {
-            padding: 8px 15px;
-            font-size: 0.8em;
-            white-space: nowrap;
-            background-color: #6d28d9;
+        .apply-btn-group {
+            display: flex;
             flex-shrink: 0;
         }
 
-        .note-applicator .apply-btn:hover {
+        .apply-btn-group button {
+            padding: 8px 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            white-space: nowrap;
+            background-color: #4b5563;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .apply-btn-group button:hover {
+            background-color: #6d28d9;
+        }
+
+        .apply-btn-group button:first-child {
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+
+        .apply-btn-group button:last-child {
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+            background-color: #6d28d9;
+        }
+
+        .apply-btn-group button:last-child:hover {
             background-color: #7c3aed;
         }
 
@@ -1653,8 +1695,12 @@
                 const controlsDiv = document.createElement('div');
                 controlsDiv.className = 'card-controls';
 
-                const topControlsRow = document.createElement('div');
-                topControlsRow.className = 'controls-row';
+                const mainActionsRow = document.createElement('div');
+                mainActionsRow.className = 'controls-row main-actions';
+
+                const actionButtons = document.createElement('div');
+                actionButtons.style.display = 'flex';
+                actionButtons.style.gap = '8px';
 
                 const toggleBtn = document.createElement('button');
                 toggleBtn.className = 'series-toggle-btn';
@@ -1665,7 +1711,7 @@
                     e.stopPropagation();
                     toggleGroup(data.characters, e);
                 };
-                topControlsRow.appendChild(toggleBtn);
+                actionButtons.appendChild(toggleBtn);
 
                 const invertBtn = document.createElement('button');
                 invertBtn.textContent = 'Invert';
@@ -1675,11 +1721,13 @@
                     e.stopPropagation();
                     invertGroup(data.characters, e);
                 };
-                topControlsRow.appendChild(invertBtn);
+                actionButtons.appendChild(invertBtn);
+
+                mainActionsRow.appendChild(actionButtons);
 
                 const sortButtonsContainer = document.createElement('div');
                 sortButtonsContainer.className = 'sort-buttons';
-                sortButtonsContainer.innerHTML = `<span style="font-size: 0.8em; color: #9ca3af; margin-right: 5px;">Sort:</span>`;
+                sortButtonsContainer.innerHTML = `<span class="sort-label">Sort:</span>`;
 
                 const sortOptions = [
                     {
@@ -1702,6 +1750,7 @@
                         button.classList.add('active');
                     }
                     button.onclick = (e) => {
+                        e.stopPropagation();
                         e.target.parentElement.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
                         e.target.classList.add('active');
                         reRankAndRender(option.func);
@@ -1709,30 +1758,63 @@
                     sortButtonsContainer.appendChild(button);
                 });
 
-                topControlsRow.appendChild(sortButtonsContainer);
-                controlsDiv.appendChild(topControlsRow);
+                mainActionsRow.appendChild(sortButtonsContainer);
+                controlsDiv.appendChild(mainActionsRow);
 
-                const noteInputContainer = document.createElement('div');
-                noteInputContainer.className = 'controls-row note-applicator';
+                const bulkApplyRow = document.createElement('div');
+                bulkApplyRow.className = 'controls-row';
+
+                const noteApplyGroup = document.createElement('div');
+                noteApplyGroup.className = 'bulk-apply-group';
+
                 const noteInput = document.createElement('input');
                 noteInput.type = 'text';
                 noteInput.className = 'note-input';
-                noteInput.placeholder = 'Enter group note...';
-                noteInput.style.flexGrow = '1';
+                noteInput.placeholder = 'Apply note...';
 
-                const applyButton = document.createElement('button');
-                applyButton.className = 'apply-btn';
-                applyButton.textContent = 'Apply to All';
+                const noteBtnGroup = document.createElement('div');
+                noteBtnGroup.className = 'apply-btn-group';
 
-                const applySelectedButton = document.createElement('button');
-                applySelectedButton.className = 'apply-btn';
-                applySelectedButton.textContent = 'Apply to Selected';
-                applySelectedButton.style.backgroundColor = '#6d28d9';
+                const applyNoteButton = document.createElement('button');
+                applyNoteButton.textContent = 'All';
+                applyNoteButton.title = 'Apply note to all characters in this group';
 
-                noteInputContainer.appendChild(noteInput);
-                noteInputContainer.appendChild(applyButton);
-                noteInputContainer.appendChild(applySelectedButton);
-                controlsDiv.appendChild(noteInputContainer);
+                const applySelectedNoteButton = document.createElement('button');
+                applySelectedNoteButton.textContent = 'Selected';
+                applySelectedNoteButton.title = 'Apply note to selected characters in this group';
+
+                noteBtnGroup.appendChild(applyNoteButton);
+                noteBtnGroup.appendChild(applySelectedNoteButton);
+                noteApplyGroup.appendChild(noteInput);
+                noteApplyGroup.appendChild(noteBtnGroup);
+                bulkApplyRow.appendChild(noteApplyGroup);
+
+                const colorApplyGroup = document.createElement('div');
+                colorApplyGroup.className = 'bulk-apply-group';
+
+                const colorInput = document.createElement('input');
+                colorInput.type = 'text';
+                colorInput.className = 'note-input';
+                colorInput.placeholder = 'Apply color...';
+
+                const colorBtnGroup = document.createElement('div');
+                colorBtnGroup.className = 'apply-btn-group';
+
+                const applyColorButton = document.createElement('button');
+                applyColorButton.textContent = 'All';
+                applyColorButton.title = 'Apply color to all characters in this group';
+
+                const applySelectedColorButton = document.createElement('button');
+                applySelectedColorButton.textContent = 'Selected';
+                applySelectedColorButton.title = 'Apply color to selected characters in this group';
+
+                colorBtnGroup.appendChild(applyColorButton);
+                colorBtnGroup.appendChild(applySelectedColorButton);
+                colorApplyGroup.appendChild(colorInput);
+                colorApplyGroup.appendChild(colorBtnGroup);
+                bulkApplyRow.appendChild(colorApplyGroup);
+
+                controlsDiv.appendChild(bulkApplyRow);
                 card.appendChild(controlsDiv);
 
                 const charList = document.createElement('div');
@@ -1765,58 +1847,82 @@
                     });
                 };
 
-                applyButton.onclick = () => {
+                applyNoteButton.onclick = () => {
                     const newNote = noteInput.value.trim();
-
                     data.characters.forEach(char => {
                         seriesData[char.originalSeries].characters[char.originalIndex].note = newNote;
-                        char.note = newNote;
                     });
-
                     saveToLocalStorage();
-
                     if (currentGrouping === 'note') {
                         displaySeries();
                     } else {
-                        charList.querySelectorAll('.character-card').forEach(cardElement => {
-                            const noteDiv = cardElement.querySelector('.character-note');
-                            if (noteDiv) {
-                                const hasNote = newNote !== '';
-                                noteDiv.textContent = hasNote ? newNote : 'No note!';
-                                noteDiv.title = hasNote ? newNote : 'Click to add note';
-                                noteDiv.style.color = hasNote ? '#9ca3af' : '#dc2626';
-                                noteDiv.style.fontWeight = hasNote ? 'normal' : 'bold';
-                            }
+                        charList.querySelectorAll('.character-card .character-note').forEach(noteDiv => {
+                            const hasNote = newNote !== '';
+                            noteDiv.textContent = hasNote ? newNote : 'No note!';
+                            noteDiv.title = hasNote ? newNote : 'Click to add note';
+                            noteDiv.style.color = hasNote ? '#9ca3af' : '#dc2626';
+                            noteDiv.style.fontWeight = hasNote ? 'normal' : 'bold';
                         });
                     }
                 };
-                applySelectedButton.onclick = () => {
-                    const newNote = noteInput.value.trim();
 
+                applySelectedNoteButton.onclick = () => {
+                    const newNote = noteInput.value.trim();
                     data.characters.forEach(char => {
-                        const masterChar = seriesData[char.originalSeries].characters[char.originalIndex];
-                        if (!masterChar.excluded) {
-                            masterChar.note = newNote;
+                        if (!seriesData[char.originalSeries].characters[char.originalIndex].excluded) {
+                            seriesData[char.originalSeries].characters[char.originalIndex].note = newNote;
                         }
                     });
-
                     saveToLocalStorage();
-
                     if (currentGrouping === 'note') {
                         displaySeries();
                     } else {
-                        charList.querySelectorAll('.character-card:not(.excluded)').forEach(cardElement => {
-                            const noteDiv = cardElement.querySelector('.character-note');
-                            if (noteDiv) {
-                                const hasNote = newNote !== '';
-                                noteDiv.textContent = hasNote ? newNote : 'No note!';
-                                noteDiv.title = hasNote ? newNote : 'Click to add note';
-                                noteDiv.style.color = hasNote ? '#9ca3af' : '#dc2626';
-                                noteDiv.style.fontWeight = hasNote ? 'normal' : 'bold';
-                            }
+                        charList.querySelectorAll('.character-card:not(.excluded) .character-note').forEach(noteDiv => {
+                            const hasNote = newNote !== '';
+                            noteDiv.textContent = hasNote ? newNote : 'No note!';
+                            noteDiv.title = hasNote ? newNote : 'Click to add note';
+                            noteDiv.style.color = hasNote ? '#9ca3af' : '#dc2626';
+                            noteDiv.style.fontWeight = hasNote ? 'normal' : 'bold';
                         });
                     }
                 };
+
+                const isValidHex = (color) => /^#([0-9a-fA-F]{3}){1,2}$/.test(color);
+
+                applyColorButton.onclick = () => {
+                    const newColor = colorInput.value.trim();
+                    if (!isValidHex(newColor)) return showMessage('Invalid hex color format. Use #RRGGBB.', 'error');
+                    data.characters.forEach(char => {
+                        seriesData[char.originalSeries].characters[char.originalIndex].color = newColor;
+                    });
+                    saveToLocalStorage();
+                    if (currentGrouping === 'color') {
+                        displaySeries();
+                    } else {
+                        charList.querySelectorAll('.character-card').forEach(cardEl => {
+                            cardEl.style.borderColor = newColor;
+                        });
+                    }
+                };
+
+                applySelectedColorButton.onclick = () => {
+                    const newColor = colorInput.value.trim();
+                    if (!isValidHex(newColor)) return showMessage('Invalid hex color format. Use #RRGGBB.', 'error');
+                    data.characters.forEach(char => {
+                        if (!seriesData[char.originalSeries].characters[char.originalIndex].excluded) {
+                            seriesData[char.originalSeries].characters[char.originalIndex].color = newColor;
+                        }
+                    });
+                    saveToLocalStorage();
+                    if (currentGrouping === 'color') {
+                        displaySeries();
+                    } else {
+                        charList.querySelectorAll('.character-card:not(.excluded)').forEach(cardEl => {
+                            cardEl.style.borderColor = newColor;
+                        });
+                    }
+                };
+
                 const initialRender = () => {
                     if (isRankingEnabled) {
                         if (currentlyDisplayedChars.every(c => c.rank === 0)) {
