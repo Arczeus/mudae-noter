@@ -520,15 +520,15 @@
             justify-content: center;
         }
 
-        .character-card {
-            position: relative;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 5px solid transparent;
-            border-radius: 8px;
-            overflow: hidden;
-            width: 135px;
-        }
+.character-card {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 5px solid var(--card-color, transparent);
+    border-radius: 8px;
+    overflow: hidden;
+    width: 135px;
+}
 
         .character-card img {
             width: 135px;
@@ -760,6 +760,18 @@
             margin-bottom: 0;
         }
 
+        .sort-buttons button:hover {
+            background: #7c3aed;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .sort-buttons button.active {
+            background: #7c3aed;
+            color: white;
+            transform: translateY(-1px);
+        }
+
         .bulk-apply-group {
             display: flex;
             flex-grow: 1;
@@ -797,15 +809,9 @@
             background-color: #6d28d9;
         }
 
-        .apply-btn-group button:first-child {
-            border-top-left-radius: 5px;
-            border-bottom-left-radius: 5px;
-        }
-
         .apply-btn-group button:last-child {
             border-top-right-radius: 5px;
             border-bottom-right-radius: 5px;
-            background-color: #6d28d9;
         }
 
         .apply-btn-group button:last-child:hover {
@@ -1281,7 +1287,7 @@
             charCard.className = classNames.join(' ');
 
             const colorCode = char.color || '#670d08';
-            charCard.style.borderColor = colorCode;
+            charCard.style.setProperty('--card-color', colorCode);
             charCard.onclick = (event) => toggleCharacter(char.originalSeries, char.originalIndex, event.currentTarget);
 
             const img = document.createElement('img');
