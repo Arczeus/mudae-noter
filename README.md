@@ -73,6 +73,6 @@ The less important:
 
 ## Images
 
-![Parsing and Options](image.png)
+![Input section](input.png)
 
-![Characters](image-1.png)
+![Characters](characters.png)
