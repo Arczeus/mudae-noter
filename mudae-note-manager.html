@@ -978,6 +978,7 @@
                             </div>
                             <div>
                                 <button onclick="applyFilter()" class="btn-primary">Apply Filter</button>
+                                <button onclick="clearFilter()" class="btn-secondary">Revert Filter</button>
                             </div>
                         </div>
                     </div>
@@ -1010,6 +1011,7 @@
         let currentSortMethod = 'alpha';
         let isRankingEnabled = true;
         let showDeselected = true;
+        let preFilterCharacterStates = null;
 
         function initQuickNotes() {
             displayQuickNotes();
@@ -2334,8 +2336,13 @@
         }
 
         function applyFilter() {
-            if (Object.keys(seriesData).length === 0) {
-                return;
+            if (Object.keys(seriesData).length === 0) return;
+
+            if (preFilterCharacterStates === null) {
+                preFilterCharacterStates = {};
+                for (const seriesName in seriesData) {
+                    preFilterCharacterStates[seriesName] = seriesData[seriesName].characters.map(char => char.excluded);
+                }
             }
 
             const minKakera = parseInt(document.getElementById('min-kakera').value) || 0;
@@ -2343,23 +2350,18 @@
             const minKeys = parseInt(document.getElementById('min-keys').value) || 0;
             const maxKeys = parseInt(document.getElementById('max-keys').value) || Infinity;
 
-            let deselectedCount = 0;
-
             for (const seriesName in seriesData) {
-                seriesData[seriesName].characters.forEach(char => {
+                seriesData[seriesName].characters.forEach((char) => {
                     const charKakera = parseInt(char.kakera) || 0;
                     const charKeys = parseInt(char.keys) || 0;
 
-                    const shouldDeselect =
-                        charKakera < minKakera ||
-                        charKakera > maxKakera ||
-                        charKeys < minKeys ||
-                        charKeys > maxKeys;
+                    const matchesFilter =
+                        charKakera >= minKakera &&
+                        charKakera <= maxKakera &&
+                        charKeys >= minKeys &&
+                        charKeys <= maxKeys;
 
-                    if (shouldDeselect) {
-                        if (!char.excluded) {
-                            deselectedCount++;
-                        }
+                    if (!matchesFilter) {
                         char.excluded = true;
                     }
                 });
@@ -2369,6 +2371,34 @@
             updateStats();
             saveToLocalStorage();
         }
+
+        function clearFilter() {
+            document.getElementById('min-kakera').value = '';
+            document.getElementById('max-kakera').value = '';
+            document.getElementById('min-keys').value = '';
+            document.getElementById('max-keys').value = '';
+
+            if (preFilterCharacterStates === null) {
+                return;
+            }
+
+            for (const seriesName in preFilterCharacterStates) {
+                if (seriesData[seriesName]) {
+                    preFilterCharacterStates[seriesName].forEach((wasExcluded, charIndex) => {
+                        if (seriesData[seriesName].characters[charIndex]) {
+                            seriesData[seriesName].characters[charIndex].excluded = wasExcluded;
+                        }
+                    });
+                }
+            }
+
+            preFilterCharacterStates = null;
+
+            displaySeries();
+            updateStats();
+            saveToLocalStorage();
+        }
+
         function showMessage(text, type) {
             const messageDiv = document.getElementById('message');
             messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
@@ -2379,6 +2409,14 @@
             }, 5000);
         }
 
+        function handleImageError(imgElement) {
+            imgElement.style.display = 'none';
+            const placeholder = document.createElement('div');
+            placeholder.style.cssText = 'width: 135px; height: 210px; background: #2a2a3a; display: flex; align-items: center; justify-content: center; color: #6b7280; font-size: 0.8em; text-align: center; padding: 10px;';
+            placeholder.textContent = 'No Image Available';
+            imgElement.parentNode.insertBefore(placeholder, imgElement);
+        }
+        
         function saveToLocalStorage() {
             try {
                 localStorage.setItem('mudaeSeriesData', JSON.stringify(seriesData));
