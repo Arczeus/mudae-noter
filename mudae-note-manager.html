@@ -520,15 +520,15 @@
             justify-content: center;
         }
 
-.character-card {
-    position: relative;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: 5px solid var(--card-color, transparent);
-    border-radius: 8px;
-    overflow: hidden;
-    width: 135px;
-}
+        .character-card {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 5px solid var(--card-color, transparent);
+            border-radius: 8px;
+            overflow: hidden;
+            width: 135px;
+        }
 
         .character-card img {
             width: 135px;
@@ -1518,40 +1518,6 @@
             return charCard;
         }
 
-        function updateSelectionView(deselectAll) {
-            const allCards = document.querySelectorAll('.character-card');
-            allCards.forEach(card => {
-                if (deselectAll) {
-                    card.classList.add('excluded');
-                } else {
-                    card.classList.remove('excluded');
-                }
-            });
-
-            const allToggleBtns = document.querySelectorAll('.series-toggle-btn');
-            allToggleBtns.forEach(btn => {
-                if (deselectAll) {
-                    btn.classList.add('disabled');
-                    btn.textContent = 'Enable All';
-                } else {
-                    btn.classList.remove('disabled');
-                    btn.textContent = 'Disable All';
-                }
-            });
-
-            if (currentGrouping !== 'series') {
-                const allGroupCards = document.querySelectorAll('.series-card');
-                allGroupCards.forEach(groupCard => {
-                    const countEl = groupCard.querySelector('.series-count');
-                    const total = groupCard.dataset.totalChars;
-                    if (countEl && total) {
-                        const newCount = deselectAll ? 0 : total;
-                        countEl.textContent = `${newCount}/${total}`;
-                    }
-                });
-            }
-        }
-
         function selectAllCharacters() {
             if (Object.keys(seriesData).length === 0) {
                 return;
@@ -1563,7 +1529,7 @@
                 });
             }
 
-            updateSelectionView(false);
+            displaySeries();
             updateStats();
             saveToLocalStorage();
         }
@@ -1579,7 +1545,7 @@
                 });
             }
 
-            updateSelectionView(true);
+            displaySeries();
             updateStats();
             saveToLocalStorage();
         }
@@ -1971,6 +1937,11 @@
 
             const groupCard = cardElement.closest('.series-card');
             if (groupCard) {
+                if (!showDeselected) {
+                    const hasVisibleChars = groupCard.querySelector('.character-card:not(.hidden-char)');
+                    groupCard.style.display = hasVisibleChars ? '' : 'none';
+                }
+
                 if (currentGrouping !== 'series') {
                     const countEl = groupCard.querySelector('.series-count');
                     if (countEl) {
@@ -2014,7 +1985,14 @@
                 const charCardsInGroup = groupCard.querySelectorAll('.character-card');
                 charCardsInGroup.forEach(card => {
                     card.classList.toggle('excluded', shouldExclude);
+                    if (!showDeselected) {
+                        card.classList.toggle('hidden-char', shouldExclude);
+                    }
                 });
+
+                if (!showDeselected) {
+                    groupCard.style.display = shouldExclude ? 'none' : '';
+                }
 
                 const countEl = groupCard.querySelector('.series-count');
                 const total = groupCard.dataset.totalChars;
@@ -2027,6 +2005,7 @@
             updateStats();
             saveToLocalStorage();
         }
+
         function invertGroup(charactersInGroup, event) {
             if (!charactersInGroup || charactersInGroup.length === 0) return;
 
@@ -2045,9 +2024,17 @@
                     const charIndex = parseInt(card.dataset.originalIndex, 10);
                     const charData = seriesData[seriesName].characters[charIndex];
                     card.classList.toggle('excluded', charData.excluded);
+                    if (!showDeselected) {
+                        card.classList.toggle('hidden-char', charData.excluded);
+                    }
                 });
 
                 const includedCount = charactersInGroup.filter(c => !seriesData[c.originalSeries].characters[c.originalIndex].excluded).length;
+
+                if (!showDeselected) {
+                    groupCard.style.display = includedCount === 0 ? 'none' : '';
+                }
+
                 const countEl = groupCard.querySelector('.series-count');
                 const total = groupCard.dataset.totalChars;
                 if (countEl && total) {
@@ -2065,6 +2052,7 @@
             updateStats();
             saveToLocalStorage();
         }
+
         function updateStats() {
             const totalSeries = Object.keys(seriesData).length;
             let totalChars = 0;
