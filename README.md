@@ -14,7 +14,7 @@ Designed for use with the [Mudae bot](https://top.gg/bot/432610292342587392) on 
 
 ## How to Open
 
-Download **`[mudae-note-manager.html](mudae-note-manager.html)`** and open it in any browser.
+Download **[mudae-note-manager.html](mudae-note-manager.html)** and open it in any browser.
 
 
 
