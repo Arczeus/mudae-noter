@@ -77,4 +77,4 @@ The less important:
 
 ![Input section](images/input.png)
 
-![Characters](images/haracters.png)
+![Characters](images/characters.png)
