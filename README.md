@@ -14,10 +14,9 @@ Designed for use with the [Mudae bot](https://top.gg/bot/432610292342587392) on 
 
 ## How to Open
 
-1. Download the repository or **`mudae-note-manager.html`** file.
-2. Open **`mudae-note-manager.html`** on any browser.
+Download **`[mudae-note-manager.html](mudae-note-manager.html)`** and open it in any browser.
 
-The app works offline, but images require an internet connection.
+
 
 
 ## How to Use
@@ -30,6 +29,7 @@ The app works offline, but images require an internet connection.
 
 ## Notes
 
+- The app works offline, but images require an internet connection.
 - Large collections may take some time to load.
 - This website doesn't and won't work on phones.
 - It also may break unexpectedly.
