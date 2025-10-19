@@ -22,7 +22,7 @@ The app works offline, but images require an internet connection.
 
 ## How to Use
 
-1. Run `$mmasi-[kc+x+y+]` in Discord.  
+1. Run `$mmsaty+ri-c+x+k` in Discord.
 2. Copy the character list.  
 3. Paste it in the page and click **Parse Input**.  
 4. Add notes as needed.
@@ -75,6 +75,6 @@ The less important:
 
 ## Images
 
-![Input section](input.png)
+![Input section](images/input.png)
 
-![Characters](characters.png)
+![Characters](images/haracters.png)

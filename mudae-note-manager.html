@@ -29,6 +29,8 @@
             border-radius: 15px;
             padding: 30px;
             border: 1px solid #1f1f2e;
+            display: flex;
+            flex-direction: column;
         }
 
         .header-row {
@@ -821,10 +823,21 @@
 
         .footer {
             text-align: center;
-            padding: 1%;
+            padding: 40px 0 0;
             color: #6b7280;
             font-size: 0.85em;
-            border-top: 1px solid #2a2a3a;
+            margin-top: auto;
+            position: relative;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: #2a2a3a;
         }
 
         .footer-contact {
@@ -849,7 +862,7 @@
                 </p>
                 <p class="instruction-item">
 
-                    <strong>Command:</strong> Use <code> $mmsaty+ri-c+x+kt </code>to include extra info.
+                    <strong>Command:</strong> Use <code> $mmsaty+ri-c+x+k </code>to include extra info.
                 </p>
                 <p class="instruction-item">
                     <strong>Select Characters:</strong> Click cards to toggle selection (<span class="dimmed">grayed =
