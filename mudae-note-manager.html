@@ -982,6 +982,17 @@
                                     <label for="max-kakera">Max Ka</label>
                                     <input type="number" id="max-kakera" placeholder="any" class="add-note-input">
                                 </div>
+                                <div class="filter-control">
+                                    <label for="filter-gender">Gender</label>
+                                    <select id="filter-gender" class="add-note-input">
+                                        <option value="any">Any</option>
+                                        <option value="has_waifu">Has Waifu</option>
+                                        <option value="has_husbando">Has Husbando</option>
+                                        <option value="only_waifu">Only Waifu</option>
+                                        <option value="only_husbando">Only Husbando</option>
+                                        <option value="genderless">Genderless / Other</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="filter-group">
                                 <div class="filter-control">
@@ -991,6 +1002,17 @@
                                 <div class="filter-control">
                                     <label for="max-keys">Max Keys</label>
                                     <input type="number" id="max-keys" placeholder="any" class="add-note-input">
+                                </div>
+                                <div class="filter-control">
+                                    <label for="filter-roulette">Roulette</label>
+                                    <select id="filter-roulette" class="add-note-input">
+                                        <option value="any">Any</option>
+                                        <option value="has_animanga">Has Animanga</option>
+                                        <option value="has_game">Has Game</option>
+                                        <option value="only_animanga">Only Animanga</option>
+                                        <option value="only_game">Only Game</option>
+                                        <option value="both">Both</option>
+                                    </select>
                                 </div>
                             </div>
                             <div>
@@ -2185,17 +2207,62 @@ ${rouletteBarHTML}
             const maxKakera = parseInt(document.getElementById('max-kakera').value) || Infinity;
             const minKeys = parseInt(document.getElementById('min-keys').value) || 0;
             const maxKeys = parseInt(document.getElementById('max-keys').value) || Infinity;
+            const genderFilter = document.getElementById('filter-gender').value;
+            const rouletteFilter = document.getElementById('filter-roulette').value;
 
             for (const seriesName in seriesData) {
                 seriesData[seriesName].characters.forEach((char) => {
                     const charKakera = parseInt(char.kakera) || 0;
                     const charKeys = parseInt(char.keys) || 0;
 
-                    const matchesFilter =
-                        charKakera >= minKakera &&
-                        charKakera <= maxKakera &&
-                        charKeys >= minKeys &&
-                        charKeys <= maxKeys;
+                    const matchesKakera = charKakera >= minKakera && charKakera <= maxKakera;
+                    const matchesKeys = charKeys >= minKeys && charKeys <= maxKeys;
+
+                    const genders = new Set();
+                    if (char.mudaeTags) {
+                        char.mudaeTags.forEach(tag => {
+                            const gender = tag[0].toLowerCase();
+                            if (gender === 'w' || gender === 'h') genders.add(gender);
+                        });
+                    }
+                    const hasWaifu = genders.has('w');
+                    const hasHusbando = genders.has('h');
+
+                    let matchesGender = false;
+                    switch (genderFilter) {
+                        case 'any': matchesGender = true; break;
+                        case 'has_waifu': matchesGender = hasWaifu; break;
+                        case 'has_husbando': matchesGender = hasHusbando; break;
+                        case 'only_waifu': matchesGender = hasWaifu && !hasHusbando; break;
+                        case 'only_husbando': matchesGender = hasHusbando && !hasWaifu; break;
+                        case 'genderless': matchesGender = !hasWaifu && !hasHusbando; break;
+                        default: matchesGender = true;
+                    }
+
+                    const roulettes = new Set();
+                    if (char.mudaeTags) {
+                        char.mudaeTags.forEach(tag => {
+                            if (tag.length > 1) {
+                                const roulette = tag[1].toLowerCase();
+                                if (roulette === 'a' || roulette === 'g') roulettes.add(roulette);
+                            }
+                        });
+                    }
+                    const hasAnimanga = roulettes.has('a');
+                    const hasGame = roulettes.has('g');
+
+                    let matchesRoulette = false;
+                    switch (rouletteFilter) {
+                        case 'any': matchesRoulette = true; break;
+                        case 'has_animanga': matchesRoulette = hasAnimanga; break;
+                        case 'has_game': matchesRoulette = hasGame; break;
+                        case 'only_animanga': matchesRoulette = hasAnimanga && !hasGame; break;
+                        case 'only_game': matchesRoulette = hasGame && !hasAnimanga; break;
+                        case 'both': matchesRoulette = hasAnimanga && hasGame; break;
+                        default: matchesRoulette = true;
+                    }
+
+                    const matchesFilter = matchesKakera && matchesKeys && matchesGender && matchesRoulette;
 
                     if (!matchesFilter) {
                         char.excluded = true;
@@ -2213,6 +2280,8 @@ ${rouletteBarHTML}
             document.getElementById('max-kakera').value = '';
             document.getElementById('min-keys').value = '';
             document.getElementById('max-keys').value = '';
+            document.getElementById('filter-gender').value = 'any';
+            document.getElementById('filter-roulette').value = 'any';
 
             if (preFilterCharacterStates === null) {
                 return;
