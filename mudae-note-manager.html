@@ -782,6 +782,7 @@
             background-color: #0a0a0f;
             padding: 8px;
             border-radius: 6px;
+            margin-top: 5px;
             border: 1px solid #2a2a3a;
             align-items: center;
         }
@@ -847,6 +848,121 @@
 
         .footer-contact strong {
             color: #a78bfa;
+        }
+
+        @media (max-width: 1200px) {
+            body {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .quick-notes {
+                position: static;
+                width: 100%;
+                max-width: 1610px;
+                height: auto;
+                max-height: none;
+                top: auto;
+            }
+
+            .container {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 1000px) {
+            .series-grid {
+                grid-template-columns: repeat(2, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 900px) {
+            .controls-container {
+                grid-template-columns: 1fr;
+            }
+
+            .options-panel {
+                grid-column: auto;
+                grid-row: auto;
+            }
+
+            .instructions-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 680px) {
+            .series-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .controls-row.main-actions {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .sort-buttons {
+                justify-content: flex-start;
+            }
+
+            .bulk-apply-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .apply-btn-group {
+                margin-top: 5px;
+                display: flex;
+                width: 100%;
+            }
+
+            .apply-btn-group button {
+                flex: 1;
+                text-align: center;
+            }
+
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+                width: 100%;
+            }
+
+            .filter-control {
+                width: 100%;
+            }
+
+            .filter-control .add-note-input {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+                gap: 10px;
+            }
+
+            .container,
+            .quick-notes {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .main-buttons {
+                flex-direction: column;
+            }
+
+            .main-buttons button {
+                width: 100%;
+                margin-right: 0;
+            }
         }
     </style>
 </head>
