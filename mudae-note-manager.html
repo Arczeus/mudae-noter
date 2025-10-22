@@ -965,6 +965,8 @@
                         <div class="button-group">
                             <button onclick="selectAllCharacters()">Select All</button>
                             <button onclick="deselectAllCharacters()">Deselect All</button>
+                            <button onclick="selectDisabledCharacters()">Select Disabled</button>
+                            <button onclick="deselectDisabledCharacters()">Deselect Disabled</button>
                         </div>
                     </div>
 
@@ -1561,6 +1563,42 @@ ${rouletteBarHTML}
             saveToLocalStorage();
         }
 
+        function selectDisabledCharacters() {
+            if (Object.keys(seriesData).length === 0) {
+                return;
+            }
+
+            for (let seriesName in seriesData) {
+                seriesData[seriesName].characters.forEach(function (char) {
+                    if (char.isDisabled) {
+                        char.excluded = false;
+                    }
+                });
+            }
+
+            displaySeries();
+            updateStats();
+            saveToLocalStorage();
+        }
+
+        function deselectDisabledCharacters() {
+            if (Object.keys(seriesData).length === 0) {
+                return;
+            }
+
+            for (let seriesName in seriesData) {
+                seriesData[seriesName].characters.forEach(function (char) {
+                    if (char.isDisabled) {
+                        char.excluded = true;
+                    }
+                });
+            }
+
+            displaySeries();
+            updateStats();
+            saveToLocalStorage();
+        }
+
         function displaySeries() {
             const grid = document.getElementById('seriesGrid');
             grid.innerHTML = '';
@@ -1731,11 +1769,20 @@ ${rouletteBarHTML}
         }
 
         function updateGroupUI(groupCard) {
-            const identifiers = groupCard.dataset.characters.split(',');
-            const groupChars = identifiers.map(id => {
-                const [series, index] = id.split('|');
-                return seriesData[series] ? seriesData[series].characters[index] : null;
-            }).filter(Boolean);
+            let groupChars = [];
+            try {
+                const identifierObjects = JSON.parse(groupCard.dataset.characters);
+                groupChars = identifierObjects.map(obj => {
+                    const { series, index } = obj;
+                    if (seriesData[series] && seriesData[series].characters[index]) {
+                        return seriesData[series].characters[index];
+                    }
+                    return null;
+                }).filter(Boolean);
+            } catch (e) {
+                console.error('Failed to parse group characters in updateGroupUI:', e);
+                return;
+            }
 
             const includedCount = groupChars.filter(c => !c.excluded).length;
             const allExcluded = includedCount === 0;
