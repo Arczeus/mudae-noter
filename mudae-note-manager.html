@@ -973,36 +973,41 @@
             <h1>Mudae Note Manager</h1>
             <div class="instructions-list">
                 <p class="instruction-item">
-                    <strong>Quick Start:</strong> Paste your <code>$mmasi-</code> output below and click
+                    <strong>Get Started:</strong> Paste <code>$mmasi-</code> output in the box and
+                    hit
                     <b>Parse Input</b>.
                 </p>
                 <p class="instruction-item">
-
-                    <strong>Command:</strong> Use <code> $mmsaty+ri-c+x+k </code>to include extra info.
+                    <strong>More Info:</strong> Use <code>$mmsaty+ri-c+x+k</code> for extra
+                    character
+                    data.
                 </p>
                 <p class="instruction-item">
-                    <strong>Select Characters:</strong> Click cards to toggle selection (<span class="dimmed">grayed =
+                    <strong>Selection:</strong> Cards can be clicked to toggle selection (<span class="dimmed">gray
+                        =
                         deselected</span>).
                 </p>
                 <p class="instruction-item">
-                    <strong>Add Notes:</strong> Click the note area or use the group input to apply notes in bulk.
+                    <strong>Notes:</strong> Add notes individually or apply in bulk using the group
+                    inputs.
                 </p>
                 <p class="instruction-item">
-                    <strong>Sorting:</strong> Use the sort buttons in each group (clicking on sort button again causes
-                    the
-                    ordering numbers to be recalculated)
+                    <strong>Sorting:</strong> Groups can be sorted by various stats. Re-clicking a
+                    sort
+                    will re-rank.
                 </p>
                 <p class="instruction-item">
-                    <strong>Ranking:</strong> Click the <span class="instruction-badge">#</span> badge to set your
-                    custom order.
+                    <strong>Ranking:</strong> Custom order is set by clicking the <span
+                        class="instruction-badge">#</span> badge.
                 </p>
                 <p class="instruction-item">
-                    <strong>Generate:</strong> Click Generate buttons to create your <code>$n</code> commands
-                    with your selected characters.
+                    <strong>Generate:</strong> Commands (<code>$n</code>, <code>$ec</code>) are
+                    created from
+                    selected characters.
                 </p>
                 <p class="instruction-item">
-                    <strong>Quick Notes:</strong> Use the sidebar to store frequently used emojis, notes, and colors for
-                    easy reuse.
+                    <strong>Quick Notes:</strong> The sidebar holds notes, emojis, or colors for
+                    quick copy-paste.
                 </p>
             </div>
         </div>
@@ -2063,12 +2068,12 @@ ${rouletteBarHTML}
         function generateNoteCommands() {
             const commandsDiv = document.getElementById('commands');
             commandsDiv.innerHTML = `
-    <div class="commands-section">
-        <h2 style="display: flex; justify-content: space-between; align-items: center;">
-            Generated Note Commands
-            <button onclick="scrollToTop()" style="font-size: 0.7em; padding: 6px 12px;">Go to Top ↑</button>
-        </h2>
-    </div>`;
+ <div class="commands-section">
+  <h2 style="display: flex; justify-content: space-between; align-items: center;">
+   Generated Note Commands
+   <button onclick="scrollToTop()" style="font-size: 0.7em; padding: 6px 12px;">Go to Top ↑</button>
+  </h2>
+ </div>`;
             const container = commandsDiv.querySelector('.commands-section');
 
             const commandsByNote = {};
@@ -2133,12 +2138,12 @@ ${rouletteBarHTML}
                     }
 
                     commandItem.innerHTML = `
-                        <div class="command-header">
-                            <div class="command-series">${headerText}</div>
-                        </div>
-                        <div class="command-text">${command}</div>
-                        <button class="copy-btn" onclick="copyCommand(this, \`${command.replace(/`/g, '\\`')}\`)">Copy Command</button>
-                    `;
+      <div class="command-header">
+       <div class="command-series">${headerText}</div>
+      </div>
+      <div class="command-text">${command}</div>
+      <button class="copy-btn" onclick="copyCommand(this, \`${command.replace(/`/g, '\\`')}\`)">Copy Command</button>
+     `;
                     container.appendChild(commandItem);
                 });
             }
@@ -2162,12 +2167,12 @@ ${rouletteBarHTML}
         function generateColorCommands() {
             const commandsDiv = document.getElementById('commands');
             commandsDiv.innerHTML = `
-    <div class="commands-section">
-        <h2 style="display: flex; justify-content: space-between; align-items: center;">
-            Generated Color Commands ($ec)
-            <button onclick="scrollToTop()" style="font-size: 0.7em; padding: 6px 12px;">Go to Top ↑</button>
-        </h2>
-    </div>`;
+ <div class="commands-section">
+  <h2 style="display: flex; justify-content: space-between; align-items: center;">
+   Generated Color Commands ($ec)
+   <button onclick="scrollToTop()" style="font-size: 0.7em; padding: 6px 12px;">Go to Top ↑</button>
+  </h2>
+ </div>`;
             const container = commandsDiv.querySelector('.commands-section');
 
             const commandsByColor = {};
@@ -2232,12 +2237,12 @@ ${rouletteBarHTML}
                     }
 
                     commandItem.innerHTML = `
-                        <div class="command-header">
-                            <div class="command-series">${headerText}</div>
-                        </div>
-                        <div class="command-text">${command}</div>
-                        <button class="copy-btn" onclick="copyCommand(this, \`${command.replace(/`/g, '\\`')}\`)">Copy Command</button>
-                    `;
+      <div class="command-header">
+       <div class="command-series">${headerText}</div>
+      </div>
+      <div class="command-text">${command}</div>
+      <button class="copy-btn" onclick="copyCommand(this, \`${command.replace(/`/g, '\\`')}\`)">Copy Command</button>
+     `;
                     container.appendChild(commandItem);
                 });
             }
