@@ -6,7 +6,7 @@ Designed for use with the [Mudae bot](https://top.gg/bot/432610292342587392) on 
 
 ## Features
 
--   Import your collection from the `$mmasi-[kc+x+y+]` command and show characters with their images, series, kakera, and key values.
+-   Import your collection from the `$mmsaty+ri-c+x+ko` command and show characters with their images, series, kakera, and key values.
 -   Group characters by **Series**, **Note**, or **Keys**. Sort them by **name**, **kakera** or **keys**.
 -   A ranking system to number characters. 
 -   Add notes individually or to entire groups at once.
@@ -17,11 +17,9 @@ Designed for use with the [Mudae bot](https://top.gg/bot/432610292342587392) on 
 Download **[mudae-note-manager.html](mudae-note-manager.html)** and open it in any browser.
 
 
-
-
 ## How to Use
 
-1. Run `$mmsaty+ri-c+x+k` in Discord.
+1. Run `$mmsaty+ri-c+x+ko` or `$mmasi-` in Discord.
 2. Copy the character list.  
 3. Paste it in the page and click **Parse Input**.  
 4. Add notes as needed.
@@ -29,7 +27,6 @@ Download **[mudae-note-manager.html](mudae-note-manager.html)** and open it in a
 
 ## Notes
 
-- The app works offline, but images require an internet connection.
 - Large collections may take some time to load.
 - This website doesn't and won't work on phones.
 - It also may break unexpectedly.
@@ -63,7 +60,7 @@ The less important:
 - ~~Add generate $ec command~~
 - ~~Add generate $sm command~~ (redundant)
 - ~~Add button to apply to selected characters only~~
-- Make quick notes draggable (maybe seperate them into colors and notes)
+- ~~Make quick notes draggable (maybe seperate them into colors and notes)~~ (not doing that)
 
 ## Bugs
 
