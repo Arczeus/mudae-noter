@@ -246,11 +246,6 @@
             border-color: #7c3aed;
         }
 
-        .filter-control {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
 
         button {
             background: #7c3aed;
@@ -298,7 +293,20 @@
             flex-direction: column;
         }
 
-        .actions-panel textarea {
+        .input-areas-container {
+            display: flex;
+            gap: 20px;
+            flex-grow: 1;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .input-group textarea {
             flex-grow: 1;
             min-height: 200px;
             resize: vertical;
@@ -428,12 +436,7 @@
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
-            align-items: flex-end;
-        }
-
-        .filter-group {
-            display: flex;
-            gap: 5px;
+            align-items: stretch;
         }
 
         .series-grid {
@@ -553,7 +556,7 @@
             filter: grayscale(100%);
         }
 
-        .character-card.permanently-disabled::after {
+        .container:not(.hide-disabled-emoji) .character-card.permanently-disabled::after {
             content: '🚫';
             position: absolute;
             top: 105px;
@@ -589,6 +592,21 @@
             justify-content: space-around;
             gap: 8px;
             font-size: 0.65em;
+        }
+
+        .character-owner-badge {
+            background-color: rgba(10, 10, 15, 0.8);
+            color: #4ade80;
+            font-weight: 700;
+            font-size: 0.7em;
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: default;
+            border: 1px solid #4ade80;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
         }
 
         .stat-badge {
@@ -925,13 +943,38 @@
             }
 
             .filter-group {
-                flex-direction: column;
-                align-items: stretch;
-                width: 100%;
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+                flex: 1 1 300px;
             }
 
             .filter-control {
-                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                flex: 1 1 140px;
+            }
+
+            .filter-control label {
+                font-size: 0.8em;
+                font-weight: 600;
+                color: #9ca3af;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 0;
+            }
+
+            .filter-controls-container>div:last-of-type {
+                display: flex;
+                gap: 10px;
+                justify-content: flex-end;
+                flex-basis: 100%;
+                margin-top: 10px;
+            }
+
+            .filter-controls-container>div:last-of-type button {
+                margin-right: 0;
             }
 
             .filter-control .add-note-input {
@@ -978,9 +1021,12 @@
                     <b>Parse Input</b>.
                 </p>
                 <p class="instruction-item">
-                    <strong>More Info:</strong> Use <code>$mmsaty+ri-c+x+k</code> for extra
+                    <strong>More Info:</strong> Use <code>$mmsaty+ri-c+x+ko</code> for extra
                     character
                     data.
+                </p>
+                <p class="instruction-item">
+                    <strong>Multiple Users:</strong> Parse multiple users together in one box or use both boxes.
                 </p>
                 <p class="instruction-item">
                     <strong>Selection:</strong> Cards can be clicked to toggle selection (<span class="dimmed">gray
@@ -998,7 +1044,7 @@
                 </p>
                 <p class="instruction-item">
                     <strong>Ranking:</strong> Custom order is set by clicking the <span
-                        class="instruction-badge">#</span> badge.
+                        class="instruction-badge">#</span> badge. (Enabled in settings)
                 </p>
                 <p class="instruction-item">
                     <strong>Generate:</strong> Commands (<code>$n</code>, <code>$ec</code>) are
@@ -1015,9 +1061,17 @@
         <div class="input-section">
             <div class="controls-container">
                 <div class="actions-panel">
-                    <label for="input">Paste your output here:</label>
-                    <textarea id="input"
-                        placeholder="Dungeon Meshi - 4/10&#10;Laios Touden · ($ha) 5680 ka - https://mudae.net/uploads/dm1.png&#10;#1,234 - Marcille Donato | Elf ✨ · :goldkey: (3) (#fde2e2) 7250 ka - https://mudae.net/uploads/dm2.png&#10;Chilchuck Tims · :silverkey: (1) 2800 ka - https://mudae.net/uploads/dm3.png&#10;#1 - Izutsumi | KIBTY!! :3 (#6f4e37) 3100 ka - https://mudae.net/uploads/dm4.png&#10;&#10;Vocaloid - 3/25&#10;Hatsune Miku 🚫 9980 ka - https://mudae.net/uploads/v1.png&#10;Kagamine Rin · :goldkey: (2) (#ffcc00) 6100 ka - https://mudae.net/uploads/v2.png&#10;KAITO 4300 ka - https://mudae.net/uploads/v3.png"></textarea>
+                    <div class="input-areas-container">
+                        <div class="input-group">
+                            <label for="input">Goober 1 Input:</label>
+                            <textarea id="input"
+                                placeholder="Dungeon Meshi - 4/10&#10;Laios Touden · ($ha) 5680 ka - https://mudae.net/uploads/dm1.png&#10;#1,234 - Marcille Donato | Elf ✨ · :goldkey: (3) (#fde2e2) 7250 ka - https://mudae.net/uploads/dm2.png&#10;Chilchuck Tims · :silverkey: (1) 2800 ka - https://mudae.net/uploads/dm3.png&#10;#1 - Izutsumi | KIBTY!! :3 (#6f4e37) 3100 ka - https://mudae.net/uploads/dm4.png&#10;&#10;Vocaloid - 3/25&#10;Hatsune Miku 🚫 9980 ka - https://mudae.net/uploads/v1.png&#10;Kagamine Rin · :goldkey: (2) (#ffcc00) 6100 ka - https://mudae.net/uploads/v2.png&#10;KAITO 4300 ka - https://mudae.net/uploads/v3.png"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="input2">Goober 2 Input:</label>
+                            <textarea id="input2" placeholder="Another input"></textarea>
+                        </div>
+                    </div>
                     <div class="main-buttons">
                         <button onclick="parseInput()" class="btn-primary">Parse Input</button>
                         <button onclick="clearAll()" class="btn-primary">Clear All</button>
@@ -1073,6 +1127,13 @@
                             <button onclick="toggleDeselectedVisibility(false)" id="deselected-hide-btn">Hide</button>
                         </div>
                         <div class="button-group">
+                            <label>Disabled Icon:</label>
+                            <button onclick="toggleDisabledIconVisibility(true)" id="disabled-icon-show-btn"
+                                class="active">Show</button>
+                            <button onclick="toggleDisabledIconVisibility(false)"
+                                id="disabled-icon-hide-btn">Hide</button>
+                        </div>
+                        <div class="button-group">
                             <label>Columns:</label>
                             <button onclick="changeGridColumns(1)" id="grid-btn-1">1</button>
                             <button onclick="changeGridColumns(2)" id="grid-btn-2">2</button>
@@ -1102,6 +1163,12 @@
                                 <div class="filter-control">
                                     <label for="max-kakera">Max Ka</label>
                                     <input type="number" id="max-kakera" placeholder="any" class="add-note-input">
+                                </div>
+                                <div class="filter-control">
+                                    <label for="filter-owner">Owner</label>
+                                    <select id="filter-owner" class="add-note-input">
+                                        <option value="any">Any</option>
+                                    </select>
                                 </div>
                                 <div class="filter-control">
                                     <label for="filter-gender">Gender</label>
@@ -1166,11 +1233,12 @@
 
     <script>
         let seriesData = {};
-        let quickNotes = ['⭐', '✨', '💕', '🧠', '#fefefe', '#000000'];
+        let quickNotes = ['⭐', '✨', '💕', 'uft', '#fefefe', '#000000'];
         let currentGrouping = 'series';
         let currentSortMethod = 'alpha';
         let isRankingEnabled = true;
         let showDeselected = true;
+        let showDisabledIcon = true;
         let preFilterCharacterStates = null;
 
         function initQuickNotes() {
@@ -1237,6 +1305,15 @@
             if (Object.keys(seriesData).length > 0) {
                 displaySeries();
             }
+
+            saveToLocalStorage();
+        }
+        function toggleDisabledIconVisibility(shouldShow) {
+            showDisabledIcon = shouldShow;
+            document.getElementById('disabled-icon-show-btn').classList.toggle('active', shouldShow);
+            document.getElementById('disabled-icon-hide-btn').classList.toggle('active', !shouldShow);
+
+            document.querySelector('.container').classList.toggle('hide-disabled-emoji', !shouldShow);
 
             saveToLocalStorage();
         }
@@ -1488,8 +1565,11 @@
         });
 
         function parseInput() {
-            const input = document.getElementById('input').value.trim();
-            if (!input) {
+            const input1 = document.getElementById('input').value.trim();
+            const input2 = document.getElementById('input2').value.trim();
+            const input = input1 + '\n' + input2;
+
+            if (!input.trim()) {
                 return;
             }
 
@@ -1515,6 +1595,13 @@
                     if (charMatch) {
                         let fullInfo = charMatch[1].trim();
                         const imageUrl = charMatch[2].trim();
+
+                        let owner = '';
+                        const ownerMatch = fullInfo.match(/💞\s*=>\s+(\S+)/);
+                        if (ownerMatch) {
+                            owner = ownerMatch[1].trim();
+                            fullInfo = fullInfo.replace(/💞\s*=>\s+\S+\s*/, '');
+                        }
 
                         fullInfo = fullInfo.replace(/\(\s*\$(?:toggle(?:western|irl)|serverdisable)\s*\)\s*·?\s*/g, '');
 
@@ -1594,7 +1681,8 @@
                             isDisabled: isDisabled,
                             rank: 0,
                             globalRank: globalRank,
-                            mudaeTags: mudaeTags
+                            mudaeTags: mudaeTags,
+                            owner: owner
                         });
                     }
                 }
@@ -1605,6 +1693,7 @@
                 return;
             }
 
+            populateOwnerFilter();
             displaySeries();
             updateStats();
             document.getElementById('generateBtn').disabled = false;
@@ -1662,6 +1751,17 @@ ${isRankingEnabled ? `<div class="character-rank-badge" data-action="edit-rank">
 <img src="${char.image}" alt="${char.name}" loading="lazy" onerror="handleImageError(this)">
 <div class="character-info">
 <div class="character-name" title="${char.name}">${char.name}</div>
+${(() => {
+                    if (!char.owner) return '';
+                    const letter = char.owner[0].toUpperCase();
+                    const hue = ((letter.charCodeAt(0) - 65) * 360) / 26;
+                    const color = `hsl(${hue}, 80%, 65%)`;
+                    return `<div class="character-owner-badge" 
+                 title="Owner: ${escapeHTML(char.owner)}" 
+                 style="color: ${color}; border-color: ${color};">
+                ${escapeHTML(char.owner)}
+            </div>`;
+                })()}
 <div class="character-note" data-action="edit-note" title="${hasNote ? char.note : 'Click to add note'}" style="background: #13131a; padding: 4px; font-size: 0.7em; color: ${hasNote ? '#9ca3af' : '#dc2626; font-weight: bold'}; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; border-radius: 4px;">${hasNote ? char.note : 'No note!'}</div>
 <div class="character-stats">
 <div class="stat-badge"><div class="stat-badge-label">Rank</div><div class="stat-badge-value">${char.globalRank ? '#' + char.globalRank : '#?'}</div></div>
@@ -2284,7 +2384,7 @@ ${rouletteBarHTML}
 
         function clearAll() {
             if (Object.keys(seriesData).length > 0) {
-                if (!confirm('Are you sure you want to clear all data?')) return;
+                if (!confirm('This will clear all data')) return;
             }
 
             seriesData = {};
@@ -2292,6 +2392,7 @@ ${rouletteBarHTML}
             currentSortMethod = 'alpha';
 
             document.getElementById('input').value = '';
+            document.getElementById('input2').value = '';
             document.getElementById('seriesGrid').innerHTML = '';
             document.getElementById('commands').innerHTML = '';
             document.getElementById('stats').innerHTML = '';
@@ -2310,8 +2411,13 @@ ${rouletteBarHTML}
             sortButtons.forEach(btn => btn.classList.remove('active'));
             document.getElementById('sort-alpha-btn').classList.add('active');
 
+            document.getElementById('disabled-icon-show-btn').classList.add('active');
+            document.getElementById('disabled-icon-hide-btn').classList.remove('active');
+            document.querySelector('.container').classList.remove('hide-disabled-emoji');
+
             localStorage.removeItem('mudaeSeriesData');
             localStorage.removeItem('mudaeQuickNotes');
+            localStorage.removeItem('mudaeShowDisabledIcon');
         }
 
         function applyFilter() {
@@ -2330,6 +2436,7 @@ ${rouletteBarHTML}
             const maxKeys = parseInt(document.getElementById('max-keys').value) || Infinity;
             const genderFilter = document.getElementById('filter-gender').value;
             const rouletteFilter = document.getElementById('filter-roulette').value;
+            const ownerFilter = document.getElementById('filter-owner').value;
 
             for (const seriesName in seriesData) {
                 seriesData[seriesName].characters.forEach((char) => {
@@ -2382,8 +2489,9 @@ ${rouletteBarHTML}
                         case 'both': matchesRoulette = hasAnimanga && hasGame; break;
                         default: matchesRoulette = true;
                     }
+                    let matchesOwner = (ownerFilter === 'any') || (char.owner === ownerFilter);
 
-                    const matchesFilter = matchesKakera && matchesKeys && matchesGender && matchesRoulette;
+                    const matchesFilter = matchesKakera && matchesKeys && matchesGender && matchesRoulette && matchesOwner;
 
                     if (!matchesFilter) {
                         char.excluded = true;
@@ -2403,6 +2511,7 @@ ${rouletteBarHTML}
             document.getElementById('max-keys').value = '';
             document.getElementById('filter-gender').value = 'any';
             document.getElementById('filter-roulette').value = 'any';
+            document.getElementById('filter-owner').value = 'any';
 
             if (preFilterCharacterStates === null) {
                 return;
@@ -2423,6 +2532,28 @@ ${rouletteBarHTML}
             displaySeries();
             updateStats();
             saveToLocalStorage();
+        }
+
+        function populateOwnerFilter() {
+            const owners = new Set();
+            for (const seriesName in seriesData) {
+                seriesData[seriesName].characters.forEach(char => {
+                    if (char.owner) owners.add(char.owner);
+                });
+            }
+
+            const filterOwner = document.getElementById('filter-owner');
+            const currentVal = filterOwner.value;
+            filterOwner.innerHTML = '<option value="any">Any</option>';
+
+            Array.from(owners).sort().forEach(owner => {
+                const option = document.createElement('option');
+                option.value = owner;
+                option.textContent = owner;
+                filterOwner.appendChild(option);
+            });
+
+            filterOwner.value = currentVal;
         }
 
         function escapeHTML(str) {
@@ -2458,6 +2589,7 @@ ${rouletteBarHTML}
                 localStorage.setItem('mudaeQuickNotes', JSON.stringify(quickNotes));
                 localStorage.setItem('mudaeRankingEnabled', JSON.stringify(isRankingEnabled));
                 localStorage.setItem('mudaeShowDeselected', JSON.stringify(showDeselected));
+                localStorage.setItem('mudaeShowDisabledIcon', JSON.stringify(showDisabledIcon));
             } catch (e) {
                 console.error('Failed to save to localStorage:', e);
             }
@@ -2493,9 +2625,15 @@ ${rouletteBarHTML}
                     toggleRanking(JSON.parse(savedRankingState));
                 }
 
-                const savedShowDeselected = localStorage.getItem('mudaeShowDeselected');
                 if (savedShowDeselected !== null) {
                     toggleDeselectedVisibility(JSON.parse(savedShowDeselected));
+                }
+
+                const savedShowDisabledIcon = localStorage.getItem('mudaeShowDisabledIcon');
+                if (savedShowDisabledIcon !== null) {
+                    toggleDisabledIconVisibility(JSON.parse(savedShowDisabledIcon));
+                } else {
+                    toggleDisabledIconVisibility(true);
                 }
             } catch (e) {
                 console.error('Failed to load from localStorage:', e);
