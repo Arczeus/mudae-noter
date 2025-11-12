@@ -69,6 +69,7 @@ The less important:
 - ~~Some characters can have (2434) in their name and parser gets confused~~
 - ~~When clicking a character and deselected is set to hide characters should hide~~
 - ~~Website lags when parsing and refreshing~~
+- Apply to selected button resets the order
 
 ## Images
 
