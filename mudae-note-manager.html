@@ -2599,6 +2599,7 @@ ${rouletteBarHTML}
             try {
                 const savedSeries = localStorage.getItem('mudaeSeriesData');
                 const savedNotes = localStorage.getItem('mudaeQuickNotes');
+                const savedShowDeselected = localStorage.getItem('mudaeShowDeselected');
 
                 if (savedSeries) {
                     seriesData = JSON.parse(savedSeries);
