@@ -3,7 +3,6 @@
 A simple web-based tool to view and note your Mudae collection.  
 Designed for use with the [Mudae bot](https://top.gg/bot/432610292342587392) on Discord.
 
-
 ## Features
 
 -   Import your collection from the `$mmsaty+ri-c+x+ko` command and show characters with their images, series, kakera, and key values.
@@ -31,7 +30,6 @@ Designed for use with the [Mudae bot](https://top.gg/bot/432610292342587392) on 
 - It also may break unexpectedly.
 - Please report any bugs.
 
-![AI Assisted](https://img.shields.io/badge/AI-Assisted-blue) 
 
 ## Known bugs
 - The "Apply to selected" button currently resets custom ordering (planned fix)
@@ -45,5 +43,8 @@ Designed for use with the [Mudae bot](https://top.gg/bot/432610292342587392) on 
 ## Why?
 I was bored
 
-## License
 ![license](https://img.shields.io/badge/license-MIT-green?style=flat)
+![AI Assisted](https://img.shields.io/badge/AI-Assisted-blue) 
+![GitHub Pages](https://img.shields.io/github/deployments/arczeus/mudae-noter/github-pages?label=Live%20View)
+![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)
+
