@@ -19,17 +19,13 @@ Download **[index.html](index.html)** or visit (website_link).
 
 ## How to Use
 
-**Live Version:** [https://arczeus.github.io/mudae-note-manager/](https://arczeus.github.io/mudae-note-manager/)
+**Live Version:** [https://arczeus.github.io/mudae-noter/](https://arczeus.github.io/mudae-noter/)
 **Or run locally:** Download `index.html` and open in your browser
 
 1. Run `$mmsaty+ri-c+x+ko` or `$mmasi-`.
 2. Copy the character list.
 3. Paste it in the page and click **Parse Input**.  
 4. Add notes as needed.
-
-
-## Notes
-
 
 
 ## Limitations
