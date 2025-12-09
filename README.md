@@ -30,6 +30,7 @@ Designed for use with the [Mudae bot](https://top.gg/bot/432610292342587392) on 
 - Large collections may take some time to load.
 - It also may break unexpectedly.
 - Please report any bugs.
+![AI Assisted](https://img.shields.io/badge/AI-Assisted-blue) 
 
 ## Known bugs
 - The "Apply to selected" button currently resets custom ordering (planned fix)
@@ -41,5 +42,4 @@ Designed for use with the [Mudae bot](https://top.gg/bot/432610292342587392) on 
 ![Characters](images/characters.png)
 
 ## License
-
-MIT License - Feel free to modify and distribute
+![license](https://img.shields.io/badge/license-MIT-green?style=flat)
