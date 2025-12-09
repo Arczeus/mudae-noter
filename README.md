@@ -19,6 +19,9 @@ Download **[index.html](index.html)** or visit (website_link).
 
 ## How to Use
 
+**Live Version:** [https://arczeus.github.io/mudae-note-manager/](https://arczeus.github.io/mudae-note-manager/)
+**Or run locally:** Download `index.html` and open in your browser
+
 1. Run `$mmsaty+ri-c+x+ko` or `$mmasi-`.
 2. Copy the character list.
 3. Paste it in the page and click **Parse Input**.  
@@ -27,50 +30,23 @@ Download **[index.html](index.html)** or visit (website_link).
 
 ## Notes
 
+
+
+## Limitations
+- **Desktop browsers only** - Mobile browsers are not supported
 - Large collections may take some time to load.
-- This website doesn't and won't work on phones.
 - It also may break unexpectedly.
 - Please report any bugs.
 
-## To-Do
-
-- ~~Add local storage~~
-- ~~Sorting~~
-- ~~Add note to a specific character~~
-- ~~Add [c+] option~~
-- ~~Parse kakera values~~
-- ~~Fix characters not getting disabled~~
-- ~~Delete any ($togglewestern) or other things that can appear~~
-- ~~Cut the name short if it's too long~~
-- ~~Go to generated commands button :)~~
-
-Top priority:
-- ~~Make groupings work~~
-- ~~Deselect by some filter~~
-- ~~Sort functionality (in groupings)~~
-- ~~Index characters~~
-- ~~Hide deselected characters~~
-- ~~Add ranks~~
-- ~~Add gender~~
-- ~~Add apply to colors~~
-
-The less important:
-- ~~change sort group parse buttons/select buttons ui~~
-- ~~Search characters~~
-- ~~Add generate $ec command~~
-- ~~Add generate $sm command~~
-- ~~Add button to apply to selected characters only~~
-
-## Bugs
-
-- ~~Apply button changes the selected characters~~
-- ~~Sorting changes the selected characters~~
-- ~~Some characters can have (2434) in their name and parser gets confused~~
-- ~~When clicking a character and deselected is set to hide characters should hide~~
-- ~~Website lags when parsing and refreshing~~
+## Known bugs
+- The "Apply to selected" button currently resets custom ordering (planned fix)
 
 ## Images
 
 ![Input section](images/input.png)
 
 ![Characters](images/characters.png)
+
+## License
+
+MIT License - Feel free to modify and distribute
