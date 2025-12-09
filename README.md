@@ -45,6 +45,6 @@ I was bored
 
 ![license](https://img.shields.io/badge/license-MIT-green?style=flat)
 ![AI Assisted](https://img.shields.io/badge/AI-Assisted-blue) 
-![GitHub Pages](https://img.shields.io/github/deployments/arczeus/mudae-noter/github-pages?label=Live%20View)
+
 ![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)
 
