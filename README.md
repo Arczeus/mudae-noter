@@ -11,15 +11,12 @@ Designed for use with the [Mudae bot](https://top.gg/bot/432610292342587392) on 
 -   A ranking system to number characters. 
 -   Add notes individually or to entire groups at once.
 -   Automatically create note commands for your selected characters.
-
-## How to Open
-
-Download **[index.html](index.html)** or visit (website_link).
-
+-   And much more...
 
 ## How to Use
 
 **Live Version:** [https://arczeus.github.io/mudae-noter/](https://arczeus.github.io/mudae-noter/)
+
 **Or run locally:** Download `index.html` and open in your browser
 
 1. Run `$mmsaty+ri-c+x+ko` or `$mmasi-`.
