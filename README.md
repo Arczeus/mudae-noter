@@ -30,6 +30,7 @@ Designed for use with the [Mudae bot](https://top.gg/bot/432610292342587392) on 
 - Large collections may take some time to load.
 - It also may break unexpectedly.
 - Please report any bugs.
+
 ![AI Assisted](https://img.shields.io/badge/AI-Assisted-blue) 
 
 ## Known bugs
@@ -40,6 +41,9 @@ Designed for use with the [Mudae bot](https://top.gg/bot/432610292342587392) on 
 ![Input section](images/input.png)
 
 ![Characters](images/characters.png)
+
+## Why?
+I was bored
 
 ## License
 ![license](https://img.shields.io/badge/license-MIT-green?style=flat)
