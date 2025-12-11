@@ -258,36 +258,6 @@
             border-color: #7c3aed;
         }
 
-
-        button {
-            background: #7c3aed;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-right: 10px;
-        }
-
-        button:hover {
-            background: #6d28d9;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.4);
-        }
-
-        button:disabled {
-            background: #4b5563;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        button.active {
-            background: #34c965;
-        }
-
         .input-section {
             margin-bottom: 30px;
         }
@@ -303,6 +273,7 @@
         .actions-panel {
             display: flex;
             flex-direction: column;
+            gap: 10px;
         }
 
         .input-areas-container {
@@ -374,57 +345,10 @@
             margin-right: 5px;
         }
 
-        .button-group button {
-            margin-right: 0;
-            padding: 8px 15px;
-            font-size: 0.9em;
-            transform: none;
-            box-shadow: none;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .button-group button:not(.active) {
-            background: #2a2a3a;
-            color: #9ca3af;
-        }
-
-        .button-group button:hover {
-            transform: translateY(-1px);
-        }
-
-        .button-group button.active {
-            background: #7c3aed;
-            color: white;
-            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
-        }
-
         .main-buttons {
             margin-top: 15px;
             display: flex;
             gap: 10px;
-        }
-
-        .btn-primary {
-            background: #7c3aed;
-        }
-
-        .btn-primary:hover {
-            background: #6d28d9;
-        }
-
-        .btn-secondary {
-            background: #4b5563;
-        }
-
-        .btn-secondary:hover {
-            background: #374151;
-        }
-
-        .btn-tertiary {
-            background: #2a2a3a;
-            padding: 6px 12px;
-            font-size: 0.9em;
         }
 
         #filter-section {
@@ -478,32 +402,6 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-
-        .series-toggle-btn {
-            background: #7c3aed;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 5px;
-            font-size: 0.8em;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-            margin-bottom: 10px;
-        }
-
-        .series-toggle-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .series-toggle-btn.disabled {
-            background: #dc2626;
-        }
-
-        .series-toggle-btn.disabled:hover {
-            background: #b91c1c;
-            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4);
         }
 
         .series-count {
@@ -750,102 +648,179 @@
         .card-controls {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             margin-bottom: 15px;
-            padding: 12px;
+            padding: 15px;
             background-color: #13131a;
             border-radius: 8px;
+            border: 1px solid #2a2a3a;
+        }
+
+        .controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
         }
 
         .controls-row.main-actions {
             justify-content: space-between;
-            gap: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #2a2a3a;
+            margin-bottom: 5px;
         }
 
         .sort-buttons {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             flex-wrap: wrap;
-            justify-content: flex-end;
         }
 
         .sort-label {
-            font-size: 0.8em;
+            font-size: 0.85em;
             color: #9ca3af;
-            margin-right: 2px;
-        }
-
-        .sort-buttons button {
-            background: #2a2a3a;
-            color: #9ca3af;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 5px;
-            font-size: 0.8em;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-bottom: 0;
-        }
-
-        .sort-buttons button:hover {
-            background: #7c3aed;
-            color: white;
-            transform: translateY(-1px);
-        }
-
-        .sort-buttons button.active {
-            background: #7c3aed;
-            color: white;
-            transform: translateY(-1px);
+            text-transform: uppercase;
+            margin-right: 4px;
         }
 
         .bulk-apply-group {
             display: flex;
             flex-grow: 1;
-            gap: 8px;
+            gap: 0;
             background-color: #0a0a0f;
-            padding: 8px;
             border-radius: 6px;
-            margin-top: 5px;
             border: 1px solid #2a2a3a;
-            align-items: center;
+            align-items: stretch;
+            overflow: hidden;
         }
 
         .bulk-apply-group .note-input {
             flex-grow: 1;
             margin-bottom: 0;
+            border: none;
+            background: transparent;
+            border-radius: 0;
+            padding: 8px 12px;
+        }
+
+        .bulk-apply-group .note-input:focus {
+            box-shadow: inset 0 0 0 1px #7c3aed;
         }
 
         .apply-btn-group {
             display: flex;
-            flex-shrink: 0;
+            border-left: 1px solid #2a2a3a;
         }
 
-        .apply-btn-group button {
-            padding: 8px 12px;
-            font-size: 0.8em;
-            font-weight: 600;
-            white-space: nowrap;
-            background-color: #4b5563;
+        .apply-btn-group .btn {
+            border-radius: 0;
+            margin: 0;
             border: none;
+            border-left: 1px solid #2a2a3a;
+            font-size: 0.8em;
+            padding: 0 15px;
+            background: #1f1f2e;
+            color: #9ca3af;
+        }
+
+        .apply-btn-group .btn:hover {
+            background: #7c3aed;
             color: white;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            line-height: 1.2;
+            color: #9ca3af;
+            background: #2a2a3a;
         }
 
-        .apply-btn-group button:hover {
-            background-color: #6d28d9;
+        .btn:hover {
+            color: #e5e7eb;
+            background-color: #3f3f50;
         }
 
-        .apply-btn-group button:last-child {
+        .btn:disabled {
+            background: #1f1f2e;
+            color: #4b5563;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            border-color: transparent;
+        }
+
+        .btn-primary {
+            background: #7c3aed;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #6d28d9;
+            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.4);
+        }
+
+        .btn-secondary {
+            background: #4b5563;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #374151;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+            box-shadow: 0 5px 15px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn.active {
+            background: #7c3aed;
+            color: white;
+            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
+            border-color: #7c3aed;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85em;
+            border-radius: 6px;
+        }
+
+        .apply-btn-group .btn {
+            border-radius: 0;
+            padding: 8px 12px;
+            background: #4b5563;
+            color: white;
+        }
+
+        .apply-btn-group .btn:hover {
+            background: #6d28d9;
+        }
+
+        .apply-btn-group .btn:first-child {
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+
+        .apply-btn-group .btn:last-child {
             border-top-right-radius: 5px;
             border-bottom-right-radius: 5px;
-        }
-
-        .apply-btn-group button:last-child:hover {
-            background-color: #7c3aed;
         }
 
         .footer {
@@ -1041,7 +1016,8 @@
                     <strong>Quick Notes:</strong> The sidebar holds notes, emojis, or colors for quick copy-paste.
                 </p>
                 <p class="instruction-item">
-                    <strong>Demo:</strong> <button onclick="loadDemoData()" class="group-nogroup-btn">Load Demo</button>
+                    <strong>Demo:</strong> <button onclick="loadDemoData()" class="btn btn-sm">Load Demo</button>Load
+                    Demo</button>
                     and hit <b>Parse Input</b>.
                 </p>
             </div>
@@ -1058,16 +1034,28 @@
                         </div>
                     </div>
                     <div class="main-buttons">
-                        <button onclick="parseInput()" class="btn-primary">Parse Input</button>
-                        <button onclick="clearAll()" class="btn-primary">Clear All</button>
-                        <button onclick="generateNoteCommands()" id="generateBtn" disabled>Generate Notes</button>
-                        <button onclick="generateColorCommands()" id="generateColorBtn" disabled>Generate
-                            Colors</button>
-                        <button onclick="scrollToCommands()" id="goToCommandsBtn" style="display: none;">Go to
-                            Commands↓</button>
-                        <button onclick="showPlayerStats()" id="playerStatsBtn" class="btn-primary" disabled>Player
-                            Stats</button>
+                        <button onclick="parseInput()" class="btn btn-primary">Parse Input</button>
+                        <button onclick="clearAll()" class="btn btn-primary">Clear All</button>
+
+                        <button onclick="generateNoteCommands()" id="generateBtn" class="btn btn-primary" disabled>
+                            Generate Notes
+                        </button>
+
+                        <button onclick="generateColorCommands()" id="generateColorBtn" class="btn btn-primary"
+                            disabled>
+                            Generate Colors
+                        </button>
+
+                        <button onclick="showPlayerStats()" id="playerStatsBtn" class="btn btn-primary" disabled>
+                            Player Stats
+                        </button>
+
+
                     </div>
+                    <button onclick="scrollToCommands()" id="goToCommandsBtn" class="btn btn-primary"
+                        style="display: none;">
+                         Go to Commands↓
+                    </button>
                     <div id="stats" class="stats-panel"></div>
 
                 </div>
@@ -1078,27 +1066,28 @@
                     <div class="control-group">
                         <h3>Grouping</h3>
                         <div class="button-group" style="gap: 6px;">
-                            <button onclick="setGrouping('nogroup')" id="group-nogroup-btn">None</button>
-                            <button onclick="setGrouping('series')" id="group-series-btn" class="active">Series</button>
-                            <button onclick="setGrouping('note')" id="group-note-btn">Note</button>
-                            <button onclick="setGrouping('color')" id="group-color-btn">Color</button>
-                            <button onclick="setGrouping('keys')" id="group-keys-btn">Keys</button>
-                            <button onclick="setGrouping('kakera')" id="group-kakera-btn">Kakera</button>
-                            <button onclick="setGrouping('gender')" id="group-gender-btn">Gender</button>
-                            <button onclick="setGrouping('roulette')" id="group-roulette-btn">Roulette</button>
-                            <button onclick="setGrouping('owner')" id="group-owner-btn">Owner</button>
+                            <button onclick="setGrouping('nogroup')" id="group-nogroup-btn"
+                                class="btn btn-sm">None</button>
+                            <button onclick="setGrouping('series')" id="group-series-btn"
+                                class="btn btn-sm active">Series</button>
+                            <button onclick="setGrouping('note')" id="group-note-btn" class="btn btn-sm">Note</button>
+                            <button onclick="setGrouping('color')" id="group-color-btn"
+                                class="btn btn-sm">Color</button>
+                            <button onclick="setGrouping('keys')" id="group-keys-btn" class="btn btn-sm">Keys</button>
+                            <button onclick="setGrouping('kakera')" id="group-kakera-btn"
+                                class="btn btn-sm">Kakera</button>
+                            <button onclick="setGrouping('gender')" id="group-gender-btn"
+                                class="btn btn-sm">Gender</button>
+                            <button onclick="setGrouping('roulette')" id="group-roulette-btn"
+                                class="btn btn-sm">Roulette</button>
+                            <button onclick="setGrouping('owner')" id="group-owner-btn"
+                                class="btn btn-sm">Owner</button>
                         </div>
                         <div id="kakera-range-container" style="display: none; margin-top: 10px;">
-                            <label for="kakera-range-input">Range Size:</label>
-                            <input type="number" id="kakera-range-input" value="1000" min="1" class="add-note-input"
-                                style="width: 100px;">
-                            <button onclick="displaySeries()" class="btn-tertiary">Apply</button>
+                            <button onclick="displaySeries()" class="btn btn-sm">Apply</button>
                         </div>
                         <div id="keys-range-container" style="display: none; margin-top: 10px;">
-                            <label for="keys-range-input">Range Size:</label>
-                            <input type="number" id="keys-range-input" value="1" min="1" class="add-note-input"
-                                style="width: 100px;">
-                            <button onclick="displaySeries()" class="btn-tertiary">Apply</button>
+                            <button onclick="displaySeries()" class="btn btn-sm">Apply</button>
                         </div>
                     </div>
 
@@ -1106,43 +1095,46 @@
                         <h3>Sorting & Display</h3>
                         <div class="button-group">
                             <label>Sort Groups:</label>
-                            <button onclick="sortGroups('alpha')" id="sort-alpha-btn">A-Z</button>
-                            <button onclick="sortGroups('count')" id="sort-count-btn" class="active">Count</button>
+                            <button onclick="sortGroups('alpha')" id="sort-alpha-btn" class="btn btn-sm">A-Z</button>
+                            <button onclick="sortGroups('count')" id="sort-count-btn"
+                                class="btn btn-sm active">Count</button>
                         </div>
                         <div class="button-group">
                             <label>Ranking:</label>
-                            <button onclick="toggleRanking(true)" id="ranking-on-btn" class="active">On</button>
-                            <button onclick="toggleRanking(false)" id="ranking-off-btn">Off</button>
+                            <button onclick="toggleRanking(true)" id="ranking-on-btn"
+                                class="btn btn-sm active">On</button>
+                            <button onclick="toggleRanking(false)" id="ranking-off-btn" class="btn btn-sm">Off</button>
                         </div>
                         <div class="button-group">
                             <label>Deselected:</label>
                             <button onclick="toggleDeselectedVisibility(true)" id="deselected-show-btn"
-                                class="active">Show</button>
-                            <button onclick="toggleDeselectedVisibility(false)" id="deselected-hide-btn">Hide</button>
+                                class="btn btn-sm" class="active">Show</button>
+                            <button onclick="toggleDeselectedVisibility(false)" id="deselected-hide-btn"
+                                class="btn btn-sm">Hide</button>
                         </div>
                         <div class="button-group">
                             <label>Disabled Icon:</label>
                             <button onclick="toggleDisabledIconVisibility(true)" id="disabled-icon-show-btn"
-                                class="active">Show</button>
-                            <button onclick="toggleDisabledIconVisibility(false)"
+                                class="btn btn-sm" class="active">Show</button>
+                            <button onclick="toggleDisabledIconVisibility(false)" class="btn btn-sm"
                                 id="disabled-icon-hide-btn">Hide</button>
                         </div>
                         <div class="button-group">
                             <label>Columns:</label>
-                            <button onclick="changeGridColumns(1)" id="grid-btn-1">1</button>
-                            <button onclick="changeGridColumns(2)" id="grid-btn-2">2</button>
-                            <button onclick="changeGridColumns(3)" id="grid-btn-3" class="active">3</button>
-                            <button onclick="changeGridColumns(4)" id="grid-btn-4">4</button>
+                            <button onclick="changeGridColumns(1)" id="grid-btn-1" class="btn btn-sm">1</button>
+                            <button onclick="changeGridColumns(2)" id="grid-btn-2" class="btn btn-sm">2</button>
+                            <button onclick="changeGridColumns(3)" id="grid-btn-3" class="btn btn-sm active">3</button>
+                            <button onclick="changeGridColumns(4)" id="grid-btn-4" class="btn btn-sm">4</button>
                         </div>
                     </div>
 
                     <div class="control-group">
                         <h3>Bulk Actions</h3>
                         <div class="button-group">
-                            <button onclick="selectAllCharacters()">Select All</button>
-                            <button onclick="deselectAllCharacters()">Deselect All</button>
-                            <button onclick="selectDisabledCharacters()">Select Disabled</button>
-                            <button onclick="deselectDisabledCharacters()">Deselect Disabled</button>
+                            <button onclick="selectAllCharacters()" class="btn btn-sm">Select All</button>
+                            <button onclick="deselectAllCharacters()" class="btn btn-sm">Deselect All</button>
+                            <button onclick="selectDisabledCharacters()" class="btn btn-sm">Select Disabled</button>
+                            <button onclick="deselectDisabledCharacters()" class="btn btn-sm">Deselect Disabled</button>
                         </div>
                     </div>
 
@@ -1195,8 +1187,8 @@
                             </div>
 
                             <div class="filter-actions">
-                                <button onclick="applyFilter()" class="btn-primary">Apply Filter</button>
-                                <button onclick="clearFilter()" class="btn-secondary">Revert</button>
+                                <button onclick="applyFilter()" class="btn btn-sm btn-primary">Apply Filter</button>
+                                <button onclick="clearFilter()" class="btn btn-sm btn-secondary">Revert</button>
                             </div>
                         </div>
                     </div>
@@ -1983,31 +1975,31 @@ ${rouletteBarHTML}
 <div class="card-controls">
 <div class="controls-row main-actions">
 <div style="display: flex; gap: 8px;">
-<button class="series-toggle-btn ${allExcluded ? 'disabled' : ''}" data-action="toggle-group">${allExcluded ? 'Enable All' : 'Disable All'}</button>
-<button class="series-toggle-btn" style="background-color: #4b5563;" data-action="invert-group">Invert</button>
+<button class="btn btn-sm ${allExcluded ? 'btn-danger' : 'btn-primary'}" data-action="toggle-group">${allExcluded ? 'Enable All' : 'Disable All'}</button>
+<button class="btn btn-sm btn-secondary" data-action="invert-group">Invert</button>
 </div>
 <div class="sort-buttons">
 <span class="sort-label">Sort:</span>
-<button data-action="sort" data-sort-by="original" class="active">Original</button>
-<button data-action="sort" data-sort-by="az">A-Z</button>
-<button data-action="sort" data-sort-by="rank">Rank</button>
-<button data-action="sort" data-sort-by="kakera">Kakera</button>
-<button data-action="sort" data-sort-by="keys">Keys</button>
+<button data-action="sort" data-sort-by="original" class="btn btn-sm active">Original</button>
+<button data-action="sort" data-sort-by="az" class="btn btn-sm">A-Z</button>
+<button data-action="sort" data-sort-by="rank" class="btn btn-sm">Rank</button>
+<button data-action="sort" data-sort-by="kakera" class="btn btn-sm">Kakera</button>
+<button data-action="sort" data-sort-by="keys" class="btn btn-sm">Keys</button>
 </div>
 </div>
 <div class="controls-row">
 <div class="bulk-apply-group">
 <input type="text" class="note-input" placeholder="Apply note...">
 <div class="apply-btn-group">
-<button data-action="bulk-note" data-target="all">All</button>
-<button data-action="bulk-note" data-target="selected">Selected</button>
+<button data-action="bulk-note" data-target="all" class="btn">All</button>
+<button data-action="bulk-note" data-target="selected" class="btn">Selected</button>
 </div>
 </div>
 <div class="bulk-apply-group">
 <input type="text" class="note-input" placeholder="Apply color...">
 <div class="apply-btn-group">
-<button data-action="bulk-color" data-target="all">All</button>
-<button data-action="bulk-color" data-target="selected">Selected</button>
+<button data-action="bulk-color" data-target="all" class="btn">All</button>
+<button data-action="bulk-color" data-target="selected" class="btn">Selected</button>
 </div>
 </div>
 </div>
@@ -2216,7 +2208,7 @@ ${rouletteBarHTML}
  <div class="commands-section">
   <h2 style="display: flex; justify-content: space-between; align-items: center;">
    Generated Note Commands
-   <button onclick="scrollToTop()" style="font-size: 0.7em; padding: 6px 12px;">Go to Top ↑</button>
+   <button onclick="scrollToTop()" class="btn btn-sm btn-primary" style="font-size: 0.7em; padding: 6px 12px;">Go to Top ↑</button>
   </h2>
  </div>`;
             const container = commandsDiv.querySelector('.commands-section');
@@ -2287,7 +2279,7 @@ ${rouletteBarHTML}
        <div class="command-series">${headerText}</div>
       </div>
       <div class="command-text">${command}</div>
-      <button class="copy-btn" onclick="copyCommand(this, \`${command.replace(/`/g, '\\`')}\`)">Copy Command</button>
+      <button class="btn btn-sm btn-primary" onclick="copyCommand(this, \`${command.replace(/`/g, '\\`')}\`)">Copy Command</button>
      `;
                     container.appendChild(commandItem);
                 });
@@ -2315,7 +2307,7 @@ ${rouletteBarHTML}
  <div class="commands-section">
   <h2 style="display: flex; justify-content: space-between; align-items: center;">
    Generated Color Commands ($ec)
-   <button onclick="scrollToTop()" style="font-size: 0.7em; padding: 6px 12px;">Go to Top ↑</button>
+   <button onclick="scrollToTop()" class="btn btn-sm btn-primary" style="font-size: 0.7em; padding: 6px 12px;">Go to Top ↑</button>
   </h2>
  </div>`;
             const container = commandsDiv.querySelector('.commands-section');
@@ -2386,7 +2378,7 @@ ${rouletteBarHTML}
        <div class="command-series">${headerText}</div>
       </div>
       <div class="command-text">${command}</div>
-      <button class="copy-btn" onclick="copyCommand(this, \`${command.replace(/`/g, '\\`')}\`)">Copy Command</button>
+      <button class="btn btn-sm btn-primary" onclick="copyCommand(this, \`${command.replace(/`/g, '\\`')}\`)">Copy Command</button>
      `;
                     container.appendChild(commandItem);
                 });
@@ -2831,7 +2823,7 @@ ${rouletteBarHTML}
                     <div class="player-legend">
                         ${legendHTML}
                     </div>
-                    <button onclick="hidePlayerStats()" class="back-button btn-secondary">Back to Characters</button>
+                    <button onclick="hidePlayerStats()" class="back-button btn btn-primary">Back to Characters</button>
                 </div>
             `;
 
