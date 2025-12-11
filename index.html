@@ -1016,7 +1016,8 @@
                     <strong>Quick Notes:</strong> The sidebar holds notes, emojis, or colors for quick copy-paste.
                 </p>
                 <p class="instruction-item">
-                    <strong>Demo:</strong> <button onclick="loadDemoData()" class="btn btn-sm">Load Demo</button>Load
+                    <strong>Demo:</strong> <button onclick="loadDemoData()" class="btn btn-sm"
+                        style="margin: 0 6px;">Load Demo</button>Load
                     Demo</button>
                     and hit <b>Parse Input</b>.
                 </p>
@@ -1054,7 +1055,7 @@
                     </div>
                     <button onclick="scrollToCommands()" id="goToCommandsBtn" class="btn btn-primary"
                         style="display: none;">
-                         Go to Commands↓
+                        Go to Commands↓
                     </button>
                     <div id="stats" class="stats-panel"></div>
 
@@ -1444,10 +1445,19 @@
 
                         if (action === 'edit-rank') {
                             char.rank = parseInt(newValue) > 0 ? parseInt(newValue) : 0;
+
+                            target.textContent = char.rank > 0 ? char.rank : '#';
                         } else {
                             char.note = newValue.trim();
+
                             if (currentGrouping === 'note') {
                                 needsFullRender = true;
+                            } else {
+                                const hasNote = char.note && char.note.trim() !== '';
+                                target.textContent = hasNote ? char.note : 'No note!';
+                                target.title = hasNote ? char.note : 'Click to add note';
+                                target.style.color = hasNote ? '#9ca3af' : '#dc2626';
+                                target.style.fontWeight = hasNote ? 'normal' : 'bold';
                             }
                         }
 
@@ -1458,12 +1468,6 @@
 
                         if (needsFullRender) {
                             displaySeries();
-                        } else {
-                            const hasNote = char.note && char.note.trim() !== '';
-                            target.textContent = hasNote ? char.note : 'No note!';
-                            target.title = hasNote ? char.note : 'Click to add note';
-                            target.style.color = hasNote ? '#9ca3af' : '#dc2626';
-                            target.style.fontWeight = hasNote ? 'normal' : 'bold';
                         }
                     };
                     input.onblur = saveAndClose;
