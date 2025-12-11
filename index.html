@@ -1084,10 +1084,18 @@
                             <button onclick="setGrouping('owner')" id="group-owner-btn"
                                 class="btn btn-sm">Owner</button>
                         </div>
-                        <div id="kakera-range-container" style="display: none; margin-top: 10px;">
+                        <div id="kakera-range-container"
+                            style="display: none; margin-top: 10px; align-items: center; gap: 10px;">
+                            <label for="kakera-range-input" style="margin-bottom: 0;">Range Size:</label>
+                            <input type="number" id="kakera-range-input" value="1000" min="1" class="add-note-input"
+                                style="width: 120px; flex: none;">
                             <button onclick="displaySeries()" class="btn btn-sm">Apply</button>
                         </div>
-                        <div id="keys-range-container" style="display: none; margin-top: 10px;">
+                        <div id="keys-range-container"
+                            style="display: none; margin-top: 10px; align-items: center; gap: 10px;">
+                            <label for="keys-range-input" style="margin-bottom: 0;">Range Size:</label>
+                            <input type="number" id="keys-range-input" value="1" min="1" class="add-note-input"
+                                style="width: 120px; flex: none;">
                             <button onclick="displaySeries()" class="btn btn-sm">Apply</button>
                         </div>
                     </div>
