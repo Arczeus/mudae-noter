@@ -2430,7 +2430,7 @@ ${rouletteBarHTML}
             });
         }
 
-        function clearAll() {
+function clearAll() {
             if (Object.keys(seriesData).length > 0) {
                 if (!confirm('This will clear all data')) return;
             }
@@ -2465,7 +2465,6 @@ ${rouletteBarHTML}
             document.querySelector('.container').classList.remove('hide-disabled-emoji');
 
             localStorage.removeItem('mudaeSeriesData');
-            localStorage.removeItem('mudaeQuickNotes');
             localStorage.removeItem('mudaeShowDisabledIcon');
         }
 
