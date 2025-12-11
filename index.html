@@ -1929,7 +1929,7 @@ ${rouletteBarHTML}
                             else groupKey = 'Unknown Roulette';
                             break;
                         case 'owner':
-                            groupKey = char.owner ? char.owner : 'Unassigned';
+                            groupKey = char.owner ? char.owner : 'No Owner';
                             break;
                         case 'series':
                             groupKey = seriesName;
@@ -2691,7 +2691,7 @@ function clearAll() {
         }
         function showPlayerStats() {
             const playerStats = {};
-            const defaultOwner = "Unassigned";
+            const defaultOwner = "No Owner";
 
             for (const seriesName in seriesData) {
                 seriesData[seriesName].characters.forEach(char => {
