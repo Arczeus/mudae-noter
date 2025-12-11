@@ -26,9 +26,7 @@ Designed for use with the [Mudae bot](https://top.gg/bot/432610292342587392) on 
 
 ## Limitations
 - **Desktop browsers only** - Mobile browsers are not supported
-- Large collections may take some time to load.
-- It also may break unexpectedly.
-- Please report any bugs.
+- Large collections (>5000 characters) may cause the page to slow down.
 
 
 ## Known bugs
